@@ -3,7 +3,7 @@ package org.ambraproject.rhino.service.impl;
 import org.ambraproject.models.Journal;
 import org.ambraproject.rhino.rest.MetadataFormat;
 import org.ambraproject.rhino.rest.RestClientException;
-import org.ambraproject.rhino.service.JournalReadService;
+import org.ambraproject.rhino.service.JournalCrudService;
 import org.ambraproject.rhino.util.response.ResponseReceiver;
 import org.ambraproject.rhino.view.KeyedListView;
 import org.ambraproject.rhino.view.journal.JournalNonAssocView;
@@ -21,7 +21,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import java.io.IOException;
 import java.util.List;
 
-public class JournalReadServiceImpl extends AmbraService implements JournalReadService {
+public class JournalCrudServiceImpl extends AmbraService implements JournalCrudService {
 
   @Autowired
   private HibernateTemplate hibernateTemplate;

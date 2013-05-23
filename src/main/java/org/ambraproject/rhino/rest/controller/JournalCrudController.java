@@ -4,7 +4,7 @@ import org.ambraproject.rhino.identity.DoiBasedIdentity;
 import org.ambraproject.rhino.rest.MetadataFormat;
 import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.rhino.rest.controller.abstr.RestController;
-import org.ambraproject.rhino.service.JournalReadService;
+import org.ambraproject.rhino.service.JournalCrudService;
 import org.ambraproject.rhino.service.VolumeCrudService;
 import org.ambraproject.rhino.util.response.ResponseReceiver;
 import org.ambraproject.rhino.util.response.ServletResponseReceiver;
@@ -30,7 +30,7 @@ public class JournalCrudController extends RestController {
   private static final String JOURNAL_TEMPLATE = JOURNAL_ROOT + "/{journalKey}";
 
   @Autowired
-  private JournalReadService journalReadService;
+  private JournalCrudService journalCrudService;
   @Autowired
   private VolumeCrudService volumeCrudService;
 
@@ -40,7 +40,7 @@ public class JournalCrudController extends RestController {
       throws IOException {
     MetadataFormat mf = MetadataFormat.getFromParameter(format, true);
     ResponseReceiver receiver = ServletResponseReceiver.createForJson(request, response);
-    journalReadService.listJournals(receiver, mf);
+    journalCrudService.listJournals(receiver, mf);
   }
 
   @RequestMapping(value = JOURNAL_TEMPLATE, method = RequestMethod.GET)
@@ -50,7 +50,7 @@ public class JournalCrudController extends RestController {
       throws IOException {
     MetadataFormat mf = MetadataFormat.getFromParameter(format, true);
     ResponseReceiver receiver = ServletResponseReceiver.createForJson(request, response);
-    journalReadService.read(receiver, journalKey, mf);
+    journalCrudService.read(receiver, journalKey, mf);
   }
 
   @RequestMapping(value = JOURNAL_TEMPLATE, method = RequestMethod.POST)

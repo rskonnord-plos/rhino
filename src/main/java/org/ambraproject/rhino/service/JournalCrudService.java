@@ -5,7 +5,7 @@ import org.ambraproject.rhino.util.response.ResponseReceiver;
 
 import java.io.IOException;
 
-public interface JournalReadService {
+public interface JournalCrudService {
 
   public abstract void listJournals(ResponseReceiver receiver, MetadataFormat format) throws IOException;
 

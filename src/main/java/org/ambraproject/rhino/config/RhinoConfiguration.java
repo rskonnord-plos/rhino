@@ -32,7 +32,7 @@ import org.ambraproject.rhino.service.AssetCrudService;
 import org.ambraproject.rhino.service.ConfigurationReadService;
 import org.ambraproject.rhino.service.IngestibleService;
 import org.ambraproject.rhino.service.IssueCrudService;
-import org.ambraproject.rhino.service.JournalReadService;
+import org.ambraproject.rhino.service.JournalCrudService;
 import org.ambraproject.rhino.service.PingbackReadService;
 import org.ambraproject.rhino.service.VolumeCrudService;
 import org.ambraproject.rhino.service.impl.ArticleCrudServiceImpl;
@@ -41,7 +41,7 @@ import org.ambraproject.rhino.service.impl.AssetCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ConfigurationReadServiceImpl;
 import org.ambraproject.rhino.service.impl.IngestibleServiceImpl;
 import org.ambraproject.rhino.service.impl.IssueCrudServiceImpl;
-import org.ambraproject.rhino.service.impl.JournalReadServiceImpl;
+import org.ambraproject.rhino.service.impl.JournalCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.PingbackReadServiceImpl;
 import org.ambraproject.rhino.service.impl.VolumeCrudServiceImpl;
 import org.ambraproject.rhino.view.JsonOutputView;
@@ -230,8 +230,8 @@ public class RhinoConfiguration extends BaseConfiguration {
   }
 
   @Bean
-  public JournalReadService journalReadService() {
-    return new JournalReadServiceImpl();
+  public JournalCrudService journalCrudService() {
+    return new JournalCrudServiceImpl();
   }
 
 }
