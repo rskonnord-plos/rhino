@@ -1,5 +1,7 @@
 package org.ambraproject.rhino.rest.controller;
 
+import com.google.common.io.Closeables;
+import com.google.common.io.Closer;
 import org.ambraproject.rhino.identity.DoiBasedIdentity;
 import org.ambraproject.rhino.rest.MetadataFormat;
 import org.ambraproject.rhino.rest.RestClientException;
@@ -9,6 +11,7 @@ import org.ambraproject.rhino.service.VolumeCrudService;
 import org.ambraproject.rhino.util.response.ResponseReceiver;
 import org.ambraproject.rhino.util.response.ServletResponseReceiver;
 import org.ambraproject.rhino.view.journal.VolumeInputView;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,15 +22,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Controller
 public class JournalCrudController extends RestController {
 
   private static final String JOURNAL_ROOT = "/journals";
   private static final String JOURNAL_TEMPLATE = JOURNAL_ROOT + "/{journalKey}";
+  private static final String FRONT_END_PARAMETER = "fend";
 
   @Autowired
   private JournalCrudService journalCrudService;
@@ -63,6 +69,32 @@ public class JournalCrudController extends RestController {
 
     DoiBasedIdentity volumeId = volumeCrudService.create(journalKey, input);
     return reportCreated(volumeId.getIdentifier());
+  }
+
+  @RequestMapping(value = JOURNAL_TEMPLATE, params = {FRONT_END_PARAMETER}, method = RequestMethod.PUT)
+  public void writeFrontEndBundle(HttpServletRequest request, @PathVariable String journalKey) throws IOException {
+    InputStream stream = null;
+    boolean threw = true;
+    try {
+      stream = request.getInputStream();
+      journalCrudService.writeFrontEndBundle(journalKey, stream);
+    } finally {
+      Closeables.close(stream, threw);
+    }
+  }
+
+  @RequestMapping(value = JOURNAL_TEMPLATE, params = {FRONT_END_PARAMETER}, method = RequestMethod.GET)
+  public void readFrontEndBundle(HttpServletResponse response, @PathVariable String journalKey) throws IOException {
+    Closer closer = Closer.create();
+    try {
+      ServletOutputStream responseStream = closer.register(response.getOutputStream());
+      InputStream bundleStream = closer.register(journalCrudService.readFrontEndBundle(journalKey));
+      IOUtils.copy(bundleStream, responseStream);
+    } catch (Throwable t) {
+      throw closer.rethrow(t);
+    } finally {
+      closer.close();
+    }
   }
 
 }

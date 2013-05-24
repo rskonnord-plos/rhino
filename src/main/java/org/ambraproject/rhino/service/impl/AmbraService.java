@@ -47,6 +47,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -214,6 +215,10 @@ public abstract class AmbraService {
     } finally {
       Closeables.close(writer, threw);
     }
+  }
+
+  protected static String internalFsid(String key) {
+    return "__rhino" + File.separator + Preconditions.checkNotNull(key);
   }
 
 }
