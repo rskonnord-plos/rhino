@@ -29,6 +29,7 @@ import org.ambraproject.models.ArticleRelationship;
 import org.ambraproject.rhino.service.ArticleCrudService;
 import org.ambraproject.rhino.service.ArticleStateService;
 import org.ambraproject.rhino.service.AssetCrudService;
+import org.ambraproject.rhino.service.BlobCrudService;
 import org.ambraproject.rhino.service.ConfigurationReadService;
 import org.ambraproject.rhino.service.IngestibleService;
 import org.ambraproject.rhino.service.IssueCrudService;
@@ -38,6 +39,7 @@ import org.ambraproject.rhino.service.VolumeCrudService;
 import org.ambraproject.rhino.service.impl.ArticleCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ArticleStateServiceImpl;
 import org.ambraproject.rhino.service.impl.AssetCrudServiceImpl;
+import org.ambraproject.rhino.service.impl.BlobCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ConfigurationReadServiceImpl;
 import org.ambraproject.rhino.service.impl.IngestibleServiceImpl;
 import org.ambraproject.rhino.service.impl.IssueCrudServiceImpl;
@@ -186,6 +188,11 @@ public class RhinoConfiguration extends BaseConfiguration {
     return service;
   }
 
+
+  @Bean
+  public BlobCrudService blobCrudService() {
+    return new BlobCrudServiceImpl();
+  }
 
   @Bean
   public ArticleCrudService articleCrudService() {
