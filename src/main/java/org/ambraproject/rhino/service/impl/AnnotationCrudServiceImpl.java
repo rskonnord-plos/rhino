@@ -40,14 +40,6 @@ import java.util.Map;
  */
 public class AnnotationCrudServiceImpl extends AmbraService implements AnnotationCrudService {
 
-  /**
-   * {@inheritDoc}
-   */
-  public Transceiver readComments(ArticleIdentity id)
-      throws IOException {
-    return readAnnotations(id);
-  }
-
   private static Date getLatestLastModified(Iterable<? extends AmbraEntity> values) {
     Date lastOfAll = null;
     for (AmbraEntity entity : values) {
@@ -59,13 +51,8 @@ public class AnnotationCrudServiceImpl extends AmbraService implements Annotatio
     return lastOfAll;
   }
 
-  /**
-   * Forwards annotations matching the given types to the receiver.
-   *
-   * @param id identifies the article
-   * @throws IOException
-   */
-  private Transceiver readAnnotations(final ArticleIdentity id)
+  @Override
+  public Transceiver readComments(final ArticleIdentity id)
       throws IOException {
     return new Transceiver() {
       @Override
@@ -131,12 +118,7 @@ public class AnnotationCrudServiceImpl extends AmbraService implements Annotatio
   }
 
   @Override
-  public Transceiver readComment(DoiBasedIdentity commentId)
-      throws IOException {
-    return readAnnotation(commentId);
-  }
-
-  private Transceiver readAnnotation(final DoiBasedIdentity annotationId)
+  public Transceiver readComment(final DoiBasedIdentity commentId)
       throws IOException {
     return new Transceiver() {
       @Override
@@ -149,10 +131,10 @@ public class AnnotationCrudServiceImpl extends AmbraService implements Annotatio
       protected Object getData() throws IOException {
         Annotation annotation = (Annotation) DataAccessUtils.uniqueResult((List<?>)
             hibernateTemplate.findByCriteria(DetachedCriteria.forClass(Annotation.class)
-                    .add(Restrictions.eq("annotationUri", annotationId.getKey()))
+                    .add(Restrictions.eq("annotationUri", commentId.getKey()))
             ));
         if (annotation == null) {
-          throw reportNotFound(annotationId);
+          throw reportNotFound(commentId);
         }
 
         // TODO: Make this more efficient. Three queries is too many.
@@ -167,4 +149,5 @@ public class AnnotationCrudServiceImpl extends AmbraService implements Annotatio
       }
     };
   }
+
 }
