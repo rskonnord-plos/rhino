@@ -44,4 +44,11 @@ public interface AnnotationCrudService {
   public Transceiver readComment(DoiBasedIdentity commentId)
       throws IOException;
 
+  /**
+   * Finds the number of comments associated with an article.
+   *
+   * @param articleId identifies the article
+   */
+  public Transceiver countComments(ArticleIdentity articleId);
+
 }

@@ -25,6 +25,7 @@ import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.rest.controller.abstr.ArticleSpaceController;
 import org.ambraproject.rhino.service.AnnotationCrudService;
 import org.ambraproject.rhino.service.DoiBasedCrudService.WriteMode;
+import org.ambraproject.rhino.util.response.Transceiver;
 import org.ambraproject.rhino.view.article.ArticleCriteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,13 +129,17 @@ public class ArticleCrudController extends ArticleSpaceController {
                    @RequestParam(value = "excludeCitations", required = false) boolean excludeCitations)
       throws FileStoreException, IOException {
     ArticleIdentity id = parse(request);
-    if (booleanParameter(comments)) {
-      annotationCrudService.readComments(id).respond(request, response, entityGson);
+    Transceiver responseContent;
+    if ("count".equalsIgnoreCase(comments)) {
+      responseContent = annotationCrudService.countComments(id);
+    } else if (booleanParameter(comments)) {
+      responseContent = annotationCrudService.readComments(id);
     } else if (booleanParameter(authors)) {
-      articleCrudService.readAuthors(id).respond(request, response, entityGson);
+      responseContent = articleCrudService.readAuthors(id);
     } else {
-      articleCrudService.readMetadata(id, excludeCitations).respond(request, response, entityGson);
+      responseContent = articleCrudService.readMetadata(id, excludeCitations);
     }
+    responseContent.respond(request, response, entityGson);
   }
 
   @Transactional(rollbackFor = {Throwable.class})

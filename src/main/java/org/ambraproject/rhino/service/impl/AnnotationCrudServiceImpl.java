@@ -150,4 +150,25 @@ public class AnnotationCrudServiceImpl extends AmbraService implements Annotatio
     };
   }
 
+  @Override
+  public Transceiver countComments(final ArticleIdentity articleId) {
+    return new Transceiver() {
+      @Override
+      protected Calendar getLastModifiedDate() throws IOException {
+        return null;
+      }
+
+      @Override
+      protected Number getData() throws IOException {
+        return (Number) DataAccessUtils.requiredUniqueResult(hibernateTemplate.find(""
+                + "select count(anno) "
+                + "from Article art, Annotation anno "
+                + "where art.ID = anno.articleID "
+                + "and art.doi = ?",
+            articleId.getKey()
+        ));
+      }
+    };
+  }
+
 }
