@@ -22,6 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -54,6 +55,7 @@ import org.ambraproject.rhino.view.article.ArticleCriteria;
 import org.ambraproject.rhino.view.article.ArticleOutputView;
 import org.ambraproject.service.article.NoSuchArticleIdException;
 import org.ambraproject.views.AuthorView;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -71,6 +73,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,6 +87,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -101,6 +106,9 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
 
   @Autowired
   private XpathReader xpathReader;
+
+  @Autowired
+  private Cache<String, byte[]> articleXmlCache;
 
   private boolean articleExistsAt(DoiBasedIdentity id) {
     DetachedCriteria criteria = DetachedCriteria.forClass(Article.class)
@@ -746,9 +754,27 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
     if (!articleExistsAt(id)) {
       throw reportNotFound(id);
     }
+    final String fsid = id.forXmlAsset().getFsid();
 
-    // TODO Can an invalid request cause this to throw FileStoreException? If so, wrap in RestClientException.
-    return fileStoreService.getFileInStream(id.forXmlAsset().getFsid());
+    byte[] cachedXml;
+    try {
+      cachedXml = articleXmlCache.get(fsid, new Callable<byte[]>() {
+        @Override
+        public byte[] call() throws IOException, FileStoreException {
+          try (InputStream fileStream = fileStoreService.getFileInStream(fsid)) {
+            /*
+             * It might be better to return fileStream directly as readXml's return value (which necessitates some
+             * clever way of getting it into the cache, maybe with org.apache.commons.io.input.TeeInputStream), but
+             * since the bytes are going into the cache at least temporary, it seems harmless to buffer it in memory.
+             */
+            return IOUtils.toByteArray(fileStream);
+          }
+        }
+      });
+    } catch (ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+    return new ByteArrayInputStream(cachedXml);
   }
 
   @Override

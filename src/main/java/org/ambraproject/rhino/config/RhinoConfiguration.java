@@ -18,6 +18,8 @@
 
 package org.ambraproject.rhino.config;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.ambraproject.configuration.ConfigurationStore;
@@ -61,8 +63,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-import org.yaml.snakeyaml.Yaml;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.yaml.snakeyaml.Yaml;
+
 import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.File;
@@ -72,6 +75,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Bean configuration for the application.
@@ -162,6 +166,27 @@ public class RhinoConfiguration extends BaseConfiguration {
     MultiThreadedHttpConnectionManager manager = new MultiThreadedHttpConnectionManager();
     manager.setParams(params);
     return new HttpClient(manager);
+  }
+
+  /**
+   * A short-term cache for article XML documents loaded from the file store.
+   * <p/>
+   * Rationale for the cache: rendering an article in Web display entails more than one request that causes us to read
+   * the XML from the file store. For example: Wombat requests the XML once in order to transform it to HTML; it also
+   * requests a JSON file of author metadata, which forces us to load the XML again in order to parse out the metadata
+   * to be served. Unlike most other use cases, client-side caching does not help, since we pass back the XML only in
+   * the first request, but in the second request it's used internally and then discarded.
+   * <p/>
+   * This cache is meant to minimize reads to the file store while responding to multiple requests <em>during the same
+   * instance</em> of rendering an article. Hence, it is small and short-lived.
+   */
+  @Bean
+  public Cache<String, byte[]> articleXmlCache() {
+    return CacheBuilder.newBuilder()
+        // TODO: Pull parameters into rhino.yaml. Possibly make the whole thing optional.
+        .expireAfterWrite(15, TimeUnit.SECONDS) // TODO Make this slightly longer than a reasonable max page load time
+        .maximumSize(100) // TODO Make this slightly larger than peak article views per expireAfterWrite duration
+        .build();
   }
 
   @Bean
