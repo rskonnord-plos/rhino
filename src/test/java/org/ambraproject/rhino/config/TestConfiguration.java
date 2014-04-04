@@ -18,6 +18,7 @@
 
 package org.ambraproject.rhino.config;
 
+import com.google.common.cache.Cache;
 import com.google.common.io.Closeables;
 import org.ambraproject.filestore.FileStoreService;
 import org.ambraproject.filestore.impl.FileSystemImpl;
@@ -33,6 +34,7 @@ import org.ambraproject.rhino.service.impl.AnnotationCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ArticleStateServiceImpl;
 import org.ambraproject.rhino.service.impl.AssetCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ClassificationServiceImpl;
+import org.ambraproject.rhino.util.NullGuavaCache;
 import org.ambraproject.service.article.ArticleClassifier;
 import org.ambraproject.service.article.ArticleService;
 import org.ambraproject.service.article.ArticleServiceImpl;
@@ -105,6 +107,11 @@ public class TestConfiguration extends BaseConfiguration {
   @Bean
   public org.apache.commons.configuration.Configuration ambraConfiguration() throws Exception {
     return AmbraTestConfigurationFactory.getConfiguration("ambra-test-config.xml");
+  }
+
+  @Bean
+  public Cache<String, byte[]> articleXmlCache() {
+    return NullGuavaCache.getInstance();
   }
 
   /**
