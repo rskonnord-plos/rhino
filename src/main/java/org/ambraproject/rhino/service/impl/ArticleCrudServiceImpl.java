@@ -766,7 +766,7 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
             /*
              * It might be better to return fileStream directly as readXml's return value (which necessitates some
              * clever way of getting it into the cache, maybe with org.apache.commons.io.input.TeeInputStream), but
-             * since the bytes are going into the cache at least temporary, it seems harmless to buffer it in memory.
+             * since the bytes are going into the cache at least temporarily, it seems harmless to buffer it in memory.
              */
             return IOUtils.toByteArray(fileStream);
           }
