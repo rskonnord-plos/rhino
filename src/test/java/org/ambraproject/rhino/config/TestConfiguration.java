@@ -34,7 +34,7 @@ import org.ambraproject.rhino.service.impl.AnnotationCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ArticleStateServiceImpl;
 import org.ambraproject.rhino.service.impl.AssetCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ClassificationServiceImpl;
-import org.ambraproject.rhino.util.NullGuavaCache;
+import org.ambraproject.rhino.util.TestGuavaCache;
 import org.ambraproject.service.article.ArticleClassifier;
 import org.ambraproject.service.article.ArticleService;
 import org.ambraproject.service.article.ArticleServiceImpl;
@@ -111,7 +111,7 @@ public class TestConfiguration extends BaseConfiguration {
 
   @Bean
   public Cache<String, byte[]> articleXmlCache() {
-    return NullGuavaCache.getInstance();
+    return new TestGuavaCache<>();
   }
 
   /**
