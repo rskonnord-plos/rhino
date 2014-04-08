@@ -234,6 +234,7 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
     // ArticleIdentity doesn't like this part of the DOI.
     doi = doi.substring("info:doi/".length());
     String fsid = ArticleIdentity.create(doi).forXmlAsset().getFsid();
+    articleXmlCache.invalidate(fsid);
     write(xmlData, fsid);
     return fsid;
   }
