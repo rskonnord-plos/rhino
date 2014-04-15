@@ -35,6 +35,7 @@ import org.ambraproject.rhino.service.IssueCrudService;
 import org.ambraproject.rhino.service.JournalReadService;
 import org.ambraproject.rhino.service.PingbackReadService;
 import org.ambraproject.rhino.service.VolumeCrudService;
+import org.ambraproject.rhino.service.impl.AmbraService;
 import org.ambraproject.rhino.service.impl.AnnotationCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ArticleCrudServiceImpl;
 import org.ambraproject.rhino.service.impl.ArticleStateServiceImpl;
@@ -224,6 +225,11 @@ public class RhinoConfiguration extends BaseConfiguration {
   @Bean
   public AnnotationCrudService annotationCrudService() {
     return new AnnotationCrudServiceImpl();
+  }
+
+  @Bean
+  public AmbraService ambraService() {
+    return new AmbraService();
   }
 
   @Bean

@@ -24,7 +24,9 @@ import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import org.ambraproject.filestore.FileStoreException;
 import org.ambraproject.filestore.FileStoreService;
+import org.ambraproject.models.Article;
 import org.ambraproject.models.Journal;
+import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.DoiBasedIdentity;
 import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.service.article.ArticleClassifier;
@@ -36,6 +38,7 @@ import org.hibernate.FetchMode;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.http.HttpStatus;
@@ -52,7 +55,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-public abstract class AmbraService {
+public class AmbraService {
 
   @Autowired
   protected HibernateTemplate hibernateTemplate;
@@ -222,5 +225,33 @@ public abstract class AmbraService {
       throw new RuntimeException("Multiple entities found for " + id);
     }
     return results.get(0);
+  }
+
+  /**
+   * Method that pings the most important backends used by the application; intended for monitoring.
+   * If anything goes wrong, an exception will be thrown.
+   *
+   * @throws IOException
+   * @throws FileStoreException
+   */
+  public void ping() throws IOException, FileStoreException {
+
+    // 1. Hibernate/DB
+    Article article = (Article) DataAccessUtils.uniqueResult((List<?>) hibernateTemplate.findByCriteria(
+        DetachedCriteria.forClass(Article.class)
+        .add(Restrictions.eq("state", 0)), 0, 1));
+
+    // 2. Filestore: get XML for the above article.
+    ArticleIdentity id = ArticleIdentity.create(article);
+    try (InputStream is = fileStoreService.getFileInStream(id.forXmlAsset().getFsid())) {
+
+      // Just read the first few bytes and call it good.
+      if (is.read(new byte[64]) <= 0) {
+        throw new IllegalStateException("could not read XML for " + id.getIdentifier());
+      }
+    }
+
+    // There are more things we could check here: the queue, taxonomy server, and probably more.
+    // But these aren't necessary to render an article in wombat.
   }
 }
