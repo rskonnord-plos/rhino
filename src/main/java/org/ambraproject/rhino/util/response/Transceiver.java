@@ -85,6 +85,14 @@ public abstract class Transceiver {
    * @throws IOException
    */
   public final void respond(HttpServletRequest request, HttpServletResponse response, Gson gson) throws IOException {
+    // We want this to be invokable anywhere, but package-private for overriding
+    // Hence 'respond' is 'public final' while 'doResponse' is package-private and non-final
+    doResponse(request, response, gson);
+  }
+
+  // Override hook for testing. Should never be overridden in production code.
+  @VisibleForTesting
+  void doResponse(HttpServletRequest request, HttpServletResponse response, Gson gson) throws IOException {
     Preconditions.checkNotNull(request);
     Preconditions.checkNotNull(response);
     Preconditions.checkNotNull(gson);
