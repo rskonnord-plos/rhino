@@ -29,7 +29,7 @@ class XMLValidator(AbstractValidator):
 
   def _verify_created_date(self, section, testStartTime, apiTime):
     # Some dates (PDF section) seem to include millis too, double check for possible bug?
-    sectionDate = datetime.strptime(section['created'], '%Y-%m-%dT%H:%M:%SZ')
+    sectionDate = datetime.strptime(section['created'], '%Y-%m-%dT%H:%M:%S.%fZ')
     deltaTime = sectionDate - testStartTime
     assert deltaTime.total_seconds() > 0, "Created field in metadata section should be greater than test start time!"
     # Next validation is not working properly because there seems to be a difference of

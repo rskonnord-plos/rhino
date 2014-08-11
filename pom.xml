@@ -56,6 +56,7 @@
     <filestore.version>1.2.0</filestore.version>
     <camel.version>2.10.4</camel.version>
     <activemq.version>5.2.0</activemq.version>
+    <jacoco.version>0.7.1.201405082137</jacoco.version>
   </properties>
 
   <repositories>
@@ -387,6 +388,13 @@
       <version>1.9.13</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.jacoco</groupId>
+      <artifactId>org.jacoco.agent</artifactId>
+      <version>${jacoco.version}</version>
+      <classifier>runtime</classifier>
+    </dependency>
+
   </dependencies>
 
 
@@ -482,6 +490,7 @@
           <path>/</path>
           <contextFile>/etc/ambra/context.xml</contextFile>
           <additionalConfigFilesDir>/etc/ambra/</additionalConfigFilesDir>
+          <fork>true</fork>
           <systemProperties>
             <java.util.logging.manager>org.apache.juli.ClassLoaderLogManager</java.util.logging.manager>
             <log4j.configuration>file:///etc/ambra/log4j.xml</log4j.configuration>
@@ -507,6 +516,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.12</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.core</artifactId>
+            <version>${jacoco.version}</version>
+            <classifier>runtime</classifier>
           </dependency>
         </dependencies>
       </plugin>
@@ -573,8 +588,30 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.7.1.201405082137</version>
+        <executions>
+          <execution>
+            <id>instrument-classes</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>post-site</phase>
+            <goals>
+              <goal>restore-instrumented-classes</goal>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/Mock*.class</exclude>
+                <exclude>**/*Test.class</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
-
     </plugins>
 
   </build>

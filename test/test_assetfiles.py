@@ -10,7 +10,6 @@ from Base.Api.Rhino.Ingestion import ZIPIngestion
 from Base.Api.Rhino.AssetFiles import AssetFiles
 
 
-
 class IngestiblesTest(AssetFiles, ZIPIngestion):
 
   """
