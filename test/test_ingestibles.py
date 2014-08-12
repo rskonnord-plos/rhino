@@ -34,10 +34,18 @@ class IngestiblesTest(Ingestibles, ZIPIngestion):
     GET ingestibles: list ingestibles
     """
 
+    # Invoke API
     self.list_ingestibles()
+
+    # Verify HTTP return code is 200 (OK)
     self.verify_http_code_is(200)
+
+    # Retrieve response content as JSON object
     self.parse_response_as_json()
-    assert self.parsed.get_json() == []
+
+    # Compare response with expected value
+    # pone.0097823.zip is a pre-existent file in /datastores/src when Rhino is in *simulator* mode
+    assert self.parsed.get_json() == [u'pone.0097823.zip']
 
   def test_list_ingestibles_after_ingestion(self):
     """
@@ -50,25 +58,42 @@ class IngestiblesTest(Ingestibles, ZIPIngestion):
     This is the way the current admin interface works.
     """
 
+    # Invoke API
     self.list_ingestibles()
+    # Verify HTTP return code is 200 (OK)
     self.verify_http_code_is(200)
+    # Retrieve response content as JSON object
     self.parse_response_as_json()
-    assert self.parsed.get_json() == []
+    # Compare response with expected value
+    # pone.0097823.zip is a pre-existent file in /datastores/src when Rhino is in *simulator* mode
+    assert self.parsed.get_json() == [u'pone.0097823.zip']
 
-    self.zipUpload('pone.0097823.zip', 'forced')
+
+    # Invoke zip ingestion API
+    self.zipUpload('pone.0097199.zip', 'forced')
+    # Verify HTTP return code is 201 (CREATED)
     self.verify_http_code_is(201)
 
+    # Invoke API
     self.list_ingestibles()
+    # Verify HTTP return code is 200 (OK)
     self.verify_http_code_is(200)
-    assert self.parsed.get_json() == []
+    # Retrieve response content as JSON object
+    self.parse_response_as_json()
+    # Compare response with expected value
+    # pone.0097823.zip is a pre-existent file in /datastores/src when Rhino is in *simulator* mode
+    assert self.parsed.get_json() == [u'pone.0097823.zip']
 
   def test_ingest_archive_error_due_to_file_not_present_not_forced(self):
     """
     POST ingestibles: Throws an error due to file not present (not forced)
     """
 
+    # Invoke API with a bogus file name, not forcing
     self.ingest_archive('afile.txt')
+    # Verify HTTP return code is 405
     self.verify_http_code_is(405)
+    # Verify HTTP body is 'Could not find ingestible archive for: <our file>'
     assert self.get_http_response().text == 'Could not find ingestible archive for: afile.txt\n'
 
   def test_ingest_archive_error_due_to_file_not_present_forced(self):
@@ -76,8 +101,11 @@ class IngestiblesTest(Ingestibles, ZIPIngestion):
     POST ingestibles: Throws an error due to file not present (forced)
     """
 
+    # Invoke API with a bogus file name, forcing it
     self.ingest_archive('afile.txt', 'forcing you!')
+    # Verify HTTP return code is 405
     self.verify_http_code_is(405)
+    # Verify HTTP body is 'Could not find ingestible archive for: <our file>'
     assert self.get_http_response().text == 'Could not find ingestible archive for: afile.txt\n'
 
 
