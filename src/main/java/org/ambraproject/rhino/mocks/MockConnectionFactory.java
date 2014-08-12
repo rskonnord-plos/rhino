@@ -17,10 +17,10 @@ public class MockConnectionFactory extends MockQueueConnectionFactory {
     super(destinationManager, configurationManager);
 
     destinationManager.createQueue("plos.solr.article.index");
-    log.info("CREATED MOCK QUEUE FOR SOLR article index");
+    log.info("Created mock queue for SOLR article index");
     destinationManager.createQueue("plos.updatedCitedArticles");
-    log.info("CREATED MOCK QUEUE FOR updatedCitedArticles");
+    log.info("Created mock queue for updatedCitedArticles");
     destinationManager.createQueue("CROSSREF");
-    log.info("CREATED MOCK QUEUE FOR CROSSREF");
+    log.info("Created mock queue for CROSSREF");
   }
 }

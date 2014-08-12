@@ -163,6 +163,14 @@
   </mvc:interceptors>
 
   <beans:beans profile="testing">
+
+    <beans:bean id="solrServerFactory" class="org.ambraproject.rhino.mocks.MockSolrFactory" factory-method="getInstance" />
+
+    <beans:bean id="cacheFactory" class="org.ambraproject.rhino.mocks.MockCacheFactory" factory-method="getInstance" />
+
+    <beans:bean id="rhinoCache" factory-bean="cacheFactory" factory-method="getCache" />
+    <beans:bean id="rolesCache" factory-bean="cacheFactory" factory-method="getCache" />
+
     <beans:bean id="destinationManager" class="com.mockrunner.jms.DestinationManager" />
     <beans:bean id="configurationManager" class="com.mockrunner.jms.ConfigurationManager" />
 

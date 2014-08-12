@@ -22,7 +22,6 @@ import org.ambraproject.filestore.FileStoreService;
 import org.ambraproject.filestore.impl.FileSystemImpl;
 import org.ambraproject.rhino.mocks.MockDataSource;
 import org.ambraproject.rhino.mocks.MockHttpClient;
-import org.apache.commons.configuration.CombinedConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.hibernate.dialect.HSQLDialect;
 import org.springframework.context.annotation.Bean;
@@ -101,8 +100,8 @@ public class RhinoConfigurationTest extends BaseConfiguration {
     hibernateProperties.setProperty("hibernate.show_sql", Boolean.FALSE.toString());
     hibernateProperties.setProperty("hibernate.format_sql", Boolean.FALSE.toString());
     hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "create"); //create-drop
-//    hibernateProperties.setProperty("hibernate.cache.use_query_cache", Boolean.FALSE.toString());
-//    hibernateProperties.setProperty("hibernate.cache.use_second_level_cache", Boolean.FALSE.toString());
+    // hibernateProperties.setProperty("hibernate.cache.use_query_cache", Boolean.FALSE.toString());
+    // hibernateProperties.setProperty("hibernate.cache.use_second_level_cache", Boolean.FALSE.toString());
     localSessionFactory.setHibernateProperties(hibernateProperties);
 
     return localSessionFactory;
@@ -114,13 +113,14 @@ public class RhinoConfigurationTest extends BaseConfiguration {
   }
 
   @Bean
-  public Object configOverrider(RuntimeConfiguration yamlConfig, org.apache.commons.configuration.Configuration ambraConfiguration) throws IllegalAccessException, URISyntaxException {
+  public Object configOverrider(RuntimeConfiguration yamlConfig, org.apache.commons.configuration.Configuration ambraConfiguration) throws URISyntaxException {
     YamlConfiguration.UserFields uf = getFieldValue(yamlConfig, "uf", YamlConfiguration.UserFields.class);
     uf.setcontentRepoAddress(new URI("http://nobodycares.com/aRepoURL"));
     uf.setRepoBucketName("daRepoBucketName");
 
     ambraConfiguration.setProperty(INGEST_SOURCE_DIR_KEY, getResource("/datastores/src").getPath());
     ambraConfiguration.setProperty(INGEST_DEST_DIR_KEY, getResource("/datastores/dest").getPath());
+
     return new Object(); // Nobody cares...
   }
 
