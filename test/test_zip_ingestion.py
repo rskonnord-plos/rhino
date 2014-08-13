@@ -21,7 +21,11 @@ for MogileFS's Python client implementations.
 """
 
 from Base.Api.Rhino.Ingestion import ZIPIngestion
-from Base.Database import Database
+from Base.Database.HSQLDatabase import HSQLDatabase
+
+STATE_ACTIVE = 0
+STATE_UNPUBLISHED = 1
+STATE_DISABLED = 2
 
 
 class ZipIngestionTest(ZIPIngestion):
@@ -48,9 +52,24 @@ class ZipIngestionTest(ZIPIngestion):
     self.verify_graphics_section()
     self.verify_figures_section()
 
-    # Right now I can't access MySQL database at iad-leo-devstack01.int.plos.org from my box.
-    print 'Here we have a nice SQL query returned meanwhile: %s ' % \
-    Database().query('SELECT Version()')
+    """
+    Database validations from here
+    """
+    articlesInDB = HSQLDatabase().query("select doi, format, state from PUBLIC.ARTICLE where ARCHIVENAME = 'pone.0097823.zip'")
+
+    # We should have only one row in the database matching the SELECT criteria
+    assert len(articlesInDB) is 1
+
+    article = articlesInDB[0]
+
+    # Verify uploaded DOI against the one stored in DB
+    assert article[0] == self._zip.get_full_doi()
+
+    # Verify uploaded FORMAT against the one stored in DB
+    assert article[1] == 'text/xml', 'Article format did not match expected one of text/xml'
+
+    # Verify STATE stored in DB is STATE_UNPUBLISHED
+    assert article[2] == STATE_UNPUBLISHED, 'Article state did not match expected state of %s' % STATE_UNPUBLISHED
 
 
 if __name__ == '__main__':
