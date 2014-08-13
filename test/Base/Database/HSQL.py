@@ -21,13 +21,13 @@ from inspect import getfile
 from contextlib import closing
 
 
-class HSQLDatabase(object):
+class HSQL(object):
 
   def __init__(self):
     self.conn = jaydebeapi.connect('org.hsqldb.jdbc.JDBCDriver', ['jdbc:hsqldb:hsql://localhost/rhinodb;default_schema=true;get_column_name=false', 'sa', ''], self.find_file('hsqldb-2.3.2.jar'),)
 
   def find_file(self, filename):
-    path = dirname(abspath(getfile(HSQLDatabase)))
+    path = dirname(abspath(getfile(HSQL)))
     for root, dirs, files in walk(path):
       for file in files:
         if file == filename:

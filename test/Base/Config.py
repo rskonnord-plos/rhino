@@ -12,12 +12,3 @@ API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:8080/rhino')
 PRINT_DEBUG = False
 
 TIMEOUT = 30         # API call timeout, in seconds
-
-dbconfig = {
-  'user': 'root',
-  'password': '',
-  'host': '127.0.0.1', # 'iad-leo-devstack01.int.plos.org', Can't access it from my box. No ICMP nor 3306 port
-  'port': 3306,
-  'database': 'ambra',
-  #'raise_on_warnings': True,
-}
