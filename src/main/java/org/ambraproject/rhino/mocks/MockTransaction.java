@@ -1,6 +1,7 @@
 package org.ambraproject.rhino.mocks;
 
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HeaderGroup;
 import org.apache.commons.httpclient.StatusLine;
 
 import java.util.Vector;
@@ -33,9 +34,9 @@ public class MockTransaction {
   }
 
   class Response {
-    public Header[] headers;
-    public int status;
-    public String response;
+    public Header[] headers = new HeaderGroup().getAllHeaders();
+    public int status = 200;
+    public String body;
 
     public Response() {
     }

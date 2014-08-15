@@ -16,8 +16,8 @@ ARTICLES_API = API_BASE_URL + '/articles/'
 class Articles(BaseServiceTest):
 
   def define_zip_file_for_validations(self, archive):
-    file = self.find_file(archive)
-    self._zip = ZIPProcessor(file)
+    zipFile = self.find_file(archive)
+    self._zip = ZIPProcessor(zipFile)
 
   @deduce_doi
   def updateArticle(self, article, state, syndications=None):
@@ -55,7 +55,7 @@ class Articles(BaseServiceTest):
 
   @needs('_zip', 'define_zip_file_for_validations')
   def verify_article_pdf_section(self):
-    pdf_section = self.parsed.get_article_pdf_section
+    pdf_section = self.parsed.get_article_pdf_section()
     validator = self._zip.get_pdf_validator()
     validator.metadata(pdf_section, self._zip.get_doi(), self._testStartTime, self._apiTime)
 

@@ -25,6 +25,8 @@ public class ReflectionUtils {
   }
 
   public static <T> T getFieldValue(Object o, String fieldName, Class<T> castTo) {
+    if (o == null)
+      return null;
     Field field = findField(o.getClass(), fieldName);
     if (field != null) {
       field.setAccessible(true);

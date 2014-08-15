@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 """
-Base class for Rhino's Ingest API service tests.
+Base class for Rhino's ZIP Ingestion API service tests.
 """
 
 __author__ = 'jkrzemien@plos.org'
@@ -13,10 +13,26 @@ from ...Decorators.Api import needs
 
 
 ZIP_INGESTION_API = API_BASE_URL + '/zips'
-INGESTIBLES_API = API_BASE_URL + '/ingestibles'
 
 
-class IngestionCommon(BaseServiceTest):
+class ZIPIngestion(BaseServiceTest):
+
+  def zipUpload(self, archive, force_reingest=''):
+    zipfile = self.find_file(archive)
+    self._zip = ZIPProcessor(zipfile)
+
+    daData = {"force_reingest": force_reingest}
+    daFile = {'archive': open(zipfile, 'rb')}
+
+    self.doPost(ZIP_INGESTION_API, daData, daFile)
+
+    self.parse_response_as_json()
+
+    return self
+
+  @needs('_zip', 'API')
+  def get_processed_zip_file(self):
+    return self._zip
 
   @needs('parsed', 'parse_response_as_json()')
   def verify_state_is(self, state):
@@ -74,30 +90,3 @@ class IngestionCommon(BaseServiceTest):
       graphicDOI = self._zip.get_full_doi() + ('.g%03d' % i)
       validator.metadata(section, graphicDOI, self._testStartTime, self._apiTime)
       i += 1
-
-
-class ZIPIngestion(IngestionCommon):
-
-  def zipUpload(self, archive, force_reingest=''):
-    file = self.find_file(archive)
-    self._zip = ZIPProcessor(file)
-
-    daData = {"force_reingest": force_reingest}
-    daFile = {'archive': open(file, 'rb')}
-
-    self.doPost(ZIP_INGESTION_API, daData, daFile)
-
-class Ingestibles(IngestionCommon):
-
-  def ingest_archive(self, filename, force_reingest=''):
-
-    daData = {'name': filename, 'force_reingest': force_reingest}
-
-    self.doPost(INGESTIBLES_API, daData)
-
-
-  def list_ingestibles(self):
-
-    self.doGet(INGESTIBLES_API)
-
-

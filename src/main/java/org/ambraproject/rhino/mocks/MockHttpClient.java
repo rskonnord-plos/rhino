@@ -47,7 +47,7 @@ public class MockHttpClient extends HttpClient {
     mapper.configure(INDENT_OUTPUT, true);
     mapper.configure(FAIL_ON_EMPTY_BEANS, false);
 
-    //loadMockData();
+    loadMockData();
   }
 
   private void loadMockData() {
@@ -71,7 +71,11 @@ public class MockHttpClient extends HttpClient {
     }
   }
 
-  private void CaptureMock(HttpMethod method) {
+  public void addMockData(MockTransaction mockTransaction) {
+    mocks.add(checkNotNull(mockTransaction));
+  }
+
+  public void captureMockData(HttpMethod method) {
     FileWriter fw = null;
     try {
       fw = new FileWriter(format("%s/httpMethod%s.json", mockDataDir.getAbsolutePath(), count++));
@@ -191,20 +195,32 @@ public class MockHttpClient extends HttpClient {
     return true;
   }
 
+  public void clearMockData() {
+    mocks.clear();
+  }
+
+  private void setResponseHeaders(HttpMethod method, MockTransaction mock) {
+    HeaderGroup headerGroup = new HeaderGroup();
+    if (mock.response.headers != null) {
+      for (Header header : mock.response.headers) {
+        headerGroup.addHeader(header);
+      }
+    }
+    setFieldValue(method, "responseHeaders", headerGroup);
+  }
+
   @Override
   public int executeMethod(HttpMethod method) throws IOException, HttpException {
     log.info("HTTP request received!");
-    mocks.clear();
-    loadMockData();
-    //CaptureMock(method);
+    //captureMockData(method);
     log.info(format("Attempting to match request against %s known mock transactions...", mocks.size()));
     for (MockTransaction mock : mocks) {
       if (equals(mock.request, method)) {
         log.info("Mock transaction matched request! Building HTTP response from mock...");
-        if (mock.response.response != null) {
-          setFieldValue(method, "responseBody", mock.response.response.getBytes());
+        if (mock.response.body != null) {
+          setFieldValue(method, "responseBody", mock.response.body.getBytes());
         }
-        setFieldValue(method, "responseHeaders", mock.response.headers);
+        setResponseHeaders(method, mock);
         setFieldValue(method, "statusLine", new StatusLine(format("HTTP/1.1 %s DA_CODE", mock.response.status)));
         return method.getStatusCode();
       }

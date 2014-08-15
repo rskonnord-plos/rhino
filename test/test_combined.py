@@ -3,7 +3,7 @@
 __author__ = 'jkrzemien@plos.org'
 
 from Base.Api.Rhino.Articles import Articles
-from Base.Api.Rhino.Ingestion import ZIPIngestion
+from Base.Api.Rhino.ZIPIngestion import ZIPIngestion
 
 
 class CombinedAPITests(ZIPIngestion, Articles):
@@ -38,7 +38,7 @@ class CombinedAPITests(ZIPIngestion, Articles):
 
     # Validate it worked
     self.verify_http_code_is(201)
-    self.verify_state_is('published')
+    self.verify_state_is('ingested')
 
 if __name__ == '__main__':
     ZIPIngestion._run_tests_randomly()
