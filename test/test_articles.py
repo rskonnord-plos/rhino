@@ -13,6 +13,11 @@ from Base.Api.Rhino.ZIPIngestion import ZIPIngestion
 class ArticlesTest(Articles, ZIPIngestion):
 
   def test_article_syndication_happy_path(self):
+
+    #self.simulator().setCaptureMode()
+    self.simulator().setMockMode()
+    #self.simulator().setMockScenario('')
+
     """
     PATCH articles: Update article with publish and syndication.
 

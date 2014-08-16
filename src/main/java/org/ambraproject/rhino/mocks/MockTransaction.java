@@ -2,7 +2,6 @@ package org.ambraproject.rhino.mocks;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HeaderGroup;
-import org.apache.commons.httpclient.StatusLine;
 
 import java.util.Vector;
 
@@ -11,34 +10,138 @@ import java.util.Vector;
  */
 public class MockTransaction {
 
-  public final Request request;
-  public final Response response;
+  public Request request;
+  public Response response;
 
   public MockTransaction() {
     this.request = new Request();
     this.response = new Response();
   }
 
+  public void setRequest(Request request) {
+    this.request = request;
+  }
+
+  public void setResponse(Response response) {
+    this.response = response;
+  }
+
+  public Request getRequest() {
+    return request;
+  }
+
+  public Response getResponse() {
+    return response;
+  }
+
   class Request {
-    public String uri;
-    public String query;
-    public Header[] headers;
-    public Vector params;
-    public String body = "";
-    public String charset = "UTF-8";
-    public String contentType = "application/xml; charset=UTF-8";
-    public Long contentLength = 0L;
+    private String uri;
+    private String query;
+    private Header[] headers;
+    private Vector params;
+    private String body = "";
+    private String charset = "UTF-8";
+    private String contentType = "application/xml; charset=UTF-8";
+    private Long contentLength = 0L;
 
     public Request() {
+    }
+
+    public void setBody(String body) {
+      this.body = body;
+    }
+
+    public void setHeaders(Header[] headers) {
+      this.headers = headers;
+    }
+
+    public void setCharset(String charset) {
+      this.charset = charset;
+    }
+
+    public void setContentLength(Long contentLength) {
+      this.contentLength = contentLength;
+    }
+
+    public void setContentType(String contentType) {
+      this.contentType = contentType;
+    }
+
+    public void setParams(Vector params) {
+      this.params = params;
+    }
+
+    public void setQuery(String query) {
+      this.query = query;
+    }
+
+    public void setUri(String uri) {
+      this.uri = uri;
+    }
+
+    public String getCharset() {
+      return charset;
+    }
+
+    public String getBody() {
+      return body;
+    }
+
+    public Header[] getHeaders() {
+      return headers;
+    }
+
+    public Long getContentLength() {
+      return contentLength;
+    }
+
+    public String getContentType() {
+      return contentType;
+    }
+
+    public String getQuery() {
+      return query;
+    }
+
+    public String getUri() {
+      return uri;
+    }
+
+    public Vector getParams() {
+      return params;
     }
   }
 
   class Response {
-    public Header[] headers = new HeaderGroup().getAllHeaders();
-    public int status = 200;
-    public String body;
+    private Header[] headers = new HeaderGroup().getAllHeaders();
+    private int status = 200;
+    private String body;
 
     public Response() {
+    }
+
+    public void setHeaders(Header[] headers) {
+      this.headers = headers;
+    }
+
+    public void setStatus(int status) {
+      this.status = status;
+    }
+
+    public void setBody(String body) {
+      this.body = body;
+    }
+
+    public Header[] getHeaders() {
+      return headers;
+    }
+
+    public int getStatus() {
+      return status;
+    }
+
+    public String getBody() {
+      return body;
     }
   }
 }

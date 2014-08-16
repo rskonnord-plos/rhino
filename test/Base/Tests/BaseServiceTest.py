@@ -21,6 +21,7 @@ from ..Decorators.Api import timeit
 from ..Config import TIMEOUT, PRINT_DEBUG
 from ..Response.JSONResponse import JSONResponse
 from ..Response.XMLResponse import XMLResponse
+from Simulator import Simulator
 
 
 IMAGE_FILE_PATTERN = re.compile('\w+\.\d+\.(e|g)\d{3}.(png|tif)$')
@@ -49,6 +50,8 @@ class BaseServiceTest(unittest.TestCase):
 
   # Created upon request of get_mogile_client()
   _mogile = None
+
+  _simulator = Simulator()
 
   def setUp(self):
     pass
@@ -95,6 +98,9 @@ class BaseServiceTest(unittest.TestCase):
   @timeit
   def doUpdate(self, url, data=None, headers=None, allow_redirects=True):
     self.doPut(url, data=data, allow_redirects=allow_redirects, headers=headers)
+
+  def simulator(self):
+    return self._simulator
 
   def get_http_response(self):
     return self.__response

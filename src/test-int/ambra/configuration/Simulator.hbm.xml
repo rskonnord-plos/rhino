@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.ambraproject.rhino.config.mocks" default-lazy="false">
+
+  <class name="org.ambraproject.rhino.config.mocks.HibernateSimulatorConfig" table="SIMULATOR">
+    <id name="Id" column="id" type="long">
+      <generator class="native"/>
+    </id>
+    <property name="DatastorePath" column="DATASTORE_PATH"/>
+    <property name="DatastoreDomain" column="DATASTORE_DOMAIN"/>
+    <property name="MockDataFolder" column="MOCKDATA_FOLDER"/>
+    <property name="ContentRepoAddress" column="CONTENT_REPO_ADDRESS"/>
+    <property name="ContentRepoBucketName" column="CONTENT_REPO_BUCKET_NAME"/>
+    <property name="IngestionSrcFolder" column="INGESTION_SRC_FOLDER"/>
+    <property name="IngestionDestFolder" column="INGESTION_DEST_FOLDER"/>
+    <property name="CaptureMockData" column="CAPTURE_MODE"/>
+  </class>
+
+</hibernate-mapping>

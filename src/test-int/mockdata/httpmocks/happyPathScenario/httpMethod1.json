@@ -10,8 +10,8 @@
     "contentLength" : null
   },
   "response" : {
-    "headers" : null,
+    "headers" : [ ],
     "status" : 200,
-    "response" : "<?xml version='1.0' encoding='UTF-8'?><TMMAI project='plosthes.2013-4' location = '.'>Hello world!</TMMAI>"
+    "body" : "<?xml version='1.0' encoding='UTF-8'?><TMMAI project='plosthes.2013-4' location = '.'>Hello world!</TMMAI>"
   }
 }

@@ -22,6 +22,9 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
 import org.hsqldb.server.ServerAcl;
+import org.springframework.core.io.UrlResource;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -63,6 +66,10 @@ public enum MockDataSource {
     ds.setUrl("jdbc:hsqldb:hsql://localhost/rhinodb;default_schema=true;get_column_name=false");
     ds.setUsername("sa");
     ds.setPassword("");
+  }
+
+  public static DataSource getInstance() {
+    return SINGLETON.get();
   }
 
   public DataSource get() {

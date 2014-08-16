@@ -36,6 +36,11 @@ abstract class BaseConfiguration {
   private ApplicationContext context;
 
   protected void setAmbraMappings(LocalSessionFactoryBean sessionFactoryBean) throws IOException {
+    List<Resource> mappings = getAmbraMappings();
+    sessionFactoryBean.setMappingLocations(mappings.toArray(new Resource[mappings.size()]));
+  }
+
+  protected List<Resource> getAmbraMappings() throws IOException {
     final String mappingLocation = "classpath:org/ambraproject/models/*.hbm.xml";
     Resource[] mappingLocations = context.getResources(mappingLocation);
     if (mappingLocations.length == 0) {
@@ -53,7 +58,7 @@ abstract class BaseConfiguration {
       }
     }
     finalResources.add(context.getResource("classpath:ambra/configuration/Article.hbm.xml"));
-    sessionFactoryBean.setMappingLocations(finalResources.toArray(new Resource[finalResources.size()]));
+    return finalResources;
   }
 
 }

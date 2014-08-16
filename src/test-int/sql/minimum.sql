@@ -1,3 +1,5 @@
+INSERT INTO SIMULATOR (ID, DATASTORE_PATH, DATASTORE_DOMAIN, MOCKDATA_FOLDER, CONTENT_REPO_ADDRESS, CONTENT_REPO_BUCKET_NAME, INGESTION_SRC_FOLDER, INGESTION_DEST_FOLDER, CAPTURE_MODE) VALUES (1, '/datastores', 'test', '/mockdata/httpmocks/happyPathScenario', 'http://nobodycares.com/aRepoURL', 'daRepoBucketName', '/datastores/src', '/datastores/dest', FALSE);
+
 INSERT INTO journal(journalID, currentIssueID, journalKey, eIssn, imageUri, title, description, created, lastModified) VALUES (1, null, 'PLoSDefault', '0000-0000', null, 'Default Journals', null, '2012-06-19 17:53:16', '2014-06-24 17:11:19');
 INSERT INTO journal(journalID, currentIssueID, journalKey, eIssn, imageUri, title, description, created, lastModified) VALUES (2, null, 'PLoSBiology', '1545-7885', null, 'PLOS Biology', null, '2012-06-19 17:53:16', '2014-06-24 17:11:19');
 INSERT INTO journal(journalID, currentIssueID, journalKey, eIssn, imageUri, title, description, created, lastModified) VALUES (3, null, 'PLoSNTD', '1935-2735', null, 'PLOS Neglected Tropical Diseases', null, '2012-06-19 17:53:16', '2014-06-24 17:11:19');

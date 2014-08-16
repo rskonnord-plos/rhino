@@ -164,6 +164,13 @@
 
   <beans:beans profile="testing">
 
+    <beans:bean id="hibernateDataSource" class="org.ambraproject.rhino.mocks.MockDataSource" factory-method="getInstance" />
+
+    <beans:bean id="fileStoreService" class="org.ambraproject.filestore.impl.FileSystemImpl">
+      <beans:constructor-arg ref="fileStorePath" />
+      <beans:constructor-arg ref="fileStoreDomain" />
+    </beans:bean>
+
     <beans:bean id="solrServerFactory" class="org.ambraproject.rhino.mocks.MockSolrFactory" factory-method="getInstance" />
 
     <beans:bean id="cacheFactory" class="org.ambraproject.rhino.mocks.MockCacheFactory" factory-method="getInstance" />
