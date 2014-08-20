@@ -22,6 +22,9 @@ import java.util.Map;
 
 /**
  * Created by jkrzemien on 8/12/14.
+ *
+ * THIS CLASS IS NOT FINISHED YET. IT JUST MAKES RHINO THINK THERE IS A SOLR SERVER, BUT THERE IS NO WAY
+ * OF RETRIEVING THE DOCUMENTS FROM THE OUTSIDE WORLD YET (TESTS)
  */
 public class MockSolrFactory extends SolrServerFactory {
 

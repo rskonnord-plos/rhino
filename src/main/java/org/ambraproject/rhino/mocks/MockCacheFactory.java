@@ -11,6 +11,12 @@ import static java.lang.String.format;
 
 /**
  * Created by jkrzemien on 8/12/14.
+ *
+ * THIS CLASS IS NOT FINISHED YET. IT JUST MAKES RHINO THINK THERE IS A CACHE, BUT THERE IS NO WAY
+ * OF RETRIEVING THE ITEMS FROM THE OUTSIDE WORLD YET (TESTS).
+ *
+ * EXPOSE AS MBEAN THROUGH JMX's HTTP ADAPTER?
+ *
  */
 public enum MockCacheFactory {
 

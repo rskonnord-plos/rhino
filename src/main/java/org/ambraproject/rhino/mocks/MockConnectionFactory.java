@@ -15,6 +15,9 @@ import java.util.Set;
 
 /**
  * Created by jkrzemien on 8/8/14.
+ *
+ * THIS CLASS IS NOT FINISHED YET. IT JUST MAKES RHINO THINK THERE IS A QUEUE, BUT THERE IS NO WAY
+ * OF RETRIEVING THE MESSAGES FROM THE OUTSIDE WORLD YET (TESTS)
  */
 public class MockConnectionFactory extends MockQueueConnectionFactory {
 
@@ -56,11 +59,10 @@ public class MockConnectionFactory extends MockQueueConnectionFactory {
     @Override
     public void onMessage(Message message) {
       try {
-        log.info("ME LLEGO UN FUCKING MENSAJE! = " + message.getJMSMessageID());
+        log.info("Message arrived! = " + message.getJMSMessageID());
       } catch (JMSException e) {
         e.printStackTrace();
       }
-
     }
   }
 }
