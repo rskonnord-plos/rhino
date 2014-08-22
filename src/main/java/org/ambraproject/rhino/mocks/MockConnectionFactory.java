@@ -1,5 +1,6 @@
 package org.ambraproject.rhino.mocks;
 
+import com.google.common.base.Preconditions;
 import com.mockrunner.jms.ConfigurationManager;
 import com.mockrunner.jms.DestinationManager;
 import com.mockrunner.mock.jms.MockConnection;
@@ -11,7 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 
 /**
  * Created by jkrzemien on 8/8/14.
@@ -26,13 +31,13 @@ public class MockConnectionFactory extends MockQueueConnectionFactory {
 
   public MockConnectionFactory(DestinationManager destinationManager, ConfigurationManager configurationManager) {
     super(destinationManager, configurationManager);
+  }
 
-    queues.add(destinationManager.createQueue("plos.solr.article.index"));
-    log.info("Created mock queue for SOLR article index");
-    queues.add(destinationManager.createQueue("plos.updatedCitedArticles"));
-    log.info("Created mock queue for updatedCitedArticles");
-    queues.add(destinationManager.createQueue("CROSSREF"));
-    log.info("Created mock queue for CROSSREF");
+  public void setQueueNames(List<String> queueNames) {
+    for (String queue : checkNotNull(queueNames)) {
+      queues.add(destinationManager().createQueue(queue));
+      log.info(format("Created mock queue for %s", queue));
+    }
   }
 
   @Override

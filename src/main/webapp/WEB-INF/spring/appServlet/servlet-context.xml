@@ -184,6 +184,13 @@
     <beans:bean id="jmsConnectionFactory" class="org.ambraproject.rhino.mocks.MockConnectionFactory">
       <beans:constructor-arg ref="destinationManager" />
       <beans:constructor-arg ref="configurationManager" />
+      <beans:property name="queueNames">
+        <beans:list>
+          <beans:value>plos.solr.article.index</beans:value>
+          <beans:value>plos.updatedCitedArticles</beans:value>
+          <beans:value>CROSSREF</beans:value>
+        </beans:list>
+      </beans:property>
     </beans:bean>
   </beans:beans>
 
