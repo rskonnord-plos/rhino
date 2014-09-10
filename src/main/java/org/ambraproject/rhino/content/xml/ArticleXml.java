@@ -34,6 +34,7 @@ import org.ambraproject.models.CitedArticle;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.util.NodeListAdapter;
 import org.ambraproject.rhino.util.StringReplacer;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -41,10 +42,8 @@ import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
 import java.net.URLEncoder;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -189,7 +188,8 @@ public class ArticleXml extends AbstractArticleXml<Article> {
     article.setPublisherLocation(readString("/article/front/journal-meta/publisher/publisher-loc"));
 
     article.setLanguage(parseLanguage(readString("/article/@xml:lang")));
-    article.setDate(parseDate(readNode("/article/front/article-meta/pub-date[@pub-type=\"epub\"]")));
+    article.setDate(convertPublicationDate(parseDate(
+        readNode("/article/front/article-meta/pub-date[@pub-type=\"epub\"]"))));
 
     // We have to be careful when setting Article properties that have a one-to-many relationship with entities
     // that are marked 'cascade="all-delete-orphans"' in the hibernate config.  This is especially important
@@ -403,7 +403,7 @@ public class ArticleXml extends AbstractArticleXml<Article> {
     return language.toLowerCase();
   }
 
-  private Date parseDate(Node dateNode) throws XmlContentException {
+  private LocalDate parseDate(Node dateNode) throws XmlContentException {
     int year, month, day;
     try {
       year = Integer.parseInt(readString("child::year", dateNode));
@@ -412,19 +412,16 @@ public class ArticleXml extends AbstractArticleXml<Article> {
     } catch (NumberFormatException e) {
       throw new XmlContentException("Expected numbers for date fields", e);
     }
-    Calendar date = GregorianCalendar.getInstance();
 
-    // Need to call clear to clear out fields we don't set below (like milliseconds).
-    date.clear();
+    return new LocalDate(year, month, day);
+  }
 
-    // TODO: figure out if we want to set time zone.  I'm leaving it out for now
-    // so that the tests will pass in all locales (the date returned by this method
-    // will be in the same time zone as the ones used in the tests).
-//    date.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-
-    // Note that Calendar wants month to be zero-based.
-    date.set(year, month - 1, day, 0, 0, 0);
-    return date.getTime();
+  /**
+   * Represent a publication date (logical calendar day with no time) as a {@link Date} for legacy database
+   * compatibility. Convert it to midnight in the local time zone.
+   */
+  private static Date convertPublicationDate(LocalDate localDate) {
+    return localDate.toDateMidnight().toDate();
   }
 
   private List<ArticleAuthor> readAuthors(List<Node> authorNodes) throws XmlContentException {

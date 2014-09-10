@@ -53,11 +53,13 @@ import org.ambraproject.rhino.test.AssertionCollector;
 import org.ambraproject.rhino.util.StringReplacer;
 import org.ambraproject.rhino.util.response.Transceiver;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +77,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -528,11 +531,7 @@ public class IngestionTest extends BaseRhinoTest {
     compare(results, Article.class, "format", actual.getFormat(), expected.getFormat());
     comparePageRanges(results, Article.class, "pages", actual.getPages(), expected.getPages());
     compare(results, Article.class, "eLocationId", actual.geteLocationId(), expected.geteLocationId());
-
-    // actual.getDate() returns a java.sql.Date since it's coming from hibernate.  We have
-    // to convert that to a java.util.Date (which GSON returns) for the comparison.
-    compare(results, Article.class, "date", new Date(actual.getDate().getTime()),
-        expected.getDate());
+    comparePublicationDates(results, actual.getDate(), expected.getDate());
     compare(results, Article.class, "volume", actual.getVolume(), expected.getVolume());
     compare(results, Article.class, "issue", actual.getIssue(), expected.getIssue());
     compare(results, Article.class, "journal", actual.getJournal(), expected.getJournal());
@@ -549,6 +548,30 @@ public class IngestionTest extends BaseRhinoTest {
       expectedRights = expectedRights.substring(unwantedPrefix.length());
     }
     return compare(results, Article.class, "rights", actualRights, expectedRights);
+  }
+
+  private static void comparePublicationDates(AssertionCollector results, Date actualTimestamp, Date expectedTimestamp) {
+    /*
+     * Publication dates are stored in the DB as timestamps at midnight on the appropriate day. Our expected timestamps
+     * are stored in JSON as midnight in the local time on the machine where they were generated (which happens to be
+     * U.S. Pacific), converted to UTC. The actual timestamp will be at midnight in the server's local time. Therefore,
+     * we don't expect actualTimestamp and expectedTimestamp to be equal unless the test happens to be run on a machine
+     * set to U.S. Pacific time zone. Convert them to logical dates with no hour.
+     *
+     * To future-proof against expected dates being generated from a legacy Ambra environment in a locale other than
+     * Pacific, round the date to the nearest midnight. This should work as long as the JSON was generated anywhere
+     * except the few locales near the middle of the Pacific Ocean that differ from UTC by at least 12 hours. Apologies
+     * to New Zealand, et al.
+     */
+    LocalDate expectedDate = new LocalDate(DateUtils.round(expectedTimestamp, Calendar.DAY_OF_MONTH));
+
+    /*
+     * This one we can just convert from the environmental time zone, since the test environment should be the same one
+     * in which it was created.
+     */
+    LocalDate actualDate = new LocalDate(actualTimestamp);
+
+    compare(results, Article.class, "date", actualDate, expectedDate);
   }
 
   private void compareCategorySets(AssertionCollector results, Map<Category, Integer> actual, Map<Category, Integer> expected) {
