@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
@@ -164,6 +165,10 @@ public class ArticleOutputView implements JsonOutputView, ArticleView {
 
     serialized = JsonAdapterUtil.copyWithoutOverwriting(baseJson, serialized);
 
+    for (String suppressedField : SUPPRESSED_FIELDS) {
+      serialized.remove(suppressedField);
+    }
+
     serialized.add(MemberNames.PINGBACKS, context.serialize(pingbacks));
 
     /*
@@ -175,6 +180,11 @@ public class ArticleOutputView implements JsonOutputView, ArticleView {
 
     return serialized;
   }
+
+  /**
+   * Fields from the legacy Article model that we want not to show in this API.
+   */
+  private static final ImmutableSet<String> SUPPRESSED_FIELDS = ImmutableSet.of("url");
 
   private static Collection<CategoryView> buildCategoryViews(Map<Category, Integer> categoryMap) {
     Collection<CategoryView> categoryViews = Lists.newArrayListWithCapacity(categoryMap.size());
