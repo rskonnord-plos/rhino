@@ -16,26 +16,18 @@
  * limitations under the License.
  */
 
-import org.ambraproject.rhino.config.TestConfiguration;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.plos.crepo.service.contentRepo.impl.ContentRepoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(locations = {"servlet-test-context.xml"})
-@ContextConfiguration({"classpath*:servlet-test-context.xml"})
-public class ContentRepoTest {
+@ContextConfiguration(locations ={"classpath*:servlet-test-context.xml"})
+public class ContentRepoTest{
 
   @Autowired
   protected ContentRepoServiceImpl contentRepoServiceImpl;
@@ -44,7 +36,7 @@ public class ContentRepoTest {
   @Test
   public void test(){
 
-    assertTrue(true);
+    assertNotNull(contentRepoServiceImpl);
 
   }
 
