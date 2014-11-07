@@ -375,6 +375,12 @@
       <version>0.8.8</version>
     </dependency>
 
+      <dependency>
+          <groupId>org.plos</groupId>
+          <artifactId>content-repo-library</artifactId>
+          <version>1.2.0</version>
+      </dependency>
+
   </dependencies>
 
 

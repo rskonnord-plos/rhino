@@ -46,6 +46,7 @@
   </beans:bean>
 
   <context:component-scan base-package="org.ambraproject.rhino"/>
+  <context:component-scan base-package="org.plos.crepo"/>
   <context:annotation-config/>
 
   <beans:bean class="org.ambraproject.rhino.config.SwaggerConfiguration" />
