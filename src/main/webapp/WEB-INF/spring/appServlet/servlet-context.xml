@@ -36,6 +36,8 @@
   <!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
   <resources mapping="/resources/**" location="/resources/"/>
 
+
+
   <!-- Allow us to use "${foo}" notation to pull values from ambra configuration in this file.  -->
   <beans:bean id="propertyConfigurer" class="org.ambraproject.configuration.SpringPlaceholderConfigurer" />
 
@@ -45,13 +47,17 @@
     <beans:property name="suffix" value=".html"/>
   </beans:bean>
 
+    <!--<context:property-placeholder location="classpath:/config/application.properties" />-->
+
   <context:component-scan base-package="org.ambraproject.rhino"/>
-  <context:component-scan base-package="org.plos.crepo"/>
+  <!--<context:component-scan base-package="org.plos.crepo"/>-->
+
+
   <context:annotation-config/>
 
   <beans:bean class="org.ambraproject.rhino.config.SwaggerConfiguration" />
 
-  <context:property-placeholder location="classpath:git.properties" ignore-unresolvable="true" />
+  <!--<context:property-placeholder location="classpath:/config/application.properties, classpath:git.properties" ignore-unresolvable="true" />-->
 
   <beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
     <!-- <beans:property name="maxUploadSize" value=""/> -->

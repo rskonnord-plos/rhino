@@ -24,9 +24,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations ={"classpath*:servlet-test-context.xml"})
+@ContextConfiguration(locations ={"classpath*:root-context.xml"})
 public class ContentRepoTest{
 
   @Autowired
@@ -36,7 +37,11 @@ public class ContentRepoTest{
   @Test
   public void test(){
 
+    assertTrue(true);
     assertNotNull(contentRepoServiceImpl);
+
+    contentRepoServiceImpl.createBucket("testingFromRhino");
+
 
   }
 
