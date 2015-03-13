@@ -34,9 +34,9 @@ import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
-import org.plos.crepo.exceptions.ContentRepoException;
-import org.plos.crepo.exceptions.ErrorType;
-import org.plos.crepo.service.contentRepo.ContentRepoService;
+import org.plos.crepo.clientlib.exceptions.ContentRepoException;
+import org.plos.crepo.clientlib.exceptions.ErrorType;
+import org.plos.crepo.clientlib.service.ContentRepoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeMethod;
@@ -97,7 +97,7 @@ public class ArticleStateServiceTest extends BaseRhinoTest {
   }
 
   private void checkFileExistence(AssetFileIdentity fileIdentity, boolean expectedToExist) throws IOException {
-    try (InputStream stream = contentRepoService.getLatestRepoObjStream(fileIdentity.toString())) {
+    try (InputStream stream = contentRepoService.getLatestRepoObject(fileIdentity.toString())) {
       assertNotNull(stream);
       assertTrue(expectedToExist);
     } catch (ContentRepoException e) {

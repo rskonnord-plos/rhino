@@ -63,8 +63,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
-import org.plos.crepo.exceptions.ContentRepoException;
-import org.plos.crepo.exceptions.ErrorType;
+import org.plos.crepo.clientlib.exceptions.ContentRepoException;
+import org.plos.crepo.clientlib.exceptions.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -842,7 +842,7 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
   @Override
   public InputStream readXml(ArticleIdentity id) {
     try {
-      return contentRepoService.getLatestRepoObjStream(id.forXmlAsset().toString());
+      return contentRepoService.getLatestRepoObject(id.forXmlAsset().toString());
     } catch (ContentRepoException e) {
       if (e.getErrorType() == ErrorType.ErrorFetchingObject) {
         throw reportNotFound(id);

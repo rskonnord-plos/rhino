@@ -66,9 +66,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.hibernate.SessionFactory;
-import org.plos.crepo.config.ContentRepoAccessConfig;
-import org.plos.crepo.service.contentRepo.ContentRepoService;
-import org.plos.crepo.service.contentRepo.impl.factory.ContentRepoServiceFactory;
+import org.plos.crepo.clientlib.config.ContentRepoAccessConfig;
+import org.plos.crepo.clientlib.service.ContentRepoService;
+import org.plos.crepo.clientlib.service.ContentRepoServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -208,7 +208,7 @@ public class RhinoConfiguration extends BaseConfiguration {
       }
     };
 
-    return new ContentRepoServiceFactory().createContentRepoService(accessConfig);
+    return new ContentRepoServiceImpl(accessConfig);
   }
 
 

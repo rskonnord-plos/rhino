@@ -42,7 +42,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
-import org.plos.crepo.exceptions.ContentRepoException;
+import org.plos.crepo.clientlib.exceptions.ContentRepoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.support.DataAccessUtils;
@@ -268,7 +268,7 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
   @Override
   public InputStream read(AssetFileIdentity assetId) {
     try {
-      return contentRepoService.getLatestRepoObjStream(assetId.toString());
+      return contentRepoService.getLatestRepoObject(assetId.toString());
     } catch (ContentRepoException e) {
       String message = String.format("Asset not found at DOI \"%s\" with extension \"%s\"",
           assetId.getIdentifier(), assetId.getFileExtension());
