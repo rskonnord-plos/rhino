@@ -2,13 +2,11 @@ package org.ambraproject.rhino.model;
 
 import org.ambraproject.models.AmbraEntity;
 
-import java.util.UUID;
-
 public class ArticleRevision extends AmbraEntity {
 
   private String doi;
   private int revisionNumber;
-  private UUID crepoUuid;
+  private String crepoUuid; // TODO: Configure org.hibernate.type.UUIDCharType so this can be a java.util.UUID
 
   public String getDoi() {
     return doi;
@@ -26,11 +24,11 @@ public class ArticleRevision extends AmbraEntity {
     this.revisionNumber = revisionNumber;
   }
 
-  public UUID getCrepoUuid() {
+  public String getCrepoUuid() {
     return crepoUuid;
   }
 
-  public void setCrepoUuid(UUID crepoUuid) {
+  public void setCrepoUuid(String crepoUuid) {
     this.crepoUuid = crepoUuid;
   }
 
