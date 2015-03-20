@@ -1,8 +1,10 @@
 package org.ambraproject.rhino.rest.controller;
 
+import com.google.common.io.ByteStreams;
 import org.ambraproject.rhino.model.ArticleRevision;
 import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.rhino.rest.controller.abstr.RestController;
+import org.ambraproject.rhino.service.ArticleRevisionService;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -16,19 +18,32 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @Controller
 public class ArticleRevisionController extends RestController {
 
   @Autowired
   private HibernateTemplate hibernateTemplate;
+
+  @Autowired
+  private ArticleRevisionService articleRevisionService;
 
   @RequestMapping(value = "articles/revisions/create", method = RequestMethod.GET)
   public void createRevision(HttpServletRequest request, HttpServletResponse response,
@@ -83,6 +98,16 @@ public class ArticleRevisionController extends RestController {
 
     try (PrintWriter writer = response.getWriter()) {
       writer.println(uuid);
+    }
+  }
+
+  @Transactional(rollbackFor = {Throwable.class})
+  @RequestMapping(value = "articles/revision/ingest", method = RequestMethod.POST)
+  public void ingest(HttpServletRequest request, HttpServletResponse response,
+                     @RequestParam("archive") MultipartFile requestFile)
+      throws IOException {
+    try (InputStream requestStream = requestFile.getInputStream()) {
+      articleRevisionService.ingest(requestStream);
     }
   }
 
