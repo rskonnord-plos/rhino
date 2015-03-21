@@ -184,12 +184,9 @@ public class RhinoConfiguration extends BaseConfiguration {
     return HttpClientBuilder.create().setConnectionManager(manager).build();
   }
 
-  @Bean
-  public ContentRepoService contentRepoService(RuntimeConfiguration runtimeConfiguration,
-                                               final CloseableHttpClient httpClient) {
-    RuntimeConfiguration.ContentRepoEndpoint corpus = runtimeConfiguration.getCorpusBucket();
-    final String repoServer = Preconditions.checkNotNull(corpus.getAddress().toString());
-    final String bucketName = Preconditions.checkNotNull(corpus.getBucket());
+  private static ContentRepoService buildContentRepoService(RuntimeConfiguration.ContentRepoEndpoint endpoint, final CloseableHttpClient httpClient) {
+    final String repoServer = Preconditions.checkNotNull(endpoint.getAddress().toString());
+    final String bucketName = Preconditions.checkNotNull(endpoint.getBucket());
     Preconditions.checkNotNull(httpClient);
 
     ContentRepoAccessConfig accessConfig = new ContentRepoAccessConfig() {
@@ -210,6 +207,23 @@ public class RhinoConfiguration extends BaseConfiguration {
     };
 
     return new ContentRepoServiceImpl(accessConfig);
+  }
+
+  @Bean
+  public ContentRepoService contentRepoService(RuntimeConfiguration runtimeConfiguration,
+                                               final CloseableHttpClient httpClient) {
+    return buildContentRepoService(runtimeConfiguration.getCorpusBucket(), httpClient);
+  }
+
+  /**
+   * TEMPORARY while the versioned-article prototype is under development.
+   * <p/>
+   * TODO: Unify with {@link #contentRepoService}
+   */
+  @Bean
+  public ContentRepoService versionedContentRepoService(RuntimeConfiguration runtimeConfiguration,
+                                                        final CloseableHttpClient httpClient) {
+    return buildContentRepoService(runtimeConfiguration.getVersionedCorpusBucket(), httpClient);
   }
 
 

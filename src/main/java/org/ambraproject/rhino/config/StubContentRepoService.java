@@ -155,6 +155,11 @@ public class StubContentRepoService implements ContentRepoService {
   }
 
   @Override
+  public RepoCollectionMetadata autoCreateCollection(RepoCollection repoCollection) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public RepoCollectionMetadata createCollection(RepoCollection repoCollection) {
     throw new UnsupportedOperationException();
   }

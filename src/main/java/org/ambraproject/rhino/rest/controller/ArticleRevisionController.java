@@ -1,6 +1,6 @@
 package org.ambraproject.rhino.rest.controller;
 
-import com.google.common.io.ByteStreams;
+import org.ambraproject.rhino.content.xml.XmlContentException;
 import org.ambraproject.rhino.model.ArticleRevision;
 import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.rhino.rest.controller.abstr.RestController;
@@ -22,19 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 @Controller
 public class ArticleRevisionController extends RestController {
@@ -108,6 +100,8 @@ public class ArticleRevisionController extends RestController {
       throws IOException {
     try (InputStream requestStream = requestFile.getInputStream()) {
       articleRevisionService.ingest(requestStream);
+    } catch (XmlContentException e) {
+      throw new RestClientException("Invalid XML", HttpStatus.BAD_REQUEST, e);
     }
   }
 
