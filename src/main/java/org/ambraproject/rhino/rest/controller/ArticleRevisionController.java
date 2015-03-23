@@ -157,4 +157,20 @@ public class ArticleRevisionController extends RestController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
+  @Transactional(rollbackFor = {Throwable.class})
+  @RequestMapping(value = "articles/revisions/associate", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteAssociation(HttpServletRequest request, HttpServletResponse response,
+                                             @RequestParam(value = "doi", required = true) String doi,
+                                             @RequestParam(value = "r", required = true) int revisionNumber)
+      throws IOException {
+    ArticleRevision revision = (ArticleRevision) DataAccessUtils.uniqueResult(
+        hibernateTemplate.find("from ArticleRevision where doi=? and revisionNumber=?",
+            doi, revisionNumber));
+    if (revision == null) {
+      throw new RestClientException("Revision doesn't exist", HttpStatus.NOT_FOUND);
+    }
+    hibernateTemplate.delete(revision);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
 }
