@@ -1,7 +1,11 @@
 package org.ambraproject.rhino.service;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import org.ambraproject.models.Article;
@@ -10,7 +14,9 @@ import org.ambraproject.rhino.content.xml.ManifestXml;
 import org.ambraproject.rhino.content.xml.XmlContentException;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.AssetIdentity;
+import org.ambraproject.rhino.model.ArticleRevision;
 import org.ambraproject.rhino.service.impl.AmbraService;
+import org.ambraproject.rhino.util.response.Transceiver;
 import org.plos.crepo.clientlib.model.RepoCollection;
 import org.plos.crepo.clientlib.model.RepoCollectionMetadata;
 import org.plos.crepo.clientlib.model.RepoObject;
@@ -28,11 +34,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -167,12 +177,12 @@ public class ArticleRevisionService extends AmbraService {
     map.put("manuscript", new RepoVersionRepr(objects.get(manuscriptKey)));
 
     List<ManifestXml.Asset> assetSpec = manifestXml.parse();
-    List<Map<String,Object>> assetList = new ArrayList<>(assetSpec.size());
+    List<Map<String, Object>> assetList = new ArrayList<>(assetSpec.size());
     for (ManifestXml.Asset asset : assetSpec) {
-      Map<String,Object> assetMetadata=new LinkedHashMap<>();
-      assetMetadata.put("doi",AssetIdentity.create(asset.getUri()).toString());
+      Map<String, Object> assetMetadata = new LinkedHashMap<>();
+      assetMetadata.put("doi", AssetIdentity.create(asset.getUri()).toString());
 
-      Map<String,Object> assetObjects=new LinkedHashMap<>();
+      Map<String, Object> assetObjects = new LinkedHashMap<>();
       for (ManifestXml.Representation representation : asset.getRepresentations()) {
         RepoVersion objectForRepr = objects.get(representation.getEntry());
         assetObjects.put(representation.getName(), new RepoVersionRepr(objectForRepr));
@@ -199,6 +209,63 @@ public class ArticleRevisionService extends AmbraService {
   private void writeRevision(RepoCollectionMetadata articleCollection) {
     RepoVersion collectionVersion = articleCollection.getVersion();
     // TODO Implement
+  }
+
+
+  private static class RevisionVersionMapping {
+    private final int versionNumber;
+    private final Collection<Integer> revisionNumbers;
+
+    public RevisionVersionMapping(int versionNumber) {
+      Preconditions.checkArgument(versionNumber >= 0);
+      this.versionNumber = versionNumber;
+      this.revisionNumbers = new TreeSet<>();
+    }
+  }
+
+  private static final Ordering<RevisionVersionMapping> ORDER_BY_VERSION_NUMBER = Ordering.natural().onResultOf(new Function<RevisionVersionMapping, Integer>() {
+    @Override
+    public Integer apply(RevisionVersionMapping input) {
+      return input.versionNumber;
+    }
+  });
+
+  /**
+   * Describe the full list of back-end versions for one article, and the article revisions (if any) associated with
+   * each version.
+   *
+   * @param articleIdentity
+   * @return
+   */
+  public Transceiver listRevisions(final ArticleIdentity articleIdentity) {
+    return new Transceiver() {
+      @Override
+      protected Object getData() throws IOException {
+        return fetchRevisions(articleIdentity);
+      }
+
+      @Override
+      protected Calendar getLastModifiedDate() throws IOException {
+        return null;
+      }
+    };
+  }
+
+  private Collection<?> fetchRevisions(ArticleIdentity articleIdentity) throws IOException {
+    List<RepoCollectionMetadata> versions = versionedContentRepoService.getCollectionVersions(articleIdentity.toString());
+    Map<UUID, RevisionVersionMapping> mappings = Maps.newHashMapWithExpectedSize(versions.size());
+    for (RepoCollectionMetadata version : versions) {
+      RevisionVersionMapping mapping = new RevisionVersionMapping(version.getVersionNumber().getNumber());
+      mappings.put(version.getVersion().getUuid(), mapping);
+    }
+
+    List<ArticleRevision> revisions = hibernateTemplate.find("from ArticleRevision where doi=?", articleIdentity.toString());
+    for (ArticleRevision revision : revisions) {
+      RevisionVersionMapping mapping = mappings.get(UUID.fromString(revision.getCrepoUuid()));
+      mapping.revisionNumbers.add(revision.getRevisionNumber());
+    }
+
+    return ORDER_BY_VERSION_NUMBER.immutableSortedCopy(mappings.values());
   }
 
 }
