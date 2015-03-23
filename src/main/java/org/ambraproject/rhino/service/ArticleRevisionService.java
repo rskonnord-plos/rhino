@@ -1,15 +1,22 @@
 package org.ambraproject.rhino.service;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.io.ByteStreams;
+import com.google.gson.Gson;
 import org.ambraproject.models.Article;
 import org.ambraproject.rhino.content.xml.ArticleXml;
 import org.ambraproject.rhino.content.xml.ManifestXml;
 import org.ambraproject.rhino.content.xml.XmlContentException;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.AssetIdentity;
+import org.ambraproject.rhino.model.ArticleRevision;
 import org.ambraproject.rhino.service.impl.AmbraService;
+import org.ambraproject.rhino.util.response.Transceiver;
 import org.plos.crepo.model.RepoCollection;
 import org.plos.crepo.model.RepoCollectionMetadata;
 import org.plos.crepo.model.RepoObject;
@@ -27,10 +34,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -38,6 +50,8 @@ public class ArticleRevisionService extends AmbraService {
 
   @Autowired
   private ContentRepoService versionedContentRepoService;
+  @Autowired
+  private Gson crepoGson;
 
   public void ingest(InputStream archiveStream) throws IOException, XmlContentException {
     String prefix = "ingest_" + new Date().getTime() + "_";
@@ -111,51 +125,147 @@ public class ArticleRevisionService extends AmbraService {
       articleMetadata.setDoi(articleIdentity.getKey()); // Should ArticleXml.build do this itself?
     }
 
-    Collection<RepoObject> toUpload = new ArrayList<>(files.size());
+    Map<String, RepoObject> toUpload = new LinkedHashMap<>(); // keys are zip entry names
 
     RepoObject manifestObject = new RepoObject.RepoObjectBuilder("manuscript/" + articleIdentity)
         .fileContent(manuscriptFile)
         .contentType(MediaType.APPLICATION_XML)
         .downloadName(articleIdentity.forXmlAsset().getFileName())
         .build();
-    toUpload.add(manifestObject);
+    toUpload.put(manuscriptRepr.getEntry(), manifestObject);
 
     for (ManifestXml.Asset asset : assets) {
       for (ManifestXml.Representation representation : asset.getRepresentations()) {
-        File file = files.get(representation.getEntry());
+        String entry = representation.getEntry();
+        File file = files.get(entry);
         if (file.equals(manuscriptFile)) continue;
         String key = representation.getName() + "/" + AssetIdentity.create(asset.getUri());
         RepoObject repoObject = new RepoObject.RepoObjectBuilder(key)
             .fileContent(file)
                 // TODO Add more metadata. Extract from articleMetadata and manifestXml as necessary.
             .build();
-        toUpload.add(repoObject);
+        toUpload.put(entry, repoObject);
       }
     }
 
     // Post files
-    Collection<RepoVersion> created = new ArrayList<>(toUpload.size());
-    for (RepoObject repoObject : toUpload) { // Excellent candidate for parallelization! I can haz JDK8 plz?
+    Map<String, RepoVersion> created = new LinkedHashMap<>();
+    for (Map.Entry<String, RepoObject> entry : toUpload.entrySet()) { // Excellent candidate for parallelization! I can haz JDK8 plz?
+      RepoObject repoObject = entry.getValue();
       RepoObjectMetadata createdMetadata = versionedContentRepoService.autoCreateRepoObject(repoObject);
-      created.add(createdMetadata.getVersion());
+      created.put(entry.getKey(), createdMetadata.getVersion());
     }
 
-    Object userMetadataForCollection = null; // TODO Implement
+    Map<String, Object> userMetadataForCollection = buildArticleAsUserMetadata(manifestXml, created);
 
     // Create collection
     RepoCollection collection = RepoCollection.builder()
         .setKey(articleIdentity.toString())
-        .setObjects(created)
-            // TODO Set user metadata (needs lib support)
+        .setObjects(created.values())
+        .setUserMetadata(crepoGson.toJson(userMetadataForCollection))
         .build();
     RepoCollectionMetadata collectionMetadata = versionedContentRepoService.autoCreateCollection(collection);
 
     return collectionMetadata;
   }
 
+  private Map<String, Object> buildArticleAsUserMetadata(ManifestXml manifestXml, Map<String, RepoVersion> objects) {
+    Map<String, Object> map = new LinkedHashMap<>();
+    map.put("format", "nlm");
+
+    String manuscriptKey = manifestXml.getArticleXml();
+    map.put("manuscript", new RepoVersionRepr(objects.get(manuscriptKey)));
+
+    List<ManifestXml.Asset> assetSpec = manifestXml.parse();
+    List<Map<String, Object>> assetList = new ArrayList<>(assetSpec.size());
+    for (ManifestXml.Asset asset : assetSpec) {
+      Map<String, Object> assetMetadata = new LinkedHashMap<>();
+      assetMetadata.put("doi", AssetIdentity.create(asset.getUri()).toString());
+
+      Map<String, Object> assetObjects = new LinkedHashMap<>();
+      for (ManifestXml.Representation representation : asset.getRepresentations()) {
+        RepoVersion objectForRepr = objects.get(representation.getEntry());
+        assetObjects.put(representation.getName(), new RepoVersionRepr(objectForRepr));
+      }
+      assetMetadata.put("objects", assetObjects);
+
+      assetList.add(assetMetadata);
+    }
+    map.put("assets", assetList);
+
+    return map;
+  }
+
+  private static class RepoVersionRepr {
+    private final String key;
+    private final String uuid;
+
+    private RepoVersionRepr(RepoVersion repoVersion) {
+      this.key = repoVersion.getKey();
+      this.uuid = repoVersion.getUuid().toString();
+    }
+  }
+
   private void writeRevision(RepoCollectionMetadata articleCollection) {
     RepoVersion collectionVersion = articleCollection.getVersion();
     // TODO Implement
+  }
+
+
+  private static class RevisionVersionMapping {
+    private final int versionNumber;
+    private final Collection<Integer> revisionNumbers;
+
+    public RevisionVersionMapping(int versionNumber) {
+      Preconditions.checkArgument(versionNumber >= 0);
+      this.versionNumber = versionNumber;
+      this.revisionNumbers = new TreeSet<>();
+    }
+  }
+
+  private static final Ordering<RevisionVersionMapping> ORDER_BY_VERSION_NUMBER = Ordering.natural().onResultOf(new Function<RevisionVersionMapping, Integer>() {
+    @Override
+    public Integer apply(RevisionVersionMapping input) {
+      return input.versionNumber;
+    }
+  });
+
+  /**
+   * Describe the full list of back-end versions for one article, and the article revisions (if any) associated with
+   * each version.
+   *
+   * @param articleIdentity
+   * @return
+   */
+  public Transceiver listRevisions(final ArticleIdentity articleIdentity) {
+    return new Transceiver() {
+      @Override
+      protected Object getData() throws IOException {
+        return fetchRevisions(articleIdentity);
+      }
+
+      @Override
+      protected Calendar getLastModifiedDate() throws IOException {
+        return null;
+      }
+    };
+  }
+
+  private Collection<?> fetchRevisions(ArticleIdentity articleIdentity) throws IOException {
+    List<RepoCollectionMetadata> versions = versionedContentRepoService.getCollectionVersions(articleIdentity.toString());
+    Map<UUID, RevisionVersionMapping> mappings = Maps.newHashMapWithExpectedSize(versions.size());
+    for (RepoCollectionMetadata version : versions) {
+      RevisionVersionMapping mapping = new RevisionVersionMapping(version.getVersionNumber().getNumber());
+      mappings.put(version.getVersion().getUuid(), mapping);
+    }
+
+    List<ArticleRevision> revisions = hibernateTemplate.find("from ArticleRevision where doi=?", articleIdentity.toString());
+    for (ArticleRevision revision : revisions) {
+      RevisionVersionMapping mapping = mappings.get(UUID.fromString(revision.getCrepoUuid()));
+      mapping.revisionNumbers.add(revision.getRevisionNumber());
+    }
+
+    return ORDER_BY_VERSION_NUMBER.immutableSortedCopy(mappings.values());
   }
 
 }
