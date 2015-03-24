@@ -9,12 +9,14 @@ import com.google.common.collect.Ordering;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import org.ambraproject.models.Article;
+import org.ambraproject.rhino.config.YamlConfiguration;
 import org.ambraproject.rhino.content.xml.ArticleXml;
 import org.ambraproject.rhino.content.xml.ManifestXml;
 import org.ambraproject.rhino.content.xml.XmlContentException;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.AssetIdentity;
 import org.ambraproject.rhino.model.ArticleRevision;
+import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.rhino.service.impl.AmbraService;
 import org.ambraproject.rhino.util.response.Transceiver;
 import org.plos.crepo.clientlib.model.RepoCollection;
@@ -24,6 +26,7 @@ import org.plos.crepo.clientlib.model.RepoObjectMetadata;
 import org.plos.crepo.clientlib.model.RepoVersion;
 import org.plos.crepo.clientlib.service.ContentRepoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import javax.ws.rs.core.MediaType;
 import java.io.BufferedInputStream;
@@ -197,7 +200,7 @@ public class ArticleRevisionService extends AmbraService {
   }
 
 
-  public Transceiver readRevision(ArticleIdentity articleIdentity, UUID uuid) {
+  public Transceiver readVersion(ArticleIdentity articleIdentity, UUID uuid) {
     final RepoVersion version = RepoVersion.create(articleIdentity.toString(), uuid);
     return new Transceiver() {
       @Override
@@ -213,6 +216,35 @@ public class ArticleRevisionService extends AmbraService {
         return null;
       }
     };
+  }
+
+  /**
+   * Return the metadata for the object in a collection with a given key.
+   *
+   * @param collectionVersion the collection's identifier
+   * @param objectKey         the key of the object to search for
+   * @return the metadata of the object, or {@code null} if no object with the key is in the collection
+   * @throws IllegalArgumentException if two or more objects in the collection have the given key
+   */
+  private RepoObjectMetadata findObjectInCollection(RepoVersion collectionVersion, String objectKey) {
+    Preconditions.checkNotNull(objectKey);
+    RepoCollectionMetadata collection = versionedContentRepoService.getCollection(collectionVersion);
+    RepoObjectMetadata found = null;
+    for (RepoObjectMetadata objectMetadata : collection.getObjects()) {
+      if (objectMetadata.getVersion().getKey().equals(objectKey)) {
+        if (found != null) {
+          throw new IllegalArgumentException("Multiple objects have key: " + objectKey);
+        }
+        found = objectMetadata;
+      }
+    }
+    return found;
+  }
+
+  public InputStream readFileVersion(ArticleIdentity articleIdentity, UUID articleUuid, String fileKey) {
+    RepoObjectMetadata objectMetadata = findObjectInCollection(RepoVersion.create(articleIdentity.toString(), articleUuid), fileKey);
+    if (objectMetadata==null) throw new RestClientException("File not found", HttpStatus.NOT_FOUND);
+    return contentRepoService.getRepoObject(objectMetadata.getVersion());
   }
 
 

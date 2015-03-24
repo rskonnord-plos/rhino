@@ -1,5 +1,6 @@
 package org.ambraproject.rhino.rest.controller;
 
+import com.google.common.io.ByteStreams;
 import org.ambraproject.rhino.content.xml.XmlContentException;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.model.ArticleRevision;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.UUID;
 
@@ -120,7 +122,7 @@ public class ArticleRevisionController extends RestController {
     String uuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
         "select crepoUuid from ArticleRevision where doi=? and revisionNumber=?", doi, revisionNumber));
     if (uuid == null) throw new RestClientException("Not found", HttpStatus.NOT_FOUND);
-    articleRevisionService.readRevision(ArticleIdentity.create(doi), UUID.fromString(uuid)).respond(request, response, entityGson);
+    articleRevisionService.readVersion(ArticleIdentity.create(doi), UUID.fromString(uuid)).respond(request, response, entityGson);
   }
 
   @Transactional(rollbackFor = {Throwable.class})
@@ -132,7 +134,7 @@ public class ArticleRevisionController extends RestController {
     String uuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
         "select crepoUuid from ArticleRevision where doi=? and versionNumber=?", doi, versionNumber));
     if (uuid == null) throw new RestClientException("Not found", HttpStatus.NOT_FOUND);
-    articleRevisionService.readRevision(ArticleIdentity.create(doi), UUID.fromString(uuid)).respond(request, response, entityGson);
+    articleRevisionService.readVersion(ArticleIdentity.create(doi), UUID.fromString(uuid)).respond(request, response, entityGson);
   }
 
   @Transactional(rollbackFor = {Throwable.class})
@@ -195,6 +197,43 @@ public class ArticleRevisionController extends RestController {
     }
     hibernateTemplate.delete(revision);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @Transactional(rollbackFor = {Throwable.class})
+  @RequestMapping(value = "articles/versionedFile", method = RequestMethod.GET, params = {"doi", "key", "r"})
+  public void readFileRevision(HttpServletRequest request, HttpServletResponse response,
+                               @RequestParam("doi") String doi,
+                               @RequestParam("key") String key,
+                               @RequestParam("r") int revisionNumber)
+      throws IOException {
+    String uuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
+        "select crepoUuid from ArticleRevision where doi=? and revisionNumber=?", doi, revisionNumber));
+    streamFile(request, response, doi, uuid, key);
+  }
+
+  @Transactional(rollbackFor = {Throwable.class})
+  @RequestMapping(value = "articles/versionedFile", method = RequestMethod.GET, params = {"doi", "key", "v"})
+  public void readFileVersion(HttpServletRequest request, HttpServletResponse response,
+                              @RequestParam("doi") String doi,
+                              @RequestParam("key") String key,
+                              @RequestParam("v") int versionNumber)
+      throws IOException {
+    String uuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
+        "select crepoUuid from ArticleRevision where doi=? and versionNumber=?", doi, versionNumber));
+    streamFile(request, response, doi, uuid, key);
+  }
+
+  private void streamFile(HttpServletRequest request, HttpServletResponse response,
+                          String articleDoi, String articleUuid, String fileKey)
+      throws IOException {
+    if (articleUuid == null) throw new RestClientException("Not found", HttpStatus.NOT_FOUND);
+
+    // TODO: Respect headers, reproxying, etc. This is just prototype code.
+    response.setStatus(HttpStatus.OK.value());
+    try (InputStream fileStream = articleRevisionService.readFileVersion(ArticleIdentity.create(articleDoi), UUID.fromString(articleUuid), fileKey);
+         OutputStream responseStream = response.getOutputStream()) {
+      ByteStreams.copy(fileStream, responseStream);
+    }
   }
 
 }
