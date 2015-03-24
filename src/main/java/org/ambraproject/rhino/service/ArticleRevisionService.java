@@ -196,6 +196,26 @@ public class ArticleRevisionService extends AmbraService {
     return map;
   }
 
+
+  public Transceiver readRevision(ArticleIdentity articleIdentity, UUID uuid) {
+    final RepoVersion version = RepoVersion.create(articleIdentity.toString(), uuid);
+    return new Transceiver() {
+      @Override
+      protected Object getData() throws IOException {
+        RepoCollectionMetadata collection = versionedContentRepoService.getCollection(version);
+
+        // TODO: Implement a view. Don't actually want to expose UUIDs, etc.
+        return collection.getJsonUserMetadata().orNull();
+      }
+
+      @Override
+      protected Calendar getLastModifiedDate() throws IOException {
+        return null;
+      }
+    };
+  }
+
+
   private static class RepoVersionRepr {
     private final String key;
     private final String uuid;

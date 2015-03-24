@@ -104,11 +104,35 @@ public class ArticleRevisionController extends RestController {
   }
 
   @Transactional(rollbackFor = {Throwable.class})
-  @RequestMapping(value = "articles/versions", method = RequestMethod.GET)
-  public void ingest(HttpServletRequest request, HttpServletResponse response,
-                     @RequestParam("key") final String key)
+  @RequestMapping(value = "articles/versions", method = RequestMethod.GET, params = {"doi"})
+  public void list(HttpServletRequest request, HttpServletResponse response,
+                   @RequestParam("doi") String doi)
       throws IOException {
-    articleRevisionService.listRevisions(ArticleIdentity.create(key)).respond(request, response, entityGson);
+    articleRevisionService.listRevisions(ArticleIdentity.create(doi)).respond(request, response, entityGson);
+  }
+
+  @Transactional(rollbackFor = {Throwable.class})
+  @RequestMapping(value = "articles/versions", method = RequestMethod.GET, params = {"doi", "r"})
+  public void readRevision(HttpServletRequest request, HttpServletResponse response,
+                           @RequestParam("doi") String doi,
+                           @RequestParam("r") int revisionNumber)
+      throws IOException {
+    String uuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
+        "select crepoUuid from ArticleRevision where doi=? and revisionNumber=?", doi, revisionNumber));
+    if (uuid == null) throw new RestClientException("Not found", HttpStatus.NOT_FOUND);
+    articleRevisionService.readRevision(ArticleIdentity.create(doi), UUID.fromString(uuid)).respond(request, response, entityGson);
+  }
+
+  @Transactional(rollbackFor = {Throwable.class})
+  @RequestMapping(value = "articles/versions", method = RequestMethod.GET, params = {"doi", "v"})
+  public void readVersion(HttpServletRequest request, HttpServletResponse response,
+                          @RequestParam("doi") String doi,
+                          @RequestParam("v") int versionNumber)
+      throws IOException {
+    String uuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
+        "select crepoUuid from ArticleRevision where doi=? and versionNumber=?", doi, versionNumber));
+    if (uuid == null) throw new RestClientException("Not found", HttpStatus.NOT_FOUND);
+    articleRevisionService.readRevision(ArticleIdentity.create(doi), UUID.fromString(uuid)).respond(request, response, entityGson);
   }
 
   @Transactional(rollbackFor = {Throwable.class})
