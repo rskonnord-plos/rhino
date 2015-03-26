@@ -4,17 +4,19 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import org.ambraproject.models.Article;
-import org.ambraproject.rhino.config.YamlConfiguration;
 import org.ambraproject.rhino.content.xml.ArticleXml;
 import org.ambraproject.rhino.content.xml.ManifestXml;
 import org.ambraproject.rhino.content.xml.XmlContentException;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.AssetIdentity;
+import org.ambraproject.rhino.model.ArticleAssociation;
 import org.ambraproject.rhino.model.ArticleRevision;
 import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.rhino.service.impl.AmbraService;
@@ -26,6 +28,7 @@ import org.plos.crepo.model.RepoObjectMetadata;
 import org.plos.crepo.model.RepoVersion;
 import org.plos.crepo.service.ContentRepoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.http.HttpStatus;
 
 import javax.ws.rs.core.MediaType;
@@ -44,6 +47,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -159,20 +163,45 @@ public class ArticleRevisionService extends AmbraService {
       created.put(entry.getKey(), createdMetadata.getVersion());
     }
 
-    Map<String, Object> userMetadataForCollection = buildArticleAsUserMetadata(manifestXml, created);
+    ArticleUserMetadata userMetadataForCollection = buildArticleAsUserMetadata(manifestXml, created);
 
     // Create collection
     RepoCollection collection = RepoCollection.builder()
         .setKey(articleIdentity.toString())
         .setObjects(created.values())
-        .setUserMetadata(crepoGson.toJson(userMetadataForCollection))
+        .setUserMetadata(crepoGson.toJson(userMetadataForCollection.map))
         .build();
     RepoCollectionMetadata collectionMetadata = versionedContentRepoService.autoCreateCollection(collection);
+
+    // Associate DOIs
+    for (String assetDoi : userMetadataForCollection.dois) {
+      assetDoi = AssetIdentity.create(assetDoi).toString();
+      ArticleAssociation existing = (ArticleAssociation) DataAccessUtils.uniqueResult(hibernateTemplate.find(
+          "from ArticleAssociation where doi=?", assetDoi));
+      if (existing == null) {
+        ArticleAssociation association = new ArticleAssociation();
+        association.setDoi(assetDoi);
+        association.setParentArticleDoi(articleIdentity.toString());
+        hibernateTemplate.persist(association);
+      } else if (!existing.getParentArticleDoi().equalsIgnoreCase(articleIdentity.toString())) {
+        throw new RuntimeException("Asset DOI already belongs to another parent article"); // TODO: Rollback
+      } // else, leave it as is
+    }
 
     return collectionMetadata;
   }
 
-  private Map<String, Object> buildArticleAsUserMetadata(ManifestXml manifestXml, Map<String, RepoVersion> objects) {
+  private static class ArticleUserMetadata {
+    private final Map<String, Object> map;
+    private final Set<String> dois;
+
+    private ArticleUserMetadata(Map<String, Object> map, Collection<String> dois) {
+      this.map = ImmutableMap.copyOf(map);
+      this.dois = ImmutableSet.copyOf(dois);
+    }
+  }
+
+  private ArticleUserMetadata buildArticleAsUserMetadata(ManifestXml manifestXml, Map<String, RepoVersion> objects) {
     Map<String, Object> map = new LinkedHashMap<>();
     map.put("format", "nlm");
 
@@ -181,9 +210,12 @@ public class ArticleRevisionService extends AmbraService {
 
     List<ManifestXml.Asset> assetSpec = manifestXml.parse();
     List<Map<String, Object>> assetList = new ArrayList<>(assetSpec.size());
+    List<String> assetDois = new ArrayList<>(assetSpec.size());
     for (ManifestXml.Asset asset : assetSpec) {
       Map<String, Object> assetMetadata = new LinkedHashMap<>();
-      assetMetadata.put("doi", AssetIdentity.create(asset.getUri()).toString());
+      String doi = AssetIdentity.create(asset.getUri()).toString();
+      assetMetadata.put("doi", doi);
+      assetDois.add(doi);
 
       Map<String, Object> assetObjects = new LinkedHashMap<>();
       for (ManifestXml.Representation representation : asset.getRepresentations()) {
@@ -196,7 +228,7 @@ public class ArticleRevisionService extends AmbraService {
     }
     map.put("assets", assetList);
 
-    return map;
+    return new ArticleUserMetadata(map, assetDois);
   }
 
 
@@ -243,7 +275,7 @@ public class ArticleRevisionService extends AmbraService {
 
   public InputStream readFileVersion(ArticleIdentity articleIdentity, UUID articleUuid, String fileKey) {
     RepoObjectMetadata objectMetadata = findObjectInCollection(RepoVersion.create(articleIdentity.toString(), articleUuid), fileKey);
-    if (objectMetadata==null) throw new RestClientException("File not found", HttpStatus.NOT_FOUND);
+    if (objectMetadata == null) throw new RestClientException("File not found", HttpStatus.NOT_FOUND);
     return contentRepoService.getRepoObject(objectMetadata.getVersion());
   }
 

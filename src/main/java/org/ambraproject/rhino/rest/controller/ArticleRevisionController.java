@@ -1,5 +1,6 @@
 package org.ambraproject.rhino.rest.controller;
 
+import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import org.ambraproject.rhino.content.xml.XmlContentException;
 import org.ambraproject.rhino.identity.ArticleIdentity;
@@ -10,6 +11,7 @@ import org.ambraproject.rhino.service.ArticleRevisionService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.plos.crepo.model.RepoCollectionMetadata;
+import org.plos.crepo.model.RepoObjectMetadata;
 import org.plos.crepo.model.RepoVersionNumber;
 import org.plos.crepo.service.ContentRepoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,6 +202,16 @@ public class ArticleRevisionController extends RestController {
   }
 
   @Transactional(rollbackFor = {Throwable.class})
+  @RequestMapping(value = "articles/associated", method = RequestMethod.GET)
+  public ResponseEntity<String> findAssociatedArticle(HttpServletRequest request, HttpServletResponse response,
+                                                      @RequestParam("doi") String doi) {
+    String parentArticleDoi = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
+        "select parentArticleDoi from ArticleAssociation where doi=?", doi));
+    return (parentArticleDoi == null) ? new ResponseEntity<String>(HttpStatus.NOT_FOUND)
+        : new ResponseEntity<>(entityGson.toJson(parentArticleDoi, String.class), HttpStatus.OK);
+  }
+
+  @Transactional(rollbackFor = {Throwable.class})
   @RequestMapping(value = "articles/versionedFile", method = RequestMethod.GET, params = {"doi", "key", "r"})
   public void readFileRevision(HttpServletRequest request, HttpServletResponse response,
                                @RequestParam("doi") String doi,
@@ -229,6 +241,7 @@ public class ArticleRevisionController extends RestController {
     if (articleUuid == null) throw new RestClientException("Not found", HttpStatus.NOT_FOUND);
 
     // TODO: Respect headers, reproxying, etc. This is just prototype code.
+    // See org.ambraproject.rhino.rest.controller.AssetFileCrudController.read
     response.setStatus(HttpStatus.OK.value());
     try (InputStream fileStream = articleRevisionService.readFileVersion(ArticleIdentity.create(articleDoi), UUID.fromString(articleUuid), fileKey);
          OutputStream responseStream = response.getOutputStream()) {

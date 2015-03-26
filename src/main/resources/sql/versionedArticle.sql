@@ -30,5 +30,5 @@ CREATE TABLE articleAssociation (
   lastModified DATETIME NOT NULL,
 
   PRIMARY KEY(articleAssociationId),
-  UNIQUE KEY(doi, parentArticleDoi)
+  UNIQUE KEY(doi)
 );
