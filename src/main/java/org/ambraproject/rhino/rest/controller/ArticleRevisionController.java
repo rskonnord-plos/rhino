@@ -1,9 +1,9 @@
 package org.ambraproject.rhino.rest.controller;
 
-import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import org.ambraproject.rhino.content.xml.XmlContentException;
 import org.ambraproject.rhino.identity.ArticleIdentity;
+import org.ambraproject.rhino.identity.AssetIdentity;
 import org.ambraproject.rhino.model.ArticleRevision;
 import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.rhino.rest.controller.abstr.RestController;
@@ -11,7 +11,7 @@ import org.ambraproject.rhino.service.ArticleRevisionService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.plos.crepo.model.RepoCollectionMetadata;
-import org.plos.crepo.model.RepoObjectMetadata;
+import org.plos.crepo.model.RepoVersion;
 import org.plos.crepo.model.RepoVersionNumber;
 import org.plos.crepo.service.ContentRepoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -152,11 +154,11 @@ public class ArticleRevisionController extends RestController {
   }
 
   @Transactional(rollbackFor = {Throwable.class})
-  @RequestMapping(value = "articles/revisions/associate", method = RequestMethod.POST)
-  public ResponseEntity<?> associate(HttpServletRequest request, HttpServletResponse response,
-                                     @RequestParam(value = "doi", required = true) String doi,
-                                     @RequestParam(value = "v", required = true) int versionNumber,
-                                     @RequestParam(value = "r", required = false) Integer revisionNumber)
+  @RequestMapping(value = "articles/revisions", method = RequestMethod.POST)
+  public ResponseEntity<?> createRevision(HttpServletRequest request, HttpServletResponse response,
+                                          @RequestParam(value = "doi", required = true) String doi,
+                                          @RequestParam(value = "v", required = true) int versionNumber,
+                                          @RequestParam(value = "r", required = false) Integer revisionNumber)
       throws IOException {
     RepoCollectionMetadata collectionMetadata = versionedContentRepoService.getCollection(new RepoVersionNumber(doi, versionNumber));
     // TODO: Throw RestClientException if collection does not exist
@@ -186,10 +188,10 @@ public class ArticleRevisionController extends RestController {
   }
 
   @Transactional(rollbackFor = {Throwable.class})
-  @RequestMapping(value = "articles/revisions/associate", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteAssociation(HttpServletRequest request, HttpServletResponse response,
-                                             @RequestParam(value = "doi", required = true) String doi,
-                                             @RequestParam(value = "r", required = true) int revisionNumber)
+  @RequestMapping(value = "articles/revisions", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteRevision(HttpServletRequest request, HttpServletResponse response,
+                                          @RequestParam(value = "doi", required = true) String doi,
+                                          @RequestParam(value = "r", required = true) int revisionNumber)
       throws IOException {
     ArticleRevision revision = (ArticleRevision) DataAccessUtils.uniqueResult(
         hibernateTemplate.find("from ArticleRevision where doi=? and revisionNumber=?",
@@ -212,38 +214,50 @@ public class ArticleRevisionController extends RestController {
   }
 
   @Transactional(rollbackFor = {Throwable.class})
-  @RequestMapping(value = "articles/versionedFile", method = RequestMethod.GET, params = {"doi", "key", "r"})
+  @RequestMapping(value = "articles/versionedAsset", method = RequestMethod.GET)
   public void readFileRevision(HttpServletRequest request, HttpServletResponse response,
-                               @RequestParam("doi") String doi,
-                               @RequestParam("key") String key,
+                               @RequestParam("doi") String assetDoi,
+                               @RequestParam("repr") String repr,
                                @RequestParam("r") int revisionNumber)
       throws IOException {
-    String uuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
-        "select crepoUuid from ArticleRevision where doi=? and revisionNumber=?", doi, revisionNumber));
-    streamFile(request, response, doi, uuid, key);
+    String parentArticleDoi = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
+        "select parentArticleDoi from ArticleAssociation where doi=?", assetDoi));
+    if (parentArticleDoi == null) throw new RestClientException("Unrecognized asset DOI", HttpStatus.NOT_FOUND);
+
+    String parentArticleUuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
+        "select crepoUuid from ArticleRevision where doi=? and revisionNumber=?", parentArticleDoi, revisionNumber));
+    if (parentArticleUuid == null) throw new RestClientException("Revision not found", HttpStatus.NOT_FOUND);
+
+    RepoCollectionMetadata articleCollection = versionedContentRepoService.getCollection(RepoVersion.create(parentArticleDoi, parentArticleUuid));
+    Map<String, ?> articleMetadata = (Map<String, ?>) articleCollection.getJsonUserMetadata().get();
+    Collection<Map<String, ?>> assets = (Collection<Map<String, ?>>) articleMetadata.get("assets");
+    AssetIdentity targetAssetId = AssetIdentity.create(assetDoi);
+    RepoVersion assetVersion = findAssetVersion(repr, assets, targetAssetId);
+
+    streamFile(request, response, assetVersion);
   }
 
-  @Transactional(rollbackFor = {Throwable.class})
-  @RequestMapping(value = "articles/versionedFile", method = RequestMethod.GET, params = {"doi", "key", "v"})
-  public void readFileVersion(HttpServletRequest request, HttpServletResponse response,
-                              @RequestParam("doi") String doi,
-                              @RequestParam("key") String key,
-                              @RequestParam("v") int versionNumber)
-      throws IOException {
-    String uuid = (String) DataAccessUtils.uniqueResult(hibernateTemplate.find(
-        "select crepoUuid from ArticleRevision where doi=? and versionNumber=?", doi, versionNumber));
-    streamFile(request, response, doi, uuid, key);
+  private static RepoVersion findAssetVersion(String repr, Collection<Map<String, ?>> assets, AssetIdentity targetAssetId) {
+    for (Map<String, ?> asset : assets) {
+      AssetIdentity assetId = AssetIdentity.create((String) asset.get("doi"));
+      if (assetId.equals(targetAssetId)) {
+        Map<String, ?> assetObjects = (Map<String, ?>) asset.get("objects");
+        Map<String, ?> assetRepr = (Map<String, ?>) assetObjects.get(repr);
+        if (assetRepr == null) throw new RestClientException("repr not found", HttpStatus.NOT_FOUND);
+        return RepoVersion.create((String) assetRepr.get("key"), (String) assetRepr.get("uuid"));
+      }
+    }
+    // We already match the asset DOI to this article in the ArticleAssociation table,
+    // but this is still possible if the asset appears in other revisions of the article but not this one.
+    throw new RestClientException("Asset not in revision", HttpStatus.NOT_FOUND);
   }
 
-  private void streamFile(HttpServletRequest request, HttpServletResponse response,
-                          String articleDoi, String articleUuid, String fileKey)
-      throws IOException {
-    if (articleUuid == null) throw new RestClientException("Not found", HttpStatus.NOT_FOUND);
 
+  private void streamFile(HttpServletRequest request, HttpServletResponse response, RepoVersion repoVersion) throws IOException {
     // TODO: Respect headers, reproxying, etc. This is just prototype code.
     // See org.ambraproject.rhino.rest.controller.AssetFileCrudController.read
     response.setStatus(HttpStatus.OK.value());
-    try (InputStream fileStream = articleRevisionService.readFileVersion(ArticleIdentity.create(articleDoi), UUID.fromString(articleUuid), fileKey);
+    try (InputStream fileStream = versionedContentRepoService.getRepoObject(repoVersion);
          OutputStream responseStream = response.getOutputStream()) {
       ByteStreams.copy(fileStream, responseStream);
     }
