@@ -60,7 +60,7 @@ public class ArticleRevisionService extends AmbraService {
   @Autowired
   private Gson crepoGson;
 
-  public void ingest(InputStream archiveStream) throws IOException, XmlContentException {
+  public RepoCollectionMetadata ingest(InputStream archiveStream) throws IOException, XmlContentException {
     String prefix = "ingest_" + new Date().getTime() + "_";
     Map<String, File> extracted = new HashMap<>();
 
@@ -87,8 +87,7 @@ public class ArticleRevisionService extends AmbraService {
         // TODO complain
       }
 
-      RepoCollectionMetadata articleCollection = writeCollection(extracted, manifestFile);
-      writeRevision(articleCollection);
+      return writeCollection(extracted, manifestFile);
     } finally {
       for (File file : extracted.values()) {
         file.delete();
@@ -288,11 +287,6 @@ public class ArticleRevisionService extends AmbraService {
       this.key = repoVersion.getKey();
       this.uuid = repoVersion.getUuid().toString();
     }
-  }
-
-  private void writeRevision(RepoCollectionMetadata articleCollection) {
-    RepoVersion collectionVersion = articleCollection.getVersion();
-    // TODO Implement
   }
 
 
