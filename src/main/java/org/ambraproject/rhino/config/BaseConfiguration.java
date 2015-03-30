@@ -46,13 +46,17 @@ abstract class BaseConfiguration {
     // We do this by substituting in our own Hibernate Article mapping, since the one
     // in ambra-models uses eager loading (and changing it in ambra would likely break
     // things there).
-    List<Resource> finalResources = new ArrayList<>(mappingLocations.length);
+    List<Resource> finalResources = new ArrayList<>(mappingLocations.length + 1);
     for (Resource resource : mappingLocations) {
       if (!"Article.hbm.xml".equals(resource.getFilename())) {
         finalResources.add(resource);
       }
     }
     finalResources.add(context.getResource("classpath:ambra/configuration/Article.hbm.xml"));
+
+    // add mapping for article collection model
+    finalResources.add(context.getResource("classpath:ambra/configuration/ArticleCollection.hbm.xml"));
+
     sessionFactoryBean.setMappingLocations(finalResources.toArray(new Resource[finalResources.size()]));
   }
 
