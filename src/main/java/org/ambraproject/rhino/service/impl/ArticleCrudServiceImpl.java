@@ -184,20 +184,28 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
   };
 
   @Override
-  public Article writeArchive(Archive inputArchive, Optional<ArticleIdentity> suppliedId, WriteMode mode) throws IOException {
-    RepoCollectionMetadata createdVersionedArticle;
+  public IngestionResult writeArchive(Archive inputArchive) throws IOException {
+    IngestionResult ingestionResult;
     try {
-      createdVersionedArticle = new VersionedIngestionService(this).ingest(inputArchive);
+      ingestionResult = new VersionedIngestionService(this).ingest(inputArchive);
     } catch (XmlContentException e) {
       throw new RestClientException("Invalid XML", HttpStatus.BAD_REQUEST, e);
+    } finally {
+      inputArchive.close();
     }
-    Archive collectionArchive = Archive.readCollection(contentRepoService,
-        inputArchive.getArchiveName(), createdVersionedArticle, ARCHIVE_ENTRY_NAME_EXTRACTOR);
-    inputArchive.close();
+    return ingestionResult;
+  }
 
-    Article createdLegacyArticle = new LegacyIngestionService(this).writeArchive(collectionArchive, suppliedId, mode);
+  @Override
+  public Article writeToLegacy(ArticleIdentity articleIdentity) throws IOException {
+    return new LegacyIngestionService(this).writeArchive(readArchive(articleIdentity));
+  }
 
-    return createdLegacyArticle; // TODO: Reconcile return type with createdVersionedArticle
+  @Override
+  public Article writeToLegacy(RepoCollectionMetadata articleCollection) throws IOException {
+    RepoVersionNumber versionNumber = articleCollection.getVersionNumber();
+    ArticleIdentity articleIdentity = new ArticleIdentity(versionNumber.getKey(), Optional.of(versionNumber.getNumber()));
+    return writeToLegacy(articleIdentity);
   }
 
   @Override
@@ -326,7 +334,7 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
 
     return new Transceiver() {
       @Override
-      protected Calendar getLastModifiedDate()  {
+      protected Calendar getLastModifiedDate() {
         return copyToCalendar(findArticleById(id).getLastModified());
       }
 

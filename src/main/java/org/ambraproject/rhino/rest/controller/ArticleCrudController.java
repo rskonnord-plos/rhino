@@ -18,14 +18,12 @@
 
 package org.ambraproject.rhino.rest.controller;
 
-import com.google.common.base.Optional;
 import com.google.common.net.HttpHeaders;
 import org.ambraproject.models.Article;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.rest.controller.abstr.ArticleSpaceController;
 import org.ambraproject.rhino.service.AnnotationCrudService;
 import org.ambraproject.rhino.service.ArticleRevisionService;
-import org.ambraproject.rhino.service.DoiBasedCrudService;
 import org.ambraproject.rhino.service.impl.RecentArticleQuery;
 import org.ambraproject.rhino.util.Archive;
 import org.ambraproject.rhino.view.article.ArticleCriteria;
@@ -39,13 +37,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -115,8 +111,8 @@ public class ArticleCrudController extends ArticleSpaceController {
   /**
    * Repopulates article category information by making a call to the taxonomy server.
    *
-   * @param request          HttpServletRequest
-   * @param response         HttpServletResponse
+   * @param request  HttpServletRequest
+   * @param response HttpServletResponse
    * @throws IOException
    */
   @Transactional(rollbackFor = {Throwable.class})
@@ -150,6 +146,17 @@ public class ArticleCrudController extends ArticleSpaceController {
                    @RequestParam(value = REVISION_PARAM, required = false) Integer revisionNumber)
       throws IOException {
     articleCrudService.readMetadata(parse(id, versionNumber, revisionNumber)).respond(request, response, entityGson);
+  }
+
+  @Transactional(readOnly = false)
+  @RequestMapping(value = ARTICLE_ROOT, method = RequestMethod.POST, params = {ID_PARAM, "legacyReingest"})
+  public void legacyReingest(HttpServletRequest request, HttpServletResponse response,
+                             @RequestParam(value = ID_PARAM, required = true) String id,
+                             @RequestParam(value = VERSION_PARAM, required = false) Integer versionNumber,
+                             @RequestParam(value = REVISION_PARAM, required = false) Integer revisionNumber)
+      throws IOException {
+    Article article = articleCrudService.writeToLegacy(parse(id, versionNumber, revisionNumber));
+    articleCrudService.readMetadata(article, false).respond(request, response, entityGson);
   }
 
   /**
