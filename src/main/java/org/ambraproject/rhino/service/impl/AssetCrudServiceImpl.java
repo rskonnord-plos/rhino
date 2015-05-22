@@ -22,9 +22,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.ambraproject.models.ArticleAsset;
 import org.ambraproject.models.Journal;
+import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.AssetFileIdentity;
 import org.ambraproject.rhino.identity.AssetIdentity;
 import org.ambraproject.rhino.identity.DoiBasedIdentity;
+import org.ambraproject.rhino.model.DoiAssociation;
 import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.rhino.service.AssetCrudService;
 import org.ambraproject.rhino.service.WriteResult;
@@ -36,13 +38,18 @@ import org.ambraproject.rhino.view.asset.groomed.GroomedImageView;
 import org.ambraproject.rhino.view.asset.groomed.UncategorizedAssetException;
 import org.ambraproject.rhino.view.asset.raw.RawAssetFileCollectionView;
 import org.ambraproject.rhino.view.asset.raw.RawAssetFileView;
+import org.ambraproject.rhino.view.internal.RepoVersionRepr;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.plos.crepo.exceptions.ContentRepoException;
+import org.plos.crepo.model.RepoCollectionMetadata;
+import org.plos.crepo.model.RepoObjectMetadata;
+import org.plos.crepo.model.RepoVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.support.DataAccessUtils;
@@ -57,8 +64,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-public class AssetCrudServiceImpl extends AmbraService implements AssetCrudService {
+public class AssetCrudServiceImpl extends ArticleSpaceService implements AssetCrudService {
 
   private static final Logger log = LoggerFactory.getLogger(AssetCrudServiceImpl.class);
 
@@ -262,18 +270,28 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
     write(assetData, id);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public InputStream read(AssetFileIdentity assetId) {
-    try {
-      return contentRepoService.getLatestRepoObject(assetId.getFilePath());
-    } catch (ContentRepoException e) {
-      String message = String.format("Asset not found at DOI \"%s\" with extension \"%s\"",
-          assetId.getIdentifier(), assetId.getFileExtension());
-      throw new RestClientException(message, HttpStatus.NOT_FOUND, e);
+  public RepoObjectMetadata read(AssetIdentity assetIdentity, ArticleIdentity parentArticle, String fileType) {
+    RepoCollectionMetadata articleCollection = fetchArticleCollection(parentArticle);
+    Map<String, Object> articleMetadata = (Map<String, Object>) articleCollection.getJsonUserMetadata().get();
+
+    Map<String, Object> assets = (Map<String, Object>) articleMetadata.get("assets");
+    Map<String, Object> assetEntry = (Map<String, Object>) assets.get(assetIdentity.getIdentifier());
+    if (assetEntry == null) {
+      String message = String.format("Article (%s) does not have asset: %s", parentArticle, assetIdentity);
+      throw new RestClientException(message, HttpStatus.NOT_FOUND);
     }
+
+    Map<String, Object> files = (Map<String, Object>) assetEntry.get("files");
+    Map<String, Object> fileId = (Map<String, Object>) files.get(fileType);
+    if (fileId == null) {
+      String message = String.format("Asset (%s) of article (%s) does not have file type: \"%s\". Files types are: %s",
+          assetIdentity, parentArticle, fileType, files.keySet());
+      throw new RestClientException(message, HttpStatus.NOT_FOUND);
+    }
+    RepoVersion fileVersion = RepoVersionRepr.read(fileId);
+
+    return contentRepoService.getRepoObjectMetadata(fileVersion);
   }
 
   /**
@@ -406,6 +424,15 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
     List<Journal> journalResult = hibernateTemplate.find("select journals from Article where doi = ?", articleDoi);
 
     return new ArticleVisibility(articleDoi, articleState, journalResult);
+  }
+
+  @Override
+  public ArticleIdentity getParentArticle(DoiBasedIdentity identity) {
+    String parentArticleDoi = (String) DataAccessUtils.uniqueResult(
+        hibernateTemplate.findByCriteria(DetachedCriteria.forClass(DoiAssociation.class)
+            .setProjection(Projections.property("parentArticleDoi"))
+            .add(Restrictions.eq("doi", identity.getIdentifier()))));
+    return (parentArticleDoi == null) ? null : ArticleIdentity.create(parentArticleDoi);
   }
 
 }

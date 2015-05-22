@@ -22,8 +22,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.HttpHeaders;
+import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.AssetFileIdentity;
-import org.ambraproject.rhino.rest.controller.abstr.RestController;
+import org.ambraproject.rhino.identity.AssetIdentity;
+import org.ambraproject.rhino.identity.DoiBasedIdentity;
+import org.ambraproject.rhino.rest.RestClientException;
+import org.ambraproject.rhino.rest.controller.abstr.ArticleSpaceController;
 import org.ambraproject.rhino.service.AssetCrudService;
 import org.plos.crepo.exceptions.ContentRepoException;
 import org.plos.crepo.exceptions.ErrorType;
@@ -50,7 +54,7 @@ import java.util.List;
 import static org.ambraproject.rhino.service.impl.AmbraService.reportNotFound;
 
 @Controller
-public class AssetFileCrudController extends RestController {
+public class AssetFileCrudController extends ArticleSpaceController {
 
   private static final String ASSET_ROOT = "/assetfiles";
 
@@ -61,25 +65,53 @@ public class AssetFileCrudController extends RestController {
 
 
   private static final String METADATA_PARAM = "metadata";
+  private static final String FILE_TYPE_PARAM = "file";
 
   private static final Joiner REPROXY_URL_JOINER = Joiner.on(' ');
   private static final int REPROXY_CACHE_FOR_VALUE = 6 * 60 * 60; // TODO: Make configurable
   private static final String REPROXY_CACHE_FOR_HEADER =
       REPROXY_CACHE_FOR_VALUE + "; Last-Modified Content-Type Content-Disposition";
 
+
+  @Transactional(readOnly = true)
+  @RequestMapping(value = ASSET_ROOT, method = RequestMethod.GET, params = ID_PARAM)
+  public void read(HttpServletRequest request, HttpServletResponse response,
+                   @RequestParam(value = ID_PARAM, required = true) String assetId,
+                   @RequestParam(value = VERSION_PARAM, required = false) Integer versionNumber,
+                   @RequestParam(value = REVISION_PARAM, required = false) Integer revisionNumber,
+                   @RequestParam(value = FILE_TYPE_PARAM, required = true) String fileType)
+      throws IOException {
+    ArticleIdentity parentArticle = assetCrudService.getParentArticle(DoiBasedIdentity.create(assetId));
+    if (parentArticle == null) {
+      throw new RestClientException("Asset ID not mapped to article", HttpStatus.NOT_FOUND);
+    }
+    parentArticle = parse(parentArticle.getIdentifier(), versionNumber, revisionNumber); // apply revision
+
+    AssetIdentity assetIdentity = AssetIdentity.create(assetId);
+    RepoObjectMetadata objMeta = assetCrudService.read(assetIdentity, parentArticle, fileType);
+
+    Optional<String> contentType = objMeta.getContentType();
+    if (contentType.isPresent()) {
+      response.setHeader(HttpHeaders.CONTENT_TYPE, contentType.get());
+    }
+
+    Optional<String> downloadName = objMeta.getDownloadName();
+    if (downloadName.isPresent()) {
+      response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "filename=" + downloadName.get());
+    }
+
+    serve(request, response, objMeta);
+  }
+
   /**
-   * Serve an identified asset file.
+   * Serve an explicitly named asset file from the legacy data model.
    */
   @Transactional(readOnly = true)
   @RequestMapping(value = ASSET_ROOT, method = RequestMethod.GET)
-  public void read(HttpServletRequest request, HttpServletResponse response,
-                   @RequestParam(ID_PARAM) String id)
+  public void readLegacy(HttpServletRequest request, HttpServletResponse response,
+                         @RequestParam(ID_PARAM) String assetFilename)
       throws IOException {
-    read(request, response, AssetFileIdentity.parse(id));
-  }
-
-  void read(HttpServletRequest request, HttpServletResponse response, AssetFileIdentity id)
-      throws IOException {
+    final AssetFileIdentity id = AssetFileIdentity.parse(assetFilename);
     RepoObjectMetadata objMeta;
     try {
       objMeta = contentRepoService.getLatestRepoObjectMetadata(id.getFilePath());
@@ -100,6 +132,11 @@ public class AssetFileCrudController extends RestController {
     String contentDisposition = "attachment; filename=" + filename.or(id.getFileName()); // TODO: 'attachment' is not always correct
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
 
+    serve(request, response, objMeta);
+  }
+
+  private void serve(HttpServletRequest request, HttpServletResponse response, RepoObjectMetadata objMeta)
+      throws IOException {
     Timestamp timestamp = objMeta.getTimestamp();
     setLastModifiedHeader(response, timestamp);
     if (!checkIfModifiedSince(request, timestamp)) {
@@ -115,7 +152,7 @@ public class AssetFileCrudController extends RestController {
       response.setHeader("X-Reproxy-URL", reproxyUrlHeader);
       response.setHeader("X-Reproxy-Cache-For", REPROXY_CACHE_FOR_HEADER);
     } else {
-      try (InputStream fileStream = assetCrudService.read(id);
+      try (InputStream fileStream = contentRepoService.getRepoObject(objMeta.getVersion());
            OutputStream responseStream = response.getOutputStream()) {
         ByteStreams.copy(fileStream, responseStream);
       }

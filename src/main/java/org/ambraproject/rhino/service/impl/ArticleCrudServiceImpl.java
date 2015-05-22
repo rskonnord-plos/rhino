@@ -47,6 +47,7 @@ import org.ambraproject.rhino.view.article.ArticleCriteria;
 import org.ambraproject.rhino.view.article.ArticleOutputView;
 import org.ambraproject.rhino.view.article.ArticleOutputViewFactory;
 import org.ambraproject.rhino.view.article.RelatedArticleView;
+import org.ambraproject.rhino.view.internal.RepoVersionRepr;
 import org.ambraproject.views.AuthorView;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
@@ -81,7 +82,7 @@ import java.util.Map;
 /**
  * Service implementing _c_reate, _r_ead, _u_pdate, and _d_elete operations on article entities and files.
  */
-public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudService {
+public class ArticleCrudServiceImpl extends ArticleSpaceService implements ArticleCrudService {
 
   private static final Logger log = LoggerFactory.getLogger(ArticleCrudServiceImpl.class);
 
@@ -98,24 +99,12 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
   @Autowired
   Gson crepoGson;
 
-  private RepoCollectionMetadata fetchArticleCollection(ArticleIdentity id) {
-    String identifier = id.getIdentifier();
-    Optional<Integer> versionNumber = id.getVersionNumber();
-    RepoCollectionMetadata collection;
-    if (versionNumber.isPresent()) {
-      collection = contentRepoService.getCollection(new RepoVersionNumber(identifier, versionNumber.get()));
-    } else {
-      collection = contentRepoService.getLatestCollection(identifier);
-    }
-    return collection;
-  }
-
   private Document fetchArticleXml(ArticleIdentity id) {
     RepoCollectionMetadata collection = fetchArticleCollection(id);
 
     Map<String, Object> userMetadata = (Map<String, Object>) collection.getJsonUserMetadata().get();
     Map<String, String> manuscriptId = (Map<String, String>) userMetadata.get("manuscript");
-    RepoVersion manuscript = RepoVersion.create(manuscriptId.get("key"), manuscriptId.get("uuid"));
+    RepoVersion manuscript = RepoVersionRepr.read(manuscriptId);
 
     Document document;
     try (InputStream manuscriptStream = contentRepoService.getRepoObject(manuscript)) {
