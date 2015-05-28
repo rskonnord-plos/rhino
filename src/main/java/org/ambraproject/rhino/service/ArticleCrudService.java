@@ -19,13 +19,16 @@
 package org.ambraproject.rhino.service;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import org.ambraproject.models.Article;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.DoiBasedIdentity;
 import org.ambraproject.rhino.service.impl.RecentArticleQuery;
+import org.ambraproject.rhino.util.Archive;
 import org.ambraproject.rhino.util.response.Transceiver;
 import org.ambraproject.rhino.view.article.ArticleCriteria;
 import org.ambraproject.rhino.view.article.RelatedArticleView;
+import org.plos.crepo.model.RepoCollectionMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,19 +37,16 @@ import java.util.Collection;
 public interface ArticleCrudService extends DoiBasedCrudService {
 
   /**
-   * Create or update an article from supplied XML data. If no article exists with the given identity, a new article
-   * entity is created; else, the article is re-ingested and the new data replaces the old data in the file store.
-   * <p/>
-   * The input stream is closed after being successfully read, but this is not guaranteed. Any invocation of this method
-   * must be enclosed in a {@code try} block, with the argument input stream closed in the {@code finally} block.
+   * Create or update an article from supplied ,zip archive data. If no article exists with the given identity, a new
+   * article entity is created; else, the article is re-ingested and the new data replaces the old data in the file
+   * store.
    *
-   * @param file       the XML data for the article
-   * @param suppliedId the identifier supplied for the article, if any
+   * @param archive the archive to ingest
    * @return the created or update Article
    * @throws org.ambraproject.rhino.rest.RestClientException if the DOI is already used
    * @throws IOException
    */
-  public abstract Article write(InputStream file, Optional<ArticleIdentity> suppliedId, WriteMode mode)
+  public abstract IngestionResult writeArchive(Archive archive)
       throws IOException;
 
   /**
@@ -62,6 +62,12 @@ public interface ArticleCrudService extends DoiBasedCrudService {
    */
   public abstract Article writeArchive(String filename, Optional<ArticleIdentity> suppliedId, WriteMode mode)
       throws IOException;
+
+  public abstract Article writeToLegacy(ArticleIdentity articleIdentity) throws IOException;
+
+  public abstract Article writeToLegacy(RepoCollectionMetadata articleCollection) throws IOException;
+
+  public abstract Archive readArchive(ArticleIdentity articleIdentity);
 
   /**
    * Repopulates article category information by making a call to the taxonomy server.
@@ -79,20 +85,12 @@ public interface ArticleCrudService extends DoiBasedCrudService {
   public abstract InputStream readXml(ArticleIdentity id);
 
   /**
-   * Delete an article. Both its database entry and the associated XML file in the file store are deleted.
-   *
-   * @param id the identifier of the article to delete
-   * @throws org.ambraproject.rhino.rest.RestClientException if the DOI does not belong to an article
-   */
-  public abstract void delete(ArticleIdentity id);
-
-  /**
    * Loads and returns article metadata.
    *
    * @param id specifies the article
    * @return Article object encapsulating metadata
    */
-  public abstract Article findArticleById(DoiBasedIdentity id);
+  public abstract Article findArticleById(ArticleIdentity id);
 
   /**
    * Read the metadata of an article.
@@ -167,5 +165,37 @@ public interface ArticleCrudService extends DoiBasedCrudService {
    * @return a set of views of the related articles
    */
   public abstract Collection<RelatedArticleView> getRelatedArticles(Article article);
+
+
+  public static class IngestionResult {
+    private final Article article;
+    private final RepoCollectionMetadata collection;
+
+    public IngestionResult(Article article, RepoCollectionMetadata collection) {
+      this.article = Preconditions.checkNotNull(article);
+      this.collection = Preconditions.checkNotNull(collection);
+    }
+
+    public Article getArticle() {
+      return article;
+    }
+
+    public RepoCollectionMetadata getCollection() {
+      return collection;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      IngestionResult that = (IngestionResult) o;
+      return article.equals(that.article) && collection.equals(that.collection);
+    }
+
+    @Override
+    public int hashCode() {
+      return 31 * article.hashCode() + collection.hashCode();
+    }
+  }
 
 }
