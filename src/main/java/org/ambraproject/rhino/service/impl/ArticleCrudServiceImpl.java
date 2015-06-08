@@ -100,16 +100,22 @@ public class ArticleCrudServiceImpl extends ArticleSpaceService implements Artic
   Gson crepoGson;
 
   private Document fetchArticleXml(ArticleIdentity id) {
+    return fetchArticleXml(id, "front");
+  }
+
+  private Document fetchArticleXml(ArticleIdentity id, String metadataKey) {
     RepoCollectionMetadata collection = fetchArticleCollection(id);
 
     Map<String, Object> userMetadata = (Map<String, Object>) collection.getJsonUserMetadata().get();
-    Map<String, String> manuscriptId = (Map<String, String>) userMetadata.get("manuscript");
+    Map<String, String> manuscriptId = (Map<String, String>) userMetadata.get(metadataKey);
     RepoVersion manuscript = RepoVersionRepr.read(manuscriptId);
 
     Document document;
     try (InputStream manuscriptStream = contentRepoService.getRepoObject(manuscript)) {
       DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); // TODO: Efficiency
+      log.debug("In fetchArticleXml metadataKey=" + metadataKey + " documentBuilder.parse() called");
       document = documentBuilder.parse(manuscriptStream);
+      log.debug("finish");
     } catch (IOException | SAXException | ParserConfigurationException e) {
       throw new RuntimeException(e);
     }
@@ -168,7 +174,7 @@ public class ArticleCrudServiceImpl extends ArticleSpaceService implements Artic
           return (String) ((Map) metadataValue).get(ARCHIVE_ENTRY_NAME_KEY);
         }
       }
-      return null; // default to downloadName value
+      return null; // object is not part of the original ingestible
     }
   };
 
