@@ -162,20 +162,13 @@ class AssetTable<T> {
     FIGURE {
       @Override
       protected String getFileType(String reprName) {
-        switch (reprName) {
-          case "TIF":
-            return "original";
-          case "PNG_S":
-            return "small";
-          case "PNG_I":
-            return "inline";
-          case "PNG_M":
-            return "medium";
-          case "PNG_L":
-            return "large";
-          default:
-            throw unmatchedReprException(reprName);
-        }
+        return getFileTypeForStandardThumbnails(reprName);
+      }
+    },
+    TABLE {
+      @Override
+      protected String getFileType(String reprName) {
+        return getFileTypeForStandardThumbnails(reprName);
       }
     },
     GRAPHIC {
@@ -197,6 +190,23 @@ class AssetTable<T> {
         return "supplementary";
       }
     };
+
+    private static String getFileTypeForStandardThumbnails(String reprName) {
+      switch (reprName) {
+        case "TIF":
+          return "original";
+        case "PNG_S":
+          return "small";
+        case "PNG_I":
+          return "inline";
+        case "PNG_M":
+          return "medium";
+        case "PNG_L":
+          return "large";
+        default:
+          throw unmatchedReprException(reprName);
+      }
+    }
 
     private final String identifier = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
 
@@ -232,6 +242,8 @@ class AssetTable<T> {
     switch (nodeName) {
       case "fig":
         return AssetType.FIGURE;
+      case "table-wrap":
+        return AssetType.TABLE;
       case "disp-formula":
         return AssetType.GRAPHIC;
       case "supplementary-material":
