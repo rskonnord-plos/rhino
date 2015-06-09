@@ -155,6 +155,17 @@ class VersionedIngestionService {
       String key = asset.getFileType() + "/" + assetIdentity.getIdentifier();
       AssetFileIdentity assetFileIdentity = AssetFileIdentity.create(assetIdentity.getIdentifier(), asset.getReprName());
       String archiveEntryName = asset.getFileLocator();
+
+      ArticleObject preexisting = collection.archiveObjects.get(archiveEntryName);
+      if (preexisting != null) {
+        if (!preexisting.input.getKey().equals(key)) {
+          String message = String.format("Mismatched objects (%s, %s) with same archiveEntryName: %s",
+              preexisting.input.getKey(), key, archiveEntryName);
+          throw new RuntimeException(message);
+        }
+        continue; // Don't insert a RepoObject redundant to a special object created above
+      }
+
       RepoObject.RepoObjectBuilder repoObject = new RepoObject.RepoObjectBuilder(key)
           .contentAccessor(archive.getContentAccessorFor(archiveEntryName))
           .userMetadata(createUserMetadataForArchiveEntryName(archiveEntryName))
