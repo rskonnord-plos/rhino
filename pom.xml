@@ -168,6 +168,10 @@
           <groupId>org.slf4j</groupId>
           <artifactId>jcl-over-slf4j</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -185,6 +189,12 @@
       <!--In a future version of maven, this classifier may need to change to test-jar-->
       <classifier>tests</classifier>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -203,8 +213,8 @@
 
     <dependency>
       <groupId>net.sf.saxon</groupId>
-      <artifactId>saxon</artifactId>
-      <version>9.3</version>
+      <artifactId>Saxon-HE</artifactId>
+      <version>9.6.0-4</version>
     </dependency>
 
     <dependency>
