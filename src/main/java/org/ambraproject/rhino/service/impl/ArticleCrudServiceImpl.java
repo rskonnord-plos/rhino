@@ -118,11 +118,11 @@ public class ArticleCrudServiceImpl extends AmbraService implements ArticleCrudS
     RepoCollectionMetadata collection = fetchArticleCollection(id);
 
     Map<String, Object> userMetadata = (Map<String, Object>) collection.getJsonUserMetadata().get();
-    Map<String, String> manuscriptId = (Map<String, String>) userMetadata.get(metadataKey);
-    RepoVersion manuscript = RepoVersion.create(manuscriptId.get("key"), manuscriptId.get("uuid"));
+    Map<String, String> metadataId = (Map<String, String>) userMetadata.get(metadataKey);
+    RepoVersion metadataObj = RepoVersion.create(metadataId.get("key"), metadataId.get("uuid"));
 
     Document document;
-    try (InputStream manuscriptStream = contentRepoService.getRepoObject(manuscript)) {
+    try (InputStream manuscriptStream = contentRepoService.getRepoObject(metadataObj)) {
       DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); // TODO: Efficiency
       log.debug("In fetchArticleXml metadataKey=" + metadataKey + " documentBuilder.parse() called");
       document = documentBuilder.parse(manuscriptStream);
