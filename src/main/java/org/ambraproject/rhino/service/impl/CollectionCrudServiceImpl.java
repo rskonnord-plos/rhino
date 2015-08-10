@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -93,6 +94,7 @@ public class CollectionCrudServiceImpl extends AmbraService implements Collectio
   }
 
   private List<Article> fetchArticles(Set<ArticleIdentity> articleIds) {
+    if (articleIds.isEmpty()) return new ArrayList<>(0);
     final Map<String, Integer> articleKeys = Maps.newHashMapWithExpectedSize(articleIds.size());
     int i = 0;
     for (ArticleIdentity articleId : articleIds) {
