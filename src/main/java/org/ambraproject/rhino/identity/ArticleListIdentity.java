@@ -11,12 +11,12 @@ public final class ArticleListIdentity {
 
   private final String listType; // nullable in order to play nice with Gson; always Optional<String> in public
   private final String journalKey; // non-null
-  private final String listCode; // non-null
+  private final String key; // non-null
 
-  public ArticleListIdentity(Optional<String> listType, String journalKey, String listCode) {
+  public ArticleListIdentity(Optional<String> listType, String journalKey, String key) {
     this.listType = listType.isPresent() ? validate(listType.get()) : null;
     this.journalKey = validate(journalKey);
-    this.listCode = validate(listCode);
+    this.key = validate(key);
   }
 
   private static final CharMatcher INVALID_CHARACTERS = CharMatcher.WHITESPACE.or(CharMatcher.is('/'));
@@ -35,13 +35,13 @@ public final class ArticleListIdentity {
     return journalKey;
   }
 
-  public String getListCode() {
-    return listCode;
+  public String getKey() {
+    return key;
   }
 
   @Override
   public String toString() {
-    return (listType == null ? "" : listType + "/") + journalKey + "/" + listCode;
+    return (listType == null ? "" : listType + "/") + journalKey + "/" + key;
   }
 
   @Override
@@ -53,7 +53,7 @@ public final class ArticleListIdentity {
 
     if (listType != null ? !listType.equals(that.listType) : that.listType != null) return false;
     if (!journalKey.equals(that.journalKey)) return false;
-    if (!listCode.equals(that.listCode)) return false;
+    if (!key.equals(that.key)) return false;
 
     return true;
   }
@@ -62,7 +62,7 @@ public final class ArticleListIdentity {
   public int hashCode() {
     int result = listType != null ? listType.hashCode() : 0;
     result = 31 * result + journalKey.hashCode();
-    result = 31 * result + listCode.hashCode();
+    result = 31 * result + key.hashCode();
     return result;
   }
 

@@ -44,7 +44,7 @@ public class ArticleListCrudServiceImpl extends AmbraService implements ArticleL
         "where (j.journalKey=:journalKey) and (l.listCode=:listCode) and " +
         (listType.isPresent() ? "(l.listType=:listType)" : "(l.listType is null)"));
     query.setString("journalKey", identity.getJournalKey());
-    query.setString("listCode", identity.getListCode());
+    query.setString("listCode", identity.getKey());
     if (listType.isPresent()) {
       query.setString("listType", identity.getListType().get());
     }
@@ -70,7 +70,7 @@ public class ArticleListCrudServiceImpl extends AmbraService implements ArticleL
 
     ArticleList list = new ArticleList();
     list.setListType(identity.getListType().orNull());
-    list.setListCode(identity.getListCode());
+    list.setListCode(identity.getKey());
     list.setDisplayName(displayName);
 
     list.setArticles(fetchArticles(articleIds));
