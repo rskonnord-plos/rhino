@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -107,9 +108,11 @@ public class IngestibleServiceImpl extends AmbraService implements IngestibleSer
   public File archiveIngested(String filename) throws IOException {
     File source = getIngestSourceArchive(filename);
     File dest = new File(ambraConfiguration.getString(INGEST_DEST_DIR_KEY), filename);
-    if (!source.renameTo(dest)) {
+    try {
+      Files.move(source.toPath(), dest.toPath());
+    } catch (Exception e) {
       throw new IOException(String.format("Could not move %s to %s", source.getCanonicalPath(),
-          dest.getCanonicalPath()));
+          dest.getCanonicalPath()), e);
     }
     return dest;
   }
