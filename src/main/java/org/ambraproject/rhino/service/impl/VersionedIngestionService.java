@@ -44,7 +44,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -55,6 +54,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 class VersionedIngestionService {
 
@@ -393,12 +393,12 @@ class VersionedIngestionService {
 
     public RepoCollectionList persist() {
       // Persist objects
-      Collection<ArticleObject> allObjects = getAllObjects();
-      Collection<RepoVersion> createdObjects = new ArrayList<>(allObjects.size());
-      for (ArticleObject articleObject : allObjects) { // Excellent candidate for parallelization! I can haz JDK8 plz?
-        articleObject.created = parentService.contentRepoService.autoCreateRepoObject(articleObject.input);
-        createdObjects.add(articleObject.created.getVersion());
-      }
+      Collection<RepoVersion> createdObjects = getAllObjects().parallelStream()
+          .map((ArticleObject articleObject) -> {
+            articleObject.created = parentService.contentRepoService.autoCreateRepoObject(articleObject.input);
+            return articleObject.created.getVersion();
+          })
+          .collect(Collectors.toList());
 
       Map<String, Object> userMetadata = buildUserMetadata();
 
