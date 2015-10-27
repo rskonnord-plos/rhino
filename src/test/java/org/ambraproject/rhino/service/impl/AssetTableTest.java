@@ -12,9 +12,9 @@ import com.google.gson.Gson;
 import org.ambraproject.rhino.content.xml.ArticleXml;
 import org.ambraproject.rhino.content.xml.ManifestXml;
 import org.ambraproject.rhino.util.Archive;
-import org.plos.crepo.model.RepoCollection;
+import org.plos.crepo.model.RepoCollectionInput;
 import org.plos.crepo.model.RepoCollectionList;
-import org.plos.crepo.model.RepoObject;
+import org.plos.crepo.model.RepoObjectInput;
 import org.plos.crepo.model.RepoObjectMetadata;
 import org.plos.crepo.model.RepoVersion;
 import org.plos.crepo.service.InMemoryContentRepoService;
@@ -91,7 +91,7 @@ public class AssetTableTest {
     for (AssetTable.Asset<String> asset : assetTable.getAssets()) {
       String key = asset.getFileLocator();
       RepoObjectMetadata dummyObject = inMemoryContentRepoService.autoCreateRepoObject(
-          new RepoObject.RepoObjectBuilder(mangle(key)).byteContent(DUMMY_CONTENT).build());
+          RepoObjectInput.builder(mangle(key)).byteContent(DUMMY_CONTENT).build());
       dummyRepoVersions.put(key, dummyObject.getVersion());
     }
     return dummyRepoVersions.build();
@@ -104,7 +104,7 @@ public class AssetTableTest {
 
   private RepoCollectionList createDummyRepoCollection(Map<String, Object> assetMetadata, Collection<RepoVersion> dummyObjects) {
     Map<String, Map<String, Object>> userMetadata = ImmutableMap.of("assets", assetMetadata);
-    return inMemoryContentRepoService.autoCreateCollection(RepoCollection.builder()
+    return inMemoryContentRepoService.autoCreateCollection(RepoCollectionInput.builder()
         .setKey("test")
         .setObjects(dummyObjects)
         .setUserMetadata(new Gson().toJson(userMetadata))

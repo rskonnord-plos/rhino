@@ -18,10 +18,10 @@ import org.ambraproject.rhino.rest.RestClientException;
 import org.ambraproject.rhino.service.ArticleCrudService.ArticleMetadataSource;
 import org.ambraproject.rhino.util.Archive;
 import org.ambraproject.rhino.view.internal.RepoVersionRepr;
-import org.plos.crepo.model.RepoCollection;
+import org.plos.crepo.model.RepoCollectionInput;
 import org.plos.crepo.model.RepoCollectionList;
 import org.plos.crepo.model.RepoCollectionMetadata;
-import org.plos.crepo.model.RepoObject;
+import org.plos.crepo.model.RepoObjectInput;
 import org.plos.crepo.model.RepoObjectMetadata;
 import org.plos.crepo.model.RepoVersion;
 import org.plos.crepo.model.RepoVersionNumber;
@@ -185,27 +185,27 @@ class VersionedIngestionService {
 
   private void createSpecialXmlObjects(Archive archive, String manifestEntry, String manuscriptEntry, ArticleXml parsedArticle, ArticleIdentity articleIdentity, ArticleCollection collection) {
     collection.tagSpecialObject(collection.insertArchiveObject(manifestEntry,
-            new RepoObject.RepoObjectBuilder("manifest/" + articleIdentity.getIdentifier())
+            RepoObjectInput.builder("manifest/" + articleIdentity.getIdentifier())
                 .contentAccessor(archive.getContentAccessorFor(manifestEntry))
                 .downloadName(manifestEntry)
                 .contentType(MediaType.APPLICATION_XML)),
         "manifest");
 
     collection.tagSpecialObject(collection.insertArchiveObject(manuscriptEntry,
-            new RepoObject.RepoObjectBuilder("manuscript/" + articleIdentity.getIdentifier())
+            RepoObjectInput.builder("manuscript/" + articleIdentity.getIdentifier())
                 .contentAccessor(archive.getContentAccessorFor(manuscriptEntry))
                 .contentType(MediaType.APPLICATION_XML)
                 .downloadName(articleIdentity.forXmlAsset().getFileName())),
         MANUSCRIPTS_KEY, SOURCE_KEYS.get(ArticleMetadataSource.FULL_MANUSCRIPT));
 
     collection.tagSpecialObject(createDynamicObject(
-            new RepoObject.RepoObjectBuilder("front/" + articleIdentity.getIdentifier())
+            RepoObjectInput.builder("front/" + articleIdentity.getIdentifier())
                 .byteContent(serializeXml(parsedArticle.extractFrontMatter()))
                 .contentType(MediaType.APPLICATION_XML)
                 .build()),
         MANUSCRIPTS_KEY, SOURCE_KEYS.get(ArticleMetadataSource.FRONT_MATTER));
     collection.tagSpecialObject(createDynamicObject(
-            new RepoObject.RepoObjectBuilder("frontAndBack/" + articleIdentity.getIdentifier())
+            RepoObjectInput.builder("frontAndBack/" + articleIdentity.getIdentifier())
                 .byteContent(serializeXml(parsedArticle.extractFrontAndBackMatter()))
                 .contentType(MediaType.APPLICATION_XML)
                 .build()),
@@ -229,7 +229,7 @@ class VersionedIngestionService {
         continue; // Don't insert a RepoObject redundant to a special object
       }
 
-      RepoObject.RepoObjectBuilder repoObject = new RepoObject.RepoObjectBuilder(key)
+      RepoObjectInput.Builder repoObject = RepoObjectInput.builder(key)
           .contentAccessor(archive.getContentAccessorFor(archiveEntryName))
           .userMetadata(createUserMetadataForArchiveEntryName(archiveEntryName))
           .downloadName(assetFileIdentity.getFileName())
@@ -243,7 +243,7 @@ class VersionedIngestionService {
     for (String entry : archive.getEntryNames()) {
       if (!collection.archiveObjects.containsKey(entry)) {
         String key = "nonAssetFile-" + (++nonAssetFileIndex) + "/" + articleIdentity.getIdentifier();
-        RepoObject.RepoObjectBuilder repoObject = new RepoObject.RepoObjectBuilder(key)
+        RepoObjectInput.Builder repoObject = RepoObjectInput.builder(key)
             .contentAccessor(archive.getContentAccessorFor(entry))
             .userMetadata(createUserMetadataForArchiveEntryName(entry))
             .downloadName(entry)
@@ -334,7 +334,7 @@ class VersionedIngestionService {
     /**
      * Object to be created.
      */
-    private final RepoObject input;
+    private final RepoObjectInput input;
 
     /**
      * Name of the archive entry from the ingestible representing this object. Absent if the object was not originally
@@ -347,13 +347,13 @@ class VersionedIngestionService {
      */
     private RepoObjectMetadata created;
 
-    private ArticleObject(RepoObject input, Optional<String> archiveEntryName) {
+    private ArticleObject(RepoObjectInput input, Optional<String> archiveEntryName) {
       this.input = Objects.requireNonNull(input);
       this.archiveEntryName = Objects.requireNonNull(archiveEntryName);
     }
   }
 
-  private ArticleObject createDynamicObject(RepoObject repoObject) {
+  private ArticleObject createDynamicObject(RepoObjectInput repoObject) {
     return new ArticleObject(repoObject, Optional.empty());
   }
 
@@ -372,7 +372,7 @@ class VersionedIngestionService {
       this.assetTable = Objects.requireNonNull(assetTable);
     }
 
-    public ArticleObject insertArchiveObject(String entryName, RepoObject.RepoObjectBuilder builder) {
+    public ArticleObject insertArchiveObject(String entryName, RepoObjectInput.Builder builder) {
       builder.userMetadata(createUserMetadataForArchiveEntryName(entryName));
 
       ArticleObject articleObject = new ArticleObject(builder.build(), Optional.of(entryName));
@@ -403,7 +403,7 @@ class VersionedIngestionService {
       Map<String, Object> userMetadata = buildUserMetadata();
 
       // Persist collection
-      RepoCollection collection = RepoCollection.builder()
+      RepoCollectionInput collection = RepoCollectionInput.builder()
           .setKey(articleIdentity.getIdentifier())
           .setObjects(createdObjects)
           .setUserMetadata(parentService.crepoGson.toJson(userMetadata))

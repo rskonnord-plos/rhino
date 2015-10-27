@@ -33,7 +33,7 @@ import org.hibernate.FetchMode;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
-import org.plos.crepo.model.RepoObject;
+import org.plos.crepo.model.RepoObjectInput;
 import org.plos.crepo.service.ContentRepoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
@@ -127,7 +127,7 @@ public abstract class AmbraService {
    * @throws IOException
    */
   protected void write(byte[] fileData, AssetFileIdentity identity) throws IOException {
-    RepoObject repoObject = new RepoObject.RepoObjectBuilder(identity.getFilePath())
+    RepoObjectInput repoObject = RepoObjectInput.builder(identity.getFilePath())
         .byteContent(fileData)
         .contentType(identity.inferContentType().toString())
         .downloadName(identity.getFileName())
