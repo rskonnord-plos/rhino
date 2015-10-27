@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
@@ -776,12 +775,7 @@ class LegacyIngestionService {
       pdfRepr.setAttribute("entry", articleNameStub + ".PDF");
     }
 
-    ListMultimap<String, ArticleAsset> assetsByDoi = Multimaps.index(article.getAssets(), new Function<ArticleAsset, String>() {
-      @Override
-      public String apply(ArticleAsset input) {
-        return input.getDoi();
-      }
-    });
+    ListMultimap<String, ArticleAsset> assetsByDoi = Multimaps.index(article.getAssets(), ArticleAsset::getDoi);
     for (Map.Entry<String, List<ArticleAsset>> assetGroup : Multimaps.asMap(assetsByDoi).entrySet()) {
       String key = assetGroup.getKey();
       if (key.equals(articleDoi)) {

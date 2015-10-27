@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableBiMap;
@@ -33,7 +32,6 @@ import org.springframework.http.HttpStatus;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.OutputKeys;
@@ -306,20 +304,17 @@ class VersionedIngestionService {
 
   private static final String ARCHIVE_NAME_KEY = "archiveName";
   private static final String ARCHIVE_ENTRY_NAME_KEY = "archiveEntryName";
-  private static final Function<RepoObjectMetadata, String> ARCHIVE_ENTRY_NAME_EXTRACTOR = new Function<RepoObjectMetadata, String>() {
-    @Nullable
-    @Override
-    public String apply(RepoObjectMetadata input) {
-      Optional<Object> jsonUserMetadata = input.getJsonUserMetadata();
-      if (jsonUserMetadata.isPresent()) {
-        Object metadataValue = jsonUserMetadata.get();
-        if (metadataValue instanceof Map) {
-          return (String) ((Map) metadataValue).get(ARCHIVE_ENTRY_NAME_KEY);
-        }
+
+  private static String extractArchiveEntryName(RepoObjectMetadata input) {
+    Optional<Object> jsonUserMetadata = input.getJsonUserMetadata();
+    if (jsonUserMetadata.isPresent()) {
+      Object metadataValue = jsonUserMetadata.get();
+      if (metadataValue instanceof Map) {
+        return (String) ((Map) metadataValue).get(ARCHIVE_ENTRY_NAME_KEY);
       }
-      return null; // default to downloadName value
     }
-  };
+    return null; // default to downloadName value
+  }
 
   private String createUserMetadataForArchiveEntryName(String entryName) {
     ImmutableMap<String, String> map = ImmutableMap.of(ARCHIVE_ENTRY_NAME_KEY, entryName);
@@ -329,7 +324,8 @@ class VersionedIngestionService {
   public Archive repack(RepoCollectionList article) {
     Map<String, Object> articleMetadata = (Map<String, Object>) article.getJsonUserMetadata().get();
     String archiveName = (String) articleMetadata.get(ARCHIVE_NAME_KEY);
-    return Archive.readRepoCollection(parentService.contentRepoService, archiveName, article, ARCHIVE_ENTRY_NAME_EXTRACTOR);
+    return Archive.readRepoCollection(parentService.contentRepoService, archiveName, article,
+        VersionedIngestionService::extractArchiveEntryName);
   }
 
 
@@ -426,12 +422,7 @@ class VersionedIngestionService {
       }
 
       Map<String, Object> assetMetadata = assetTable.buildAsAssetMetadata(Maps.transformValues(archiveObjects,
-          new Function<ArticleObject, RepoVersion>() {
-            @Override
-            public RepoVersion apply(ArticleObject articleObject) {
-              return articleObject.created.getVersion();
-            }
-          }));
+          (ArticleObject articleObject) -> articleObject.created.getVersion()));
       map.put("assets", assetMetadata);
 
       return map;

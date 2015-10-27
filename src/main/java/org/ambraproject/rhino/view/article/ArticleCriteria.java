@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.article;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -10,19 +9,16 @@ import org.ambraproject.models.Syndication;
 import org.ambraproject.rhino.rest.RestClientException;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.http.HttpStatus;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
-import java.sql.SQLException;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -132,27 +128,28 @@ public class ArticleCriteria {
       criteria = criteria.add(Restrictions.in("state", publicationStates.get()));
       projectionList.add(Projections.property("state"));
       return new ArticleViewList(Lists.transform((List<Object[]>) hibernateTemplate.findByCriteria(criteria),
-          DOI_AND_STATE_AS_VIEW));
+          ArticleCriteria::doiAndStateAsView));
     }
     if (includeLastModifiedDate) {
       projectionList.add(Projections.property("lastModified"));
       return new ArticleViewList(Lists.transform((List<Object[]>) hibernateTemplate.findByCriteria(criteria),
-          DOI_AND_TIMESTAMP_AS_VIEW));
+          ArticleCriteria::doiAndTimestampAsView));
     }
     return new DoiList((List<String>) hibernateTemplate.findByCriteria(criteria));
   }
 
-  private static final Function<Object[], ArticleView> DOI_AND_STATE_AS_VIEW = input -> {
+  private static ArticleView doiAndStateAsView(Object[] input) {
     String doi = (String) input[0];
     Integer pubStateConstant = (Integer) input[1];
     String pubStateName = ArticleJsonConstants.getPublicationStateName(pubStateConstant);
     return new ArticleStateView(doi, pubStateName, null);
-  };
-  private static final Function<Object[], ArticleView> DOI_AND_TIMESTAMP_AS_VIEW = input -> {
+  }
+
+  private static ArticleView doiAndTimestampAsView(@Nullable Object[] input) {
     String doi = (String) input[0];
     Date lastModified = (Date) input[1];
     return new TimestampedDoi(doi, lastModified);
-  };
+  }
 
   private static class TimestampedDoi implements ArticleView {
     private final String doi;

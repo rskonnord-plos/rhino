@@ -19,7 +19,6 @@
 package org.ambraproject.rhino.content.xml;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
@@ -83,13 +82,7 @@ public abstract class AbstractArticleXml<T extends AmbraEntity> extends Abstract
 
   // An XPath expression that will match any node with one of the name in ASSET_NODE_NAMES.
   protected static final String ASSET_EXPRESSION = Joiner.on('|').join(
-      Iterables.transform(ASSET_NODE_NAMES, new Function<String, String>() {
-        @Override
-        public String apply(String nodeName) {
-          return "//" + nodeName;
-        }
-      })
-  );
+      Iterables.transform(ASSET_NODE_NAMES, (String nodeName) -> "//" + nodeName));
 
   protected String getAssetDoi(Node assetNode) {
     String nodeName = assetNode.getNodeName();

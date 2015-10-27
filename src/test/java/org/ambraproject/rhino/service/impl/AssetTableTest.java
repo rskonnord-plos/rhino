@@ -1,8 +1,6 @@
 package org.ambraproject.rhino.service.impl;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
@@ -42,20 +40,18 @@ public class AssetTableTest {
   @DataProvider
   public Object[][] ingestibles() {
     File[] ingestibles = new File("src/test/resources/articles/").listFiles((dir, name) -> name.endsWith(".zip"));
-    return Lists.transform(Arrays.asList(ingestibles), new Function<File, Object[]>() {
-      @Override
-      public Object[] apply(File file) {
-        try {
-          Archive archive = Archive.readZipFileIntoMemory(file);
-          ManifestXml manifest = new ManifestXml(parseFrom(archive, "MANIFEST.xml"));
-          String articleEntryName = manifest.getArticleXml();
-          ArticleXml article = new ArticleXml(parseFrom(archive, articleEntryName));
-          return new Object[]{manifest, article};
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }).toArray(new Object[0][]);
+    return Lists.transform(Arrays.asList(ingestibles),
+        (File file) -> {
+          try {
+            Archive archive = Archive.readZipFileIntoMemory(file);
+            ManifestXml manifest = new ManifestXml(parseFrom(archive, "MANIFEST.xml"));
+            String articleEntryName = manifest.getArticleXml();
+            ArticleXml article = new ArticleXml(parseFrom(archive, articleEntryName));
+            return new Object[]{manifest, article};
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        }).toArray(new Object[0][]);
   }
 
   private static Document parseFrom(Archive archive, String entryName) throws IOException {
@@ -79,7 +75,8 @@ public class AssetTableTest {
     assertEqualAssetTables(rebuilt, assetTable, false);
 
     // Test buildAsAssetMetadata once more on an AssetTable<RepoVersion>
-    Map<String, Object> rebuiltMetadata = rebuilt.buildAsAssetMetadata(Maps.asMap(dummyObjects.values(), Functions.<RepoVersion>identity()));
+    Map<String, Object> rebuiltMetadata = rebuilt.buildAsAssetMetadata(Maps.asMap(dummyObjects.values(),
+        (RepoVersion repoVersion) -> repoVersion));
     AssetTable<RepoVersion> rebuiltMetadataResult = AssetTable.buildFromAssetMetadata(
         createDummyRepoCollection(rebuiltMetadata, dummyObjects.values()));
     assertEqualAssetTables(rebuiltMetadataResult, assetTable, false);

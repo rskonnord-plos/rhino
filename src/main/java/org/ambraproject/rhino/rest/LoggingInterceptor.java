@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.rest;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
 import org.slf4j.Logger;
@@ -46,7 +45,7 @@ public class LoggingInterceptor extends HandlerInterceptorAdapter {
     return super.preHandle(request, response, handler);
   }
 
-  private static final Function<Object, String> STRING_LITERAL = input -> {
+  private static String asStringLiteral(Object input) {
     String text = String.valueOf(input);
     if (input == null) {
       return text;
@@ -60,7 +59,7 @@ public class LoggingInterceptor extends HandlerInterceptorAdapter {
      */
     text = text.replace("\\", "\\\\").replace("\"", "\\\"");
     return '"' + text + '"';
-  };
+  }
 
   private static final Joiner JOINER = Joiner.on(", ");
   private static final String INDENT = "  ";
@@ -83,9 +82,9 @@ public class LoggingInterceptor extends HandlerInterceptorAdapter {
     // Append a list of headers
     for (Enumeration headerNames = request.getHeaderNames(); headerNames.hasMoreElements(); ) {
       String headerName = (String) headerNames.nextElement();
-      message.append(INDENT).append(STRING_LITERAL.apply(headerName)).append(": ");
+      message.append(INDENT).append(asStringLiteral(headerName)).append(": ");
       Enumeration<?> headers = request.getHeaders(headerName);
-      Iterator<String> headerStrings = Iterators.transform(Iterators.forEnumeration(headers), STRING_LITERAL);
+      Iterator<String> headerStrings = Iterators.transform(Iterators.forEnumeration(headers), LoggingInterceptor::asStringLiteral);
       JOINER.appendTo(message, headerStrings);
       message.append('\n');
     }

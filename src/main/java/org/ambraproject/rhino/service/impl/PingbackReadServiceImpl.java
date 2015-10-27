@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.ambraproject.models.Article;
 import org.ambraproject.models.Pingback;
@@ -44,14 +43,14 @@ import java.util.List;
 
 public class PingbackReadServiceImpl extends AmbraService implements PingbackReadService {
 
-  private static Function<Object[], ArticlePingbackView> AS_VIEW = input -> {
+  private static ArticlePingbackView asView(Object[] input) {
     String doi = (String) input[0];
     String title = (String) input[1];
     String url = (String) input[2];
     Long pingbackCount = (Long) input[3];
     Date mostRecentPingback = (Date) input[4];
     return new ArticlePingbackView(doi, title, url, pingbackCount, mostRecentPingback);
-  };
+  }
 
   @Override
   public Transceiver listByArticle(OrderBy orderBy) throws IOException {
@@ -78,7 +77,7 @@ public class PingbackReadServiceImpl extends AmbraService implements PingbackRea
                 + "from Pingback as p, Article as a where p.articleID = a.ID "
                 + "order by mostRecent desc "
         );
-        List<ArticlePingbackView> resultView = Lists.transform(results, AS_VIEW);
+        List<ArticlePingbackView> resultView = Lists.transform(results, PingbackReadServiceImpl::asView);
         return new ArticleViewList(resultView);
       }
     };

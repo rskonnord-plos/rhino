@@ -1,7 +1,6 @@
 package org.ambraproject.rhino.service.impl;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
@@ -97,32 +96,30 @@ class AssetTable<T> {
   // Implementation note: This is basically the same as exposing map.entrySet(), but with a convenient interface
   // obscuring our Key and Value classes.
   public Collection<Asset<T>> getAssets() {
-    return Collections2.transform(map.entrySet(), new Function<Map.Entry<Key, Value<T>>, Asset<T>>() {
-      @Override
-      public Asset<T> apply(final Map.Entry<Key, Value<T>> mapEntry) {
-        return new Asset<T>() {
-          @Override
-          public AssetIdentity getIdentity() {
-            return mapEntry.getKey().id;
-          }
+    return Collections2.transform(map.entrySet(),
+        (Map.Entry<Key, Value<T>> mapEntry) -> {
+          return new Asset<T>() {
+            @Override
+            public AssetIdentity getIdentity() {
+              return mapEntry.getKey().id;
+            }
 
-          @Override
-          public AssetType getAssetType() {
-            return mapEntry.getValue().assetType;
-          }
+            @Override
+            public AssetType getAssetType() {
+              return mapEntry.getValue().assetType;
+            }
 
-          @Override
-          public String getFileType() {
-            return mapEntry.getKey().fileType.identifier;
-          }
+            @Override
+            public String getFileType() {
+              return mapEntry.getKey().fileType.identifier;
+            }
 
-          @Override
-          public T getFileLocator() {
-            return mapEntry.getValue().fileLocator;
-          }
-        };
-      }
-    });
+            @Override
+            public T getFileLocator() {
+              return mapEntry.getValue().fileLocator;
+            }
+          };
+        });
   }
 
 
@@ -158,12 +155,7 @@ class AssetTable<T> {
     private final String identifier = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
 
     private static final ImmutableMap<String, FileType> BY_IDENTIFIER = Maps.uniqueIndex(EnumSet.allOf(FileType.class),
-        new Function<FileType, String>() {
-          @Override
-          public String apply(FileType input) {
-            return input.identifier;
-          }
-        });
+        (FileType fileType) -> fileType.identifier);
 
     private static String unrecognizedFileType(String fileTypeIdentifier) {
       return String.format("File type not recognized: \"%s\". Must be one of: %s",
@@ -329,12 +321,7 @@ class AssetTable<T> {
     }
 
     private static final ImmutableMap<String, AssetType> BY_IDENTIFIER = Maps.uniqueIndex(EnumSet.allOf(AssetType.class),
-        new Function<AssetType, String>() {
-          @Override
-          public String apply(AssetType input) {
-            return input.identifier;
-          }
-        });
+        (AssetType assetType) -> assetType.identifier);
   }
 
 

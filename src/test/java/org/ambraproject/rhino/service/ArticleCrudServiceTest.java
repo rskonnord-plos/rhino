@@ -18,7 +18,6 @@
  */
 package org.ambraproject.rhino.service;
 
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
@@ -280,12 +279,8 @@ public class ArticleCrudServiceTest extends BaseRhinoTransactionalTest {
     Map<?, ?> doiList = entityGson.fromJson(response.readJson(entityGson), Map.class);
 
     // Kludge! Extract DOI values from object bodies
-    ImmutableSet<String> dois = ImmutableSet.copyOf(Collections2.transform(doiList.values(), new Function<Object, String>() {
-      @Override
-      public String apply(Object input) {
-        return (String) ((Map) input).get("doi");
-      }
-    }));
+    ImmutableSet<String> dois = ImmutableSet.copyOf(Collections2.transform(doiList.values(),
+        (Object input) -> (String) ((Map) input).get("doi")));
 
     assertEquals(dois, ImmutableSet.of(a1.getDoi(), a2.getDoi()));
   }

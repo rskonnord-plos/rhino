@@ -19,7 +19,6 @@
 package org.ambraproject.rhino.service;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -558,8 +557,8 @@ public class IngestionTest extends BaseRhinoTest {
   private void compareJournalSets(AssertionCollector results, Set<Journal> actualSet, Set<Journal> expectedSet) {
     // We care only about eIssn, because that's the only part given in article XML.
     // All other Journal fields come from the environment, which doesn't exist here (see createTestJournal).
-    Set<String> actualEissns = Maps.uniqueIndex(actualSet, JOURNAL_EISSN).keySet();
-    Set<String> expectedEissns = Maps.uniqueIndex(expectedSet, JOURNAL_EISSN).keySet();
+    Set<String> actualEissns = Maps.uniqueIndex(actualSet, Journal::geteIssn).keySet();
+    Set<String> expectedEissns = Maps.uniqueIndex(expectedSet, Journal::geteIssn).keySet();
 
     for (String missing : Sets.difference(expectedEissns, actualEissns)) {
       compare(results, Journal.class, "eIssn", null, missing);
@@ -573,9 +572,9 @@ public class IngestionTest extends BaseRhinoTest {
   }
 
   private void compareRelationshipLists(AssertionCollector results, List<ArticleRelationship> actual, List<ArticleRelationship> expected) {
-    Map<String, ArticleRelationship> actualMap = Maps.uniqueIndex(actual, RELATIONSHIP_DOI);
+    Map<String, ArticleRelationship> actualMap = Maps.uniqueIndex(actual, ArticleRelationship::getOtherArticleDoi);
     Set<String> actualDois = actualMap.keySet();
-    Map<String, ArticleRelationship> expectedMap = Maps.uniqueIndex(expected, RELATIONSHIP_DOI);
+    Map<String, ArticleRelationship> expectedMap = Maps.uniqueIndex(expected, ArticleRelationship::getOtherArticleDoi);
     Set<String> expectedDois = expectedMap.keySet();
 
     for (String missingDoi : Sets.difference(expectedDois, actualDois)) {
@@ -594,9 +593,9 @@ public class IngestionTest extends BaseRhinoTest {
   private void compareAssetsWithoutExpectedFiles(AssertionCollector results,
                                                  Collection<ArticleAsset> actualList, Collection<ArticleAsset> expectedList) {
     // Compare assets by their DOI, ignoring order
-    Map<AssetIdentity, ArticleAsset> actualAssetMap = Maps.uniqueIndex(actualList, ASSET_IDENTITY);
+    Map<AssetIdentity, ArticleAsset> actualAssetMap = Maps.uniqueIndex(actualList, AssetIdentity::from);
     Set<AssetIdentity> actualAssetIds = actualAssetMap.keySet();
-    Multimap<AssetIdentity, ArticleAsset> expectedAssetMap = Multimaps.index(expectedList, ASSET_IDENTITY);
+    Multimap<AssetIdentity, ArticleAsset> expectedAssetMap = Multimaps.index(expectedList, AssetIdentity::from);
     Set<AssetIdentity> expectedAssetIds = expectedAssetMap.keySet();
 
     for (AssetIdentity missingDoi : Sets.difference(expectedAssetIds, actualAssetIds)) {
@@ -626,9 +625,9 @@ public class IngestionTest extends BaseRhinoTest {
 
   private void compareAssetsWithExpectedFiles(AssertionCollector results,
                                               Collection<ArticleAsset> actual, Collection<ArticleAsset> expected) {
-    Map<AssetFileIdentity, ArticleAsset> actualMap = Maps.uniqueIndex(actual, ASSET_FILE_IDENTITY);
+    Map<AssetFileIdentity, ArticleAsset> actualMap = Maps.uniqueIndex(actual, AssetFileIdentity::from);
     Set<AssetFileIdentity> actualKeys = actualMap.keySet();
-    Map<AssetFileIdentity, ArticleAsset> expectedMap = Maps.uniqueIndex(expected, ASSET_FILE_IDENTITY);
+    Map<AssetFileIdentity, ArticleAsset> expectedMap = Maps.uniqueIndex(expected, AssetFileIdentity::from);
     Set<AssetFileIdentity> expectedKeys = expectedMap.keySet();
 
     for (AssetFileIdentity missing : Sets.difference(expectedKeys, actualKeys)) {
@@ -704,9 +703,9 @@ public class IngestionTest extends BaseRhinoTest {
       }
     }
 
-    Map<String, CitedArticle> actualMap = Maps.uniqueIndex(actualList, CITATION_KEY);
+    Map<String, CitedArticle> actualMap = Maps.uniqueIndex(actualList, CitedArticle::getKey);
     Set<String> actualKeys = actualMap.keySet();
-    Map<String, CitedArticle> expectedMap = Maps.uniqueIndex(expectedList, CITATION_KEY);
+    Map<String, CitedArticle> expectedMap = Maps.uniqueIndex(expectedList, CitedArticle::getKey);
     Set<String> expectedKeys = expectedMap.keySet();
 
     for (String key : Sets.intersection(actualKeys, expectedKeys)) {
@@ -878,18 +877,6 @@ public class IngestionTest extends BaseRhinoTest {
       results.compare(Syndication.class, "syndication", null, expected.get(i));
     }
   }
-
-  // Transformation helpers
-
-  private static final Function<Journal, String> JOURNAL_EISSN = Journal::geteIssn;
-
-  private static final Function<ArticleRelationship, String> RELATIONSHIP_DOI = ArticleRelationship::getOtherArticleDoi;
-
-  private static final Function<ArticleAsset, AssetIdentity> ASSET_IDENTITY = AssetIdentity::from;
-
-  private static final Function<ArticleAsset, AssetFileIdentity> ASSET_FILE_IDENTITY = AssetFileIdentity::from;
-
-  private static final Function<CitedArticle, String> CITATION_KEY = CitedArticle::getKey;
 
   private static ImmutableList<PersonName> asPersonNames(Collection<? extends AmbraEntity> persons) {
     List<PersonName> names = Lists.newArrayListWithCapacity(persons.size());

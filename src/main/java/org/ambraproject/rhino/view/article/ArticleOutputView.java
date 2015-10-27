@@ -19,7 +19,6 @@
 package org.ambraproject.rhino.view.article;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -87,12 +86,10 @@ public class ArticleOutputView implements JsonOutputView, ArticleView {
     this.articleType = Optional.ofNullable(articleType);
     this.relatedArticles = ImmutableList.copyOf(relatedArticles);
     this.articleIssues = ImmutableList.copyOf(articleIssues);
-    this.syndications = Maps.uniqueIndex(syndications, GET_TARGET);
+    this.syndications = Maps.uniqueIndex(syndications, Syndication::getTarget);
     this.pingbacks = ImmutableList.copyOf(pingbacks);
     this.excludeCitations = excludeCitations;
   }
-
-  private static final Function<Syndication, String> GET_TARGET = Syndication::getTarget;
 
 
   @Override
