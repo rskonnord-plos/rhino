@@ -81,7 +81,7 @@ public class ArticleStateServiceImpl extends AmbraService implements ArticleStat
 
   /**
    * Attaches additional XML info to an article document specifying the journals it is published in.
-   * <p/>
+   * <p>
    * This is largely copied from org.ambraproject.article.service.ArticleDocumentServiceImpl in the old admin codebase.
    *
    * @param doc       article XML
@@ -121,7 +121,7 @@ public class ArticleStateServiceImpl extends AmbraService implements ArticleStat
 
   /**
    * Append an additional XML node to an article document specifying the striking image.
-   * <p/>
+   * <p>
    * This is largely copied from org.ambraproject.search.service.IndexingServiceImpl in the old admin codebase.
    *
    * @param doc     article XML

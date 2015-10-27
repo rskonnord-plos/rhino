@@ -46,7 +46,7 @@ public final class RhinoTestHelper {
 
   /**
    * Mock input stream that yields a constant string and keeps track of whether it has been closed.
-   * <p/>
+   * <p>
    * Closing the stream is not significant in this implementation, but one might want to test for it.
    */
   public static class TestInputStream extends ByteArrayInputStream {
@@ -197,8 +197,9 @@ public final class RhinoTestHelper {
       List<?> existing = hibernateTemplate.findByCriteria(DetachedCriteria
           .forClass(Journal.class)
           .add(Restrictions.eq("eIssn", eissn)));
-      if (!existing.isEmpty())
+      if (!existing.isEmpty()) {
         continue;
+      }
       Journal journal = createDummyJournal(eissn);
       hibernateTemplate.save(journal);
     }

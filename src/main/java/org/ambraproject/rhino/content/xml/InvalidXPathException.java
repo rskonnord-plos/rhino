@@ -22,7 +22,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 /**
  * Indicate that a constant, program-defined XPath expression could not be compiled.
- * <p/>
+ * <p>
  * This represents cases where the error is expected to be caused only by programmer error, which means that an
  * unchecked exception is more appropriate. If so, wrap this class around the checked {@link XPathExpressionException}.
  * If the exception can be caused by user error, it is better to duck under or handle the {@link

@@ -100,10 +100,10 @@ public enum MetadataFormat {
    * Provide a metadata format for a {@code Accept} header value. Match the content types listed in the header to the
    * first available supported format, or return the default format if none of the formats listed is supported. If there
    * is no {@code Accept} header, return the default format.
-   * <p/>
+   * <p>
    * This is the preferred way to get the metadata format in a controller method that doesn't otherwise need to receive
    * an {@code HttpServletRequest} or {@code HttpHeaders} object from Spring.
-   * <p/>
+   * <p>
    * Example usage in controller:
    * <pre>   @RequestMapping
    *   public void serve(@RequestHeader(value = "Accept", required = false) String accept) {
@@ -136,11 +136,11 @@ public enum MetadataFormat {
    * Provide a metadata format for a request. Match the content types listed in the {@code Accept} header to the first
    * available supported format, or return the default format if none of the formats listed is supported. If there is no
    * {@code Accept} header, return the default format.
-   * <p/>
+   * <p>
    * In general, controllers should call this method only if they already receive an {@code HttpServletRequest} from
    * Spring for some other reason. If you access the headers only to get the metadata format, prefer {@link
    * #getFromAcceptHeader(String)}.
-   * <p/>
+   * <p>
    * Example usage in controller:
    * <pre>   @RequestMapping
    *   public void serve(HttpServletRequest request) {
@@ -159,11 +159,11 @@ public enum MetadataFormat {
    * Provide a metadata format for a set of headers. Match the content types listed in the {@code Accept} header to the
    * first available supported format, or return the default format if none of the formats listed is supported. If there
    * is no {@code Accept} header, return the default format.
-   * <p/>
+   * <p>
    * In general, controllers should call this method only if they already receive an {@code HttpHeaders} object from
    * Spring for some other reason. If you access the headers only to get the metadata format, prefer {@link
    * #getFromAcceptHeader(String)}.
-   * <p/>
+   * <p>
    * Example usage in controller:
    * <pre>   @RequestMapping
    *   public void serve(@RequestHeader HttpHeaders headers) {

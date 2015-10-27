@@ -31,9 +31,9 @@ import java.util.regex.Pattern;
  * cleanliness, pairs them with {@code replaceAll} arguments to apply in a batch. It may be preferable to making
  * repeated calls to {@link String#replaceAll} for performance reasons, because {@link String#replaceAll} must compile a
  * new {@link Pattern} each time it is called.
- * <p/>
+ * <p>
  * This class and its cached {@link Pattern} objects are immutable and thread-safe.
- * <p/>
+ * <p>
  * TODO: Delete this and use org.ambraproject.util.StringReplacer instead as soon as it's imported from Ambra Base.
  */
 public class StringReplacer {

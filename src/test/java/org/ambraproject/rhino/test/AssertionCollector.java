@@ -14,7 +14,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * An object that does multiple "soft" assertions for equality. That is, it does all the assertions and then reports
  * which ones failed, rather than halting on the first failed assertion.
- * <p/>
+ * <p>
  * It would be nice to use TestNG features for this, but quick research indicates that it would require custom code
  * anyway.
  */

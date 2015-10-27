@@ -33,7 +33,6 @@ import org.ambraproject.rhino.service.taxonomy.DummyTaxonomyClassificationServic
 import org.ambraproject.rhino.service.taxonomy.TaxonomyClassificationService;
 import org.ambraproject.rhino.service.taxonomy.TaxonomyLookupService;
 import org.ambraproject.rhino.service.taxonomy.TaxonomyService;
-import org.ambraproject.rhino.service.taxonomy.impl.TaxonomyLookupServiceImpl;
 import org.ambraproject.rhino.service.taxonomy.impl.TaxonomyServiceImpl;
 import org.ambraproject.rhino.util.response.Transceiver;
 import org.ambraproject.service.article.ArticleService;

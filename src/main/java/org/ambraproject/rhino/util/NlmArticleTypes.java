@@ -4,11 +4,11 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * Constants specified by the NLM DTD for the {@code article-type} field.
- * <p/>
+ * <p>
  * Storing these here is a hack. It would be better to properly import them from the DTD associated with a particular
  * article, and to be flexible as to which version of the DTD to take them from. Fortunately, the list is stable across
  * the versions that our ingestion code supports (2.3 and 3.0).
- * <p/>
+ * <p>
  * These are programmatically significant because of the unfortunate way that the legacy data model mixes together what
  * it considers to be "article types". That is, both of the values (in XPath) {@code /article/@article-type} and {@code
  * "/article/front/article-meta/article-categories/subj-group[@subj-group-type = 'heading']/subject"} are mingled

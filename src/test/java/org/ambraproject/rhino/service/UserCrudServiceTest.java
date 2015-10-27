@@ -21,7 +21,6 @@ package org.ambraproject.rhino.service;
 import org.ambraproject.models.UserLogin;
 import org.ambraproject.models.UserProfile;
 import org.ambraproject.rhino.BaseRhinoTest;
-import org.ambraproject.rhino.config.RuntimeConfiguration;
 import org.ambraproject.rhino.util.response.Transceiver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Test;

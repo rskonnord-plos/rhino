@@ -293,7 +293,7 @@ public class ArticleXml extends AbstractArticleXml<Article> {
   /**
    * Safely sets a property of an article that has a one-to-many relationship, and is automatically deleted when
    * dissociated from the parent.  The collection will only be set if it differs from the values already defined.
-   * <p/>
+   * <p>
    * For example, instead of <pre>article.setFoo(newStuff);</pre>
    * you should instead do
    * <pre>
@@ -514,7 +514,7 @@ public class ArticleXml extends AbstractArticleXml<Article> {
   /**
    * Convert each collab node to its text content, excluding any text that appears inside a nested "contrib-group"
    * element.
-   * <p/>
+   * <p>
    * TODO: Find a way to do this with just XPath?
    *
    * @param collabNodes XML nodes representing "collab" elements
@@ -537,7 +537,7 @@ public class ArticleXml extends AbstractArticleXml<Article> {
 
   /**
    * Parse {@link ArticleRelationship} objects from XML.
-   * <p/>
+   * <p>
    * These are returned from here, rather than set in the {@link Article} object during normal parsing, so they can get
    * special handling.
    *

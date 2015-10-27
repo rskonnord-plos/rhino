@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * Classifications for the asset files representing an image with thumbnails.
- * <p/>
+ * <p>
  * Currently, files are associated with figure types strictly according to their file extensions, using conventions
  * pre-established by Ambra. As token future-proofing, this class allows multiple extensions to be mapped to a figure
  * type. But a better solution would be to have this explicitly declared as part of the ingestion input.

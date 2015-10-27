@@ -101,7 +101,7 @@ public class TaxonomyLookupServiceImpl implements TaxonomyLookupService {
           results.add(new Result(subject, childCount, articleCount));
         }
 
-        if(categoryView.getName().equals("ROOT")) {
+        if (categoryView.getName().equals("ROOT")) {
           results.add(new Result("ROOT", results.size(), articleCounts.get("ROOT")));
         }
 

@@ -112,7 +112,7 @@ public abstract class AbstractArticleXml<T extends AmbraEntity> extends Abstract
 
   /**
    * Read the "xlink:href" attribute from a node.
-   * <p/>
+   * <p>
    * TODO: Use XPath instead and handle the XML namespace properly.
    */
   protected static String readHrefAttribute(Node assetNode) {
@@ -144,7 +144,7 @@ public abstract class AbstractArticleXml<T extends AmbraEntity> extends Abstract
   /**
    * Parse a person's name from an article XML node. The returned object is useful for populating a {@link
    * org.ambraproject.models.ArticlePerson} or {@link org.ambraproject.models.CitedArticlePerson}.
-   * <p/>
+   * <p>
    * This method expects to find a "name-style" attribute and "surname" subnode. The "given-names" and "suffix" subnodes
    * are optional. Omitted nodes are represented by an empty string.
    *
@@ -198,7 +198,7 @@ public abstract class AbstractArticleXml<T extends AmbraEntity> extends Abstract
    * Build a text field by partially reconstructing the node's content as XML. The output is text content between the
    * node's two tags, including nested XML tags with attributes, but not this node's outer tags. Continuous substrings
    * of whitespace may be substituted with other whitespace. Markup characters are escaped.
-   * <p/>
+   * <p>
    * This method is used instead of an appropriate XML library in order to match the behavior of legacy code, for now.
    *
    * @param node the node containing the text we are retrieving

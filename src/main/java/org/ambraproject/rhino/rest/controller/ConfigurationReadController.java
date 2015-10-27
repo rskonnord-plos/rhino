@@ -25,24 +25,22 @@ public class ConfigurationReadController extends RestController {
   private ConfigurationReadService configurationReadService;
 
   /**
-   * Retrieves configuration metadata according to the given type
-   * parameters.
+   * Retrieves configuration metadata according to the given type parameters.
    *
-   * @param request  HttpServletRequest
-   * @param response HttpServletResponse
-   * @param configType  String indicating the type of config values to be returned
-   *                    (should be one of {@link ConfigurationReadService.CONFIG_TYPES})
-   *
-   **/
+   * @param request    HttpServletRequest
+   * @param response   HttpServletResponse
+   * @param configType String indicating the type of config values to be returned (should be one of {@link
+   *                   ConfigurationReadService.CONFIG_TYPES})
+   */
 
   @Transactional(readOnly = true)
   @RequestMapping(value = CONFIG_ROOT, method = RequestMethod.GET)
   public void readConfig(HttpServletRequest request, HttpServletResponse response,
                          @RequestParam(value = CONFIG_TYPE_PARAM, required = true) String configType)
       throws IOException {
-    if (!ConfigurationReadService.CONFIG_TYPES.contains(configType)){
+    if (!ConfigurationReadService.CONFIG_TYPES.contains(configType)) {
       throw new RestClientException("Invalid configuration type parameter. Options are: " +
-              ConfigurationReadService.CONFIG_TYPES.toString(), HttpStatus.BAD_REQUEST);
+          ConfigurationReadService.CONFIG_TYPES.toString(), HttpStatus.BAD_REQUEST);
     }
 
     if (configType.contentEquals("ambra")) {

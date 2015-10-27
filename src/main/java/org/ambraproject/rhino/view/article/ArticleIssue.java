@@ -14,7 +14,7 @@ public class ArticleIssue {
   private final Volume parentVolume;
   private final Journal parentJournal;
 
-  public ArticleIssue(Issue issue, Volume parentVolume, Journal parentJournal){
+  public ArticleIssue(Issue issue, Volume parentVolume, Journal parentJournal) {
     this.issue = Preconditions.checkNotNull(issue);
     this.parentVolume = Preconditions.checkNotNull(parentVolume);
     this.parentJournal = Preconditions.checkNotNull(parentJournal);

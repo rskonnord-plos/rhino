@@ -130,6 +130,7 @@ public class UserCrudServiceImpl extends AmbraService implements UserCrudService
 
   /**
    * Find the UserProfile object for a given authId
+   *
    * @param authId authId
    * @return UserProfile object
    */

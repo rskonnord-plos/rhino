@@ -71,7 +71,7 @@ public abstract class Archive implements Closeable {
   /**
    * Open a file from the archive. The argument must be one of the strings contained in the set returned by {@link
    * #getEntryNames()}.
-   * <p/>
+   * <p>
    * Must not be called if {@link #close()} has been called on this object. Behavior is undefined in this case.
    *
    * @param entryName the name of a file entry
@@ -128,9 +128,9 @@ public abstract class Archive implements Closeable {
   /**
    * Read a zip file from a stream to temp files on disk. Creating the {@code Archive} object exhausts the stream.
    * Closing the archive deletes the temp files.
-   *
-   * ZipStream.getNextEntry() will return an additional ZipEntry for directories, including archive files.
-   * Nested asset ingestion is not supported in Rhino and these ZipEntries are skipped during repackaging.
+   * <p>
+   * ZipStream.getNextEntry() will return an additional ZipEntry for directories, including archive files. Nested asset
+   * ingestion is not supported in Rhino and these ZipEntries are skipped during repackaging.
    *
    * @param zipFile a stream containing the zip archive
    * @return the archive representing the read files

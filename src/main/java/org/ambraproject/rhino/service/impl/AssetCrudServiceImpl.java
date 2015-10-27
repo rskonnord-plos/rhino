@@ -119,7 +119,7 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
    * Examine a persistent collection of existing asset entities and select or create one to represent a new file upload.
    * If there is already a file-less asset with a matching DOI, this method finds and returns it. Else, it creates a new
    * asset with the article-defined data initialized and modifies the given collection by adding it.
-   * <p/>
+   * <p>
    * It also does two kinds of data validation. If the DOI-and-extension pair being created already exists, throw a
    * client error. If a file-less asset coexists with one or more assets that have file data, log a warning because this
    * should not be possible.

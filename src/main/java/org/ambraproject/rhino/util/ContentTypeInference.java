@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Utility classes for assigning a MIME "Content-Type" header based on a file extension.
- * <p/>
+ * <p>
  * This class defers to {@link MimetypesFileTypeMap} where possible, but adds several cases. This class would best be
  * replaced with a well-maintained, general-purpose utility. But, it has the advantage of guaranteeing compatibility
  * with legacy Ambra behavior.

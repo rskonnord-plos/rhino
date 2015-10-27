@@ -110,7 +110,7 @@ public class ArticleCrudServiceTest extends BaseRhinoTransactionalTest {
     boolean received404 = false;
     try {
       articleCrudService.readXml(id);
-    } catch (InMemoryContentRepoService.InMemoryContentRepoServiceException|NotFoundException nfe) {
+    } catch (InMemoryContentRepoService.InMemoryContentRepoServiceException | NotFoundException nfe) {
       received404 = true;
     } catch (RestClientException e) {
       throw e;

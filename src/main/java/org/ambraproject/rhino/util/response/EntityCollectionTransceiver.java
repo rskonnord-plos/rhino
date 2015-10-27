@@ -30,7 +30,7 @@ public abstract class EntityCollectionTransceiver<E extends AmbraEntity> extends
 
   /**
    * {@inheritDoc}
-   * <p/>
+   * <p>
    * This class fetches the full set of persistent entities and uses the maximum built-in last-modified date. Subclasses
    * may override this method to return the last-modified date without reading the rest of the data for a performance
    * improvement.

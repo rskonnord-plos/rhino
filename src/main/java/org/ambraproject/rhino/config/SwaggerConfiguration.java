@@ -25,11 +25,11 @@ public class SwaggerConfiguration {
   private ConfigurationReadService configurationReadService;
 
   /**
-   * Every SwaggerSpringMvcPlugin bean is picked up by the swagger-mvc framework - allowing for multiple
-   * swagger groups i.e. same code base multiple swagger resource listings.
+   * Every SwaggerSpringMvcPlugin bean is picked up by the swagger-mvc framework - allowing for multiple swagger groups
+   * i.e. same code base multiple swagger resource listings.
    */
   @Bean
-  public SwaggerSpringMvcPlugin customImplementation(){
+  public SwaggerSpringMvcPlugin customImplementation() {
     return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
         .apiInfo(apiInfo())
         .apiVersion("v1");  // whenever we upgrade our api version, we will need to update this

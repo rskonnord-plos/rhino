@@ -48,7 +48,8 @@ public interface UserCrudService {
 
   /**
    * Record user logging in
-   * @param authId authId
+   *
+   * @param authId    authId
    * @param loginInfo UserLogin object
    * @return UserProfile object
    */

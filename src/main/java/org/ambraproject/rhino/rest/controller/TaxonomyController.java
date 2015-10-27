@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
@@ -67,12 +68,14 @@ public class TaxonomyController extends RestController {
 
   @Transactional(rollbackFor = {Throwable.class})
   @RequestMapping(value = TAXONOMY_NAMESPACE + "flag/{action:add|remove}", method = RequestMethod.POST)
-  public @ResponseBody Map<String,String> flagArticleCategory(
-                       @RequestParam(value = "categoryTerm", required = true) String categoryTerm,
-                       @RequestParam(value = "articleDoi", required = true) String articleDoi,
-                       @RequestParam(value = "authId", required = true) String authId,
-                       @PathVariable("action") String action)
-          throws Exception {
+  public
+  @ResponseBody
+  Map<String, String> flagArticleCategory(
+      @RequestParam(value = "categoryTerm", required = true) String categoryTerm,
+      @RequestParam(value = "articleDoi", required = true) String articleDoi,
+      @RequestParam(value = "authId", required = true) String authId,
+      @PathVariable("action") String action)
+      throws Exception {
     // TODO: we might want to optimize this by directly retrieving an article category collection in place of article instantiation
     Article article = articleCrudService.findArticleById(ArticleIdentity.create(articleDoi));
     for (Category category : article.getCategories().keySet()) {

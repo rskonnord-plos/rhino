@@ -20,7 +20,7 @@ package org.ambraproject.rhino.service;
 
 /**
  * Super-interface to CRUD services within the article namespace.
- * <p/>
+ * <p>
  * Methods are included here only if they share a common signature among services. See the extending interfaces for
  * documentation on the behavior of each method.
  */

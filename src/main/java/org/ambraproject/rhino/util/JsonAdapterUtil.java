@@ -55,7 +55,7 @@ public final class JsonAdapterUtil {
   /**
    * If the object is a lazy-loaded HibernateProxy, force it to be replaced with its actual write-replacement. This can
    * be used to work around Hibernate optimizations that disrupt Gson's automatic serialization.
-   * <p/>
+   * <p>
    * This may incur extra performance costs if the full object would not have otherwise been read.
    *
    * @param object     a Hibernate model entity, which may be lazy-loaded

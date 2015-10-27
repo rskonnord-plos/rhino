@@ -55,7 +55,7 @@ public final class PlosDoiUtils {
 
   /**
    * Returns the "short form" of the DOI that is used internally at PLOS for a variety of purposes.
-   * <p/>
+   * <p>
    * For example, "info:doi/10.1371/journal.ppat.1003156" returns "ppat.1003156"
    *
    * @param doi a PLOS DOI

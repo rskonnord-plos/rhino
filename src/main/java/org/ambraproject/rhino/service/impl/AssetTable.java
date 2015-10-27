@@ -340,7 +340,7 @@ class AssetTable<T> {
 
   /**
    * Build an asset table from input being ingested.
-   * <p/>
+   * <p>
    * The asset table can then be persisted by {@link #buildAsAssetMetadata}.
    *
    * @param assetNodeMap encapsulated descriptions of references to asset DOIs in the manuscript
@@ -503,7 +503,7 @@ class AssetTable<T> {
    * Build an asset metadata table. The table goes into the JSON metadata of a content repo collection representing an
    * ingested article. One of these tables, inside a repo collection, can be parsed back into an {@code AssetTable}
    * using {@link #buildFromAssetMetadata}.
-   * <p/>
+   * <p>
    * This can be called only after the assets in this table have been persisted to the content repo. The argument is a
    * map from the assets' file locator values (see {@link org.ambraproject.rhino.service.impl.AssetTable.Asset#getFileLocator})
    * to the keys of the persistent objects.

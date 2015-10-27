@@ -36,7 +36,6 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 import org.plos.crepo.exceptions.ContentRepoException;
-import org.plos.crepo.exceptions.ErrorType;
 import org.plos.crepo.exceptions.NotFoundException;
 import org.plos.crepo.service.ContentRepoService;
 import org.plos.crepo.service.InMemoryContentRepoService;
@@ -93,8 +92,9 @@ public class ArticleStateServiceTest extends BaseRhinoTest {
       List<?> existing = hibernateTemplate.findByCriteria(DetachedCriteria
           .forClass(Journal.class)
           .add(Restrictions.eq("eIssn", eissn)));
-      if (!existing.isEmpty())
+      if (!existing.isEmpty()) {
         continue;
+      }
       Journal journal = RhinoTestHelper.createDummyJournal(eissn);
       hibernateTemplate.save(journal);
     }
@@ -104,7 +104,7 @@ public class ArticleStateServiceTest extends BaseRhinoTest {
     try (InputStream stream = contentRepoService.getLatestRepoObject(fileIdentity.toString())) {
       assertNotNull(stream);
       assertTrue(expectedToExist);
-    } catch (InMemoryContentRepoService.InMemoryContentRepoServiceException|NotFoundException nfe) {
+    } catch (InMemoryContentRepoService.InMemoryContentRepoServiceException | NotFoundException nfe) {
       assertFalse(expectedToExist);
     } catch (ContentRepoException e) {
       throw e;

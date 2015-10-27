@@ -25,12 +25,12 @@ public class AdapterRegistry {
   /**
    * A list of all classes that implement that {@link JsonOutputView} interface and should be serialized with its {@code
    * serialize} method.
-   * <p/>
+   * <p>
    * It would be nice to configure Gson to apply the adapter to any object implementing the interface by default. It is
    * a little unfortunate that listing them here seems to be necessary, since it violates the principle that an
    * interface shouldn't have to know about its implementations. But Gson's API seems to necessitate it, unless we've
    * missed something so far.
-   * <p/>
+   * <p>
    * When you define a new {@code JsonOutputView}, you must add it here before Gson will use the interface. (Please
    * follow the existing code style for human-friendliness.)
    */
@@ -79,7 +79,7 @@ public class AdapterRegistry {
    * A map from data types to custom adapters. An adapter defined here will be applied by default when Gson encounters
    * an object of the given type. This is especially useful when those objects may appear as sub-values of other objects
    * that are serialized by reflection; then these adapters are applied automagically.
-   * <p/>
+   * <p>
    * Unlike {@link #JSON_OUTPUT_VIEW_CLASSES}, this is not so much an apparent kludge but normal Gson configuration.
    */
   private static final ImmutableMap<Type, Object> CUSTOM_ADAPTERS = ImmutableMap.<Type, Object>builder()

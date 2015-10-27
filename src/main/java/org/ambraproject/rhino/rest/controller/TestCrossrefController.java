@@ -33,10 +33,10 @@ import java.io.FileOutputStream;
 /**
  * Controller class intended to simulate the response from Crossref upon article syndication; useful for manual testing.
  * This controller processes POSTS to /crossref with a parameter, fname, set to the file being syndicated.
- * <p/>
+ * <p>
  * This is intended to be called from plos-queue, which is in turn called from rhino upon article publication.  The
  * property plos.crossref.url in /etc/topaz/camel.properties should point to this server appopriately.
- * <p/>
+ * <p>
  * The posted files will be stored in the directory specified by ambra.services.syndications.testDir in ambra.xml for
  * manual examination.
  */

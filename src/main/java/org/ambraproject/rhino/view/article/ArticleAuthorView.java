@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * JSON output view class for authors of an article.
- * <p/>
+ * <p>
  * This class would ideally be named just AuthorView, but the code also uses org.ambraproject.views.AuthorView, and I
  * thought it best to choose a distinct name.
  */

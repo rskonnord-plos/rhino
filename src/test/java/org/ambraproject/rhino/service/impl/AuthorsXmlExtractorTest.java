@@ -236,7 +236,7 @@ public class AuthorsXmlExtractorTest extends BaseRhinoTest {
         {"journal.pone.0055490.xml", new AuthorView[]{
             AuthorView.builder().setGivenNames("Michael P.").setSurnames("Heaton")
                 .setEqualContrib(true)
-                .setCorresponding( "<span class=\"email\">* E-mail:</span> <a href=\"mailto:mike.heaton@ars.usda.gov\">mike.heaton@ars.usda.gov</a> (MPH); <a href=\"mailto:ted.kalbfleisch@louisville.edu\">ted.kalbfleisch@louisville.edu</a> (TSK)")
+                .setCorresponding("<span class=\"email\">* E-mail:</span> <a href=\"mailto:mike.heaton@ars.usda.gov\">mike.heaton@ars.usda.gov</a> (MPH); <a href=\"mailto:ted.kalbfleisch@louisville.edu\">ted.kalbfleisch@louisville.edu</a> (TSK)")
                 .setAffiliations(ImmutableList.of("U.S. Meat Animal Research Center (USMARC), Clay Center, Nebraska, United States of America"))
                 .build(),
             AuthorView.builder().setGivenNames("Theodore S.").setSurnames("Kalbfleisch")

@@ -2,7 +2,6 @@ package org.ambraproject.rhino.view.article;
 
 import com.google.common.base.Preconditions;
 import org.ambraproject.rhino.identity.ArticleIdentity;
-import org.ambraproject.rhino.identity.DoiBasedIdentity;
 
 import java.util.Date;
 

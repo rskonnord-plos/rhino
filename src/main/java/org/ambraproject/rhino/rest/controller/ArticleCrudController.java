@@ -120,8 +120,8 @@ public class ArticleCrudController extends ArticleSpaceController {
   /**
    * Repopulates article category information by making a call to the taxonomy server.
    *
-   * @param request          HttpServletRequest
-   * @param response         HttpServletResponse
+   * @param request  HttpServletRequest
+   * @param response HttpServletResponse
    * @throws IOException
    */
   @Transactional(rollbackFor = {Throwable.class})
@@ -275,8 +275,8 @@ public class ArticleCrudController extends ArticleSpaceController {
   }
 
   /**
-   * Retrieves the raw taxonomy categories associated with the article along with the text that is sent to the
-   * taxonomy server for classification
+   * Retrieves the raw taxonomy categories associated with the article along with the text that is sent to the taxonomy
+   * server for classification
    *
    * @param request
    * @return a String containing the text and raw categories in the form of <text> \n\n <categories>
@@ -299,8 +299,8 @@ public class ArticleCrudController extends ArticleSpaceController {
   /**
    * Retrieves the metadata from a random article
    *
-   * @param request          HttpServletRequest
-   * @param response         HttpServletResponse
+   * @param request  HttpServletRequest
+   * @param response HttpServletResponse
    * @return a JSON representation of the random article
    * @throws IOException
    */

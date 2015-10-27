@@ -26,12 +26,12 @@ public class VolumeNonAssocView {
     this.description = description;
   }
 
-  public VolumeNonAssocView(Volume volume){
+  public VolumeNonAssocView(Volume volume) {
     this(volume.getVolumeUri(),
-         volume.getDisplayName(),
-         volume.getImageUri(),
-         volume.getTitle(),
-         volume.getDescription());
+        volume.getDisplayName(),
+        volume.getImageUri(),
+        volume.getTitle(),
+        volume.getDescription());
   }
 
   /**

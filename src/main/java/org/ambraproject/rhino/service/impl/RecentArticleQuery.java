@@ -31,10 +31,10 @@ import java.util.Set;
 /**
  * Encapsulates a query that will list the DOIs, titles, and publication dates of all articles published after a certain
  * threshold. If a minimum result count is provided, go past the threshold to return that many if necessary.
- * <p/>
+ * <p>
  * If a list of article types is provided, return all articles of those types published after the threshold. Articles
  * with the same publication date are ordered by type, in the same order as the list.
- * <p/>
+ * <p>
  * The string {@code "*"} may be used as a stand-in that matches all article types. For example, place it at the end of
  * the list to get all articles past the threshold if there aren't enough of the preceding types. If {@code minimum} is
  * present and {@code articleTypes} contains more than 1 element, then {@code articleTypes} <em>must</em> contain {@code
@@ -77,8 +77,8 @@ public class RecentArticleQuery {
 
     // TODO: Move this to external config
     private ImmutableList<String> alwaysExcludedArticleTypes = ImmutableList.of(
-            "http://rdf.plos.org/RDF/articleType/Issue%20Image"
-            );
+        "http://rdf.plos.org/RDF/articleType/Issue%20Image"
+    );
 
     /**
      * @param journalKey key of the journal to search

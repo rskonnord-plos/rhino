@@ -41,7 +41,7 @@ public abstract class BaseRhinoTest extends /* AbstractTransactionalTestNGSpring
 
   /**
    * Clear out old persistent values.
-   * <p/>
+   * <p>
    * Really, the entire persistent environment should be reset on every test. Deleting values that we expected to be
    * created by type is a kludge.
    */

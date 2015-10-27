@@ -49,26 +49,26 @@ public class TaxonomyClassificationServiceImpl implements TaxonomyClassification
       "  <VectorParam>\n" +
       "    <VectorElement>\n";
 
-  private static final String MESSAGE_DOC_ELEMENT=
+  private static final String MESSAGE_DOC_ELEMENT =
       "      <doc>\n" +
-      "        <header>\n" +
-      "%s" +
-      "        </header>\n" +
-      "        <content>\n" +
-      "          %s\n" +
-      "        </content>\n" +
-      "      </doc>\n";
+          "        <header>\n" +
+          "%s" +
+          "        </header>\n" +
+          "        <content>\n" +
+          "          %s\n" +
+          "        </content>\n" +
+          "      </doc>\n";
 
   private static final String MESSAGE_HEADER =
       "          <publication-date>%s</publication-date>\n" +
-      "          <journal-title>%s</journal-title>\n" +
-      "          <article-type>%s</article-type>\n" +
-      "          <article-id pub-id-type=\"doi\">%s</article-id>\n";
+          "          <journal-title>%s</journal-title>\n" +
+          "          <article-type>%s</article-type>\n" +
+          "          <article-id pub-id-type=\"doi\">%s</article-id>\n";
 
   private static final String MESSAGE_END =
       "    </VectorElement>\n" +
-      "  </VectorParam>\n" +
-      "</TMMAI>";
+          "  </VectorParam>\n" +
+          "</TMMAI>";
 
 
   @Autowired
@@ -259,10 +259,9 @@ public class TaxonomyClassificationServiceImpl implements TaxonomyClassification
    * research articles, this is presently the title, the abstract, the Materials and Methods section, and the Results
    * section.  (If any of these sections are not present, they are not sent, but this is not a fatal error.) If none of
    * these sections (abstract, materials/methods, or results) are present, then this method will return the entire body
-   * text. This is usually the case for non-research-articles, such as corrections, opinion pieces, etc.
-   * Please not that the "getSuggestedTermsFullPathsPlos" requires the data within the "content" tag to be
-   * XML-escaped twice. Hence, we XML escape it once in this method and once when we escape the "doc" tag in
-   * {@link getRawTerms} method.
+   * text. This is usually the case for non-research-articles, such as corrections, opinion pieces, etc. Please not that
+   * the "getSuggestedTermsFullPathsPlos" requires the data within the "content" tag to be XML-escaped twice. Hence, we
+   * XML escape it once in this method and once when we escape the "doc" tag in {@link getRawTerms} method.
    *
    * @param dom DOM tree of an article
    * @return raw text content, XML-escaped, of the relevant article sections

@@ -111,7 +111,7 @@ public class AssetFileIdentity extends DoiBasedIdentity {
   /**
    * Return the portion of the full file path that, if it were a path on an actual file system, would be the name of the
    * file. In other words, everything after the final {@code '/'} character, or the full string if there is none.
-   * <p/>
+   * <p>
    * Note that DOIs are not file paths and that slashes within them do not necessarily denote a directory hierarchy.
    *
    * @return the file name

@@ -94,17 +94,17 @@ import static org.testng.Assert.fail;
 
 /**
  * Special test suite for testing ingestion features, using the legacy Admin app as a reference implementation.
- * <p/>
+ * <p>
  * The test case data for this class live at {@code DATA_PATH}. Each XML file is raw article data to be passed to an
  * {@link ArticleCrudService}. The matching JSON file is a Gson dump of an {@link org.ambraproject.models.Article}
  * instance as created by the reference implementation ({@code org.ambraproject.article.service.IngesterImpl}). There
  * are also full zip archives that are analogous to the XML, but test {@link IngestibleService} instead.
- * <p/>
+ * <p>
  * The code in this class was centered around the reference implementation, and was written with the assumption that it
  * would use the unaltered JSON code for comparisons, bugs and all. Hence, there are a lot of little hacks in the
  * assertions that either relax the requirements for equality between actual and "expected" values, or outright ignore
  * certain values in the presence of known bugs. These should be well-commented.
- * <p/>
+ * <p>
  * Better, less hackish tests are desirable in the unit test classes that explicitly test particular services.
  */
 public class IngestionTest extends BaseRhinoTest {
@@ -123,7 +123,7 @@ public class IngestionTest extends BaseRhinoTest {
 
   /**
    * Test cases that we want to exclude from normal runs.
-   * <p/>
+   * <p>
    * Each of these cases has been found to fail because it asserts "pathological" behavior from the old Admin app that
    * we don't want to reproduce. The input files are left in the test harness, but are skipped if they are named here.
    * The pathological test failures may be observed by commenting out an entry below. Each entry in the list should be
@@ -444,15 +444,15 @@ public class IngestionTest extends BaseRhinoTest {
 
   /**
    * Change XML text to an equivalent form, for comparison.
-   * <p/>
+   * <p>
    * Expands self-closing tags. Collapses whitespace; trims leading and trailing whitespace.
-   * <p/>
+   * <p>
    * Removes whitespace from between tags. This does not produce strictly equivalent XML but it is close enough for test
    * comparisons (but see the comment in {@link #compareMarkupText}).
-   * <p/>
+   * <p>
    * Un-escape ampersands where they appear within an attribute value. (This could be handled more generally, but it
    * barely comes up. Legacy Admin unnecessarily escapes ampersands in this context on case pone.0005668.)
-   * <p/>
+   * <p>
    * This should be replaced with proper use of the XML library if it gets too hairy.
    *
    * @param text XML text

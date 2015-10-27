@@ -23,7 +23,7 @@ import org.ambraproject.models.CitedArticlePerson;
 
 /**
  * Immutable holder for a name that can be put into {@link ArticlePerson} or {@link CitedArticlePerson}.
- * <p/>
+ * <p>
  * This is a hack to allow code to write to {@link ArticlePerson} and {@link CitedArticlePerson} with minimal
  * duplication, because those two classes lack a superclass or interface to unify them.
  */

@@ -25,7 +25,7 @@ import org.testng.annotations.DataProvider;
 
 /**
  * Base class for a test where each test method is run in its own Spring/Hibernate transaction.
- * <p/>
+ * <p>
  * TODO: make BaseRhinoTest transactional, and remove this.  IngestionTest currently breaks when this is done.
  */
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = TestConfiguration.class)
@@ -39,7 +39,7 @@ public class BaseRhinoTransactionalTest extends AbstractTransactionalTestNGSprin
 
   /**
    * Clear out old persistent values.
-   * <p/>
+   * <p>
    * Really, the entire persistent environment should be reset on every test. Deleting values that we expected to be
    * created by type is a kludge.
    */

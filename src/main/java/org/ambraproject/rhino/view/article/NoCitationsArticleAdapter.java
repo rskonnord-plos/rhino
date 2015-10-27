@@ -23,7 +23,6 @@ import org.ambraproject.models.ArticleAsset;
 import org.ambraproject.models.ArticleAuthor;
 import org.ambraproject.models.ArticleEditor;
 import org.ambraproject.models.ArticleRelationship;
-import org.ambraproject.models.Journal;
 
 import java.util.Date;
 import java.util.List;

@@ -45,7 +45,7 @@ import java.util.List;
 
 /**
  * A container for a node of XML data that reads it with XPath queries.
- * <p/>
+ * <p>
  * Instances of this class are not thread-safe because they hold an instance of {@link XPath} to use.
  */
 public abstract class AbstractXpathReader {

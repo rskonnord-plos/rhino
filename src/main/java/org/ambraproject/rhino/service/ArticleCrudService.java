@@ -96,12 +96,12 @@ public interface ArticleCrudService extends DoiBasedCrudService {
   public abstract Article findArticleById(DoiBasedIdentity id);
 
   /**
-   * Retrieve an article's publication {@code journal} field based on the article's {@code eIssn}
-   * field. Always expects {@code eIssn} to match to a journal in the system.
+   * Retrieve an article's publication {@code journal} field based on the article's {@code eIssn} field. Always expects
+   * {@code eIssn} to match to a journal in the system.
    *
    * @param article the article to modify
-   * @throws RestClientException if {@code article.eIssn} is null or the {@code article.eIssn}
-   *                         isn't matched to a journal in the database
+   * @throws RestClientException if {@code article.eIssn} is null or the {@code article.eIssn} isn't matched to a
+   *                             journal in the database
    */
 
   public abstract Journal getPublicationJournal(Article article) throws RestClientException;
@@ -191,7 +191,7 @@ public interface ArticleCrudService extends DoiBasedCrudService {
 
   /**
    * Read the metadata of a random article.
-   *
+   * <p>
    * <em>WARNING</em> random retrieval of records is not performant and should be used only for testing
    */
   public abstract Transceiver readRandom() throws IOException;

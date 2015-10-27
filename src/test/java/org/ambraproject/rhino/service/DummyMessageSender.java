@@ -58,7 +58,7 @@ public class DummyMessageSender implements MessageSender {
 
   @Override
   public void sendMessage(String destination, Object body, Map<String, Object> headers) {
-    messagesSent.put(destination, (String)body);
+    messagesSent.put(destination, (String) body);
     headersSent = headers;
   }
 }

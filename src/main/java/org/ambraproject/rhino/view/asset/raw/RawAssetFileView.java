@@ -10,7 +10,7 @@ import org.ambraproject.rhino.view.article.ArticleVisibility;
 
 /**
  * Wrapper for serializing the metadata of a single asset file object.
- * <p/>
+ * <p>
  * For now, this wrapper produces the same serialization behavior as passing an unwrapped {@link ArticleAsset} object to
  * Gson. Nonetheless, any serialized {@link ArticleAsset} objects should be wrapped in this class, so it may act as a
  * hook for more complex serialization in case it is needed in the future.

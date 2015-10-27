@@ -20,17 +20,17 @@ import java.util.TimeZone;
 
 /**
  * This class encapsulates data returned from the service layer and presents it to the controller layer.
- * <p/>
+ * <p>
  * This class bridges a gap between the two layers and fills a different role for each. To the service layer, this class
  * is an interface that defines callbacks (the {@code protected abstract} methods) for such operations as retrieving an
  * object from persistence or looking up a last-modified timestamp (and maybe more in the future). To the controller
  * layer, this class is a utility that (using the {@link #respond} method) parses a RESTful request and formats the
  * response. The service layer should never need to see types like {@link HttpServletRequest} and {@link
  * HttpServletResponse}, and the controller layer should never need to see the actual data entities being served.
- * <p/>
+ * <p>
  * The class name uses the metaphor of a "transceiver" because of this dual role: in the service layer, it
  * <em>receives</em> data from persistence; in the controller layer, it <em>transmits</em> responses to the client.
- * <p/>
+ * <p>
  * Generally, one instance of this class is constructed (in the service layer) per service call. For example, there is a
  * call to read an article's metadata, so the service constructs a {@code Transceiver} object that reads the metadata
  * for that particular article. Typically this would be done by passing the relevant identifier to the subclass's
@@ -73,10 +73,10 @@ public abstract class Transceiver {
 
   /**
    * Respond with data according to a request.
-   * <p/>
+   * <p>
    * If the request contains a "Last-Modified" header and the value in question has not been modified since the given
    * date, respond with a 304 ("Not Modified") status code and omit the rest of the response.
-   * <p/>
+   * <p>
    * If the request provides a JSONP callback parameter, use it to provide a JSONP response.
    *
    * @param request  a service request

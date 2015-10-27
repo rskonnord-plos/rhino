@@ -6,7 +6,6 @@ import org.ambraproject.rhino.identity.ArticleListIdentity;
 import org.ambraproject.rhino.util.response.Transceiver;
 import org.ambraproject.rhino.view.journal.ArticleListView;
 
-import java.util.Collection;
 import java.util.Set;
 
 public interface ArticleListCrudService {

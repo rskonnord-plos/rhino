@@ -101,7 +101,7 @@ class VersionedIngestionService {
   /**
    * Identifies the model that we are using for representing articles as CRepo collections. To be stored in the
    * collection's {@code userMetadata} field under the "schema" key.
-   * <p/>
+   * <p>
    * Currently, this is not consumed anywhere. The "schema" field is future-proofing against changes to the model that
    * would require backfilling or special handling. The "format" value can be used to disambiguate different models or
    * different inputs. ("ambra-nlm" means that the article is an XML file under the NLM DTD, packaged as a zip file with
@@ -471,7 +471,7 @@ class VersionedIngestionService {
 
   /**
    * Build a representation of an article's metadata from a persisted collection.
-   * <p/>
+   * <p>
    * The legacy Hibernate model object {@link Article} is used as a data-holder for convenience and compatibility. This
    * method constructs it anew, not by accessing Hibnerate, and populates only a subset of its normal fields.
    *

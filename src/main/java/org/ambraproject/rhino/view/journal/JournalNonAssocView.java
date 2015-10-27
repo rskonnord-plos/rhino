@@ -13,7 +13,7 @@ import java.util.Collection;
 /**
  * A view of a {@link Journal} object that does not serialize its associative {@code volumes} field. Therefore, it is
  * safe to serialize a Journal wrapped in this class regardless of whether/how its associative fields were initialized.
- * <p/>
+ * <p>
  * Other than omitting that field, the view is homomorphic to the default serialization of a bare Journal object.
  */
 public class JournalNonAssocView implements JsonOutputView {

@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Contains logic for extracting author information from article XML.
- * <p/>
+ * <p>
  * TODO: store all this data in the database instead at ingest time, and then destroy this class with prejudice.
  */
 public final class AuthorsXmlExtractor {
@@ -462,7 +462,7 @@ public final class AuthorsXmlExtractor {
 
   /**
    * Kludge for FEND-794, A better ways of doing this?
-   * <p/>
+   * <p>
    * Reformat html embedded into the XML into something more easily styled on the front end
    *
    * @param source html fragment

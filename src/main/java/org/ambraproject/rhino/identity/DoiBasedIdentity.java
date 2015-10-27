@@ -125,7 +125,7 @@ public class DoiBasedIdentity {
    * Return the DOI or DOI-like identifier for the article or asset that this object identifies. The return value will
    * not be prefixed with {@code "info:doi/"} and, under Ambra's current data model, must not be stored in a DOI column
    * of any database table.
-   * <p/>
+   * <p>
    * The value {@code this.getIdentifier()} represents an actual DOI (that a public DOI resolver would know about) if
    * and only if {@code this.isAsset()} returns {@code false}.
    *

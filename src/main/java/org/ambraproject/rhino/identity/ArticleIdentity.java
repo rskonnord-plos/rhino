@@ -28,7 +28,7 @@ public final class ArticleIdentity extends DoiBasedIdentity {
 
   /**
    * Create an identifier for an article. The data described by the identifier is the article's XML file.
-   * <p/>
+   * <p>
    * The DOI provided must <em>not</em> be prefixed with {@code "info:doi/"} or any other URI scheme value.
    *
    * @param identifier the article's DOI

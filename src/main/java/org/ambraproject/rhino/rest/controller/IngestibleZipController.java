@@ -31,7 +31,7 @@ public class IngestibleZipController extends RestController {
 
   /**
    * Create an article based on a POST containing an article .zip archive file.
-   * <p/>
+   * <p>
    * TODO: this method may never be used in production, since we've decided, at least for now, that we will use the
    * ingest and ingested directories that the current admin app uses instead of posting zips directly.
    *

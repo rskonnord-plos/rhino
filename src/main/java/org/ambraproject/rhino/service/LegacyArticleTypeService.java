@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * Retrieve article types using the imported org.ambraproject.views.article.ArticleType code.
- * <p/>
+ * <p>
  * This implementation receives article type metadata from {@code ambra.xml} and stores it in global, static
  * collections. It ought to be rearchitected, but for now we want to just shove it under the {@link ArticleTypeService}
  * interface.
@@ -51,7 +51,7 @@ public class LegacyArticleTypeService implements ArticleTypeService {
 
   /**
    * {@inheritDoc}
-   * <p/>
+   * <p>
    * Returns an article type that is defined in the system's {@code ambra.xml} file, which is assumed to be unique for
    * each article.
    */
