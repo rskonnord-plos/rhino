@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Consumer;
 
 /**
  * An NLM-format XML document that can be "ingested" to build an {@link Article} object.
@@ -242,35 +243,24 @@ public class ArticleXml extends AbstractArticleXml<Article> {
 
     // TODO: this can probably be made more elegant with lambdas once we are on Java 8.
 
-    final Set<String> newTypes = buildArticleTypes();
-    setDeletableChildrenRelationship(article, article.getTypes(), newTypes, () -> {
-      article.setTypes(newTypes);
-    });
+    Set<String> newTypes = buildArticleTypes();
+    setDeletableChildrenRelationship(article.getTypes(), newTypes, article::setTypes);
 
-    final List<CitedArticle> newCitedArticles = parseCitations(readNodeList("/article/back/ref-list/ref"));
-    setDeletableChildrenRelationship(article, article.getCitedArticles(), newCitedArticles, () -> {
-      article.setCitedArticles(newCitedArticles);
-    });
+    List<CitedArticle> newCitedArticles = parseCitations(readNodeList("/article/back/ref-list/ref"));
+    setDeletableChildrenRelationship(article.getCitedArticles(), newCitedArticles, article::setCitedArticles);
 
-    final List<ArticleAuthor> newAuthors = readAuthors(readNodeList(
+    List<ArticleAuthor> newAuthors = readAuthors(readNodeList(
         "/article/front/article-meta/contrib-group/contrib[@contrib-type=\"author\"]/name"));
-    setDeletableChildrenRelationship(article, article.getAuthors(), newAuthors, () -> {
-      article.setAuthors(newAuthors);
-    });
+    setDeletableChildrenRelationship(article.getAuthors(), newAuthors, article::setAuthors);
 
-    final List<ArticleEditor> newEditors = readEditors(readNodeList(
+    List<ArticleEditor> newEditors = readEditors(readNodeList(
         "/article/front/article-meta/contrib-group/contrib[@contrib-type=\"editor\"]/name"));
-    setDeletableChildrenRelationship(article, article.getEditors(), newEditors, () -> {
-      article.setEditors(newEditors);
-    });
+    setDeletableChildrenRelationship(article.getEditors(), newEditors, article::setEditors);
 
-    final List<String> newCollaborativeAuthors = parseCollaborativeAuthors(readNodeList(
+    List<String> newCollaborativeAuthors = parseCollaborativeAuthors(readNodeList(
         "/article/front/article-meta/contrib-group/contrib[@contrib-type=\"author\"]/collab"));
-    setDeletableChildrenRelationship(article, article.getCollaborativeAuthors(), newCollaborativeAuthors,
-        () -> {
-          article.setCollaborativeAuthors(newCollaborativeAuthors);
-        }
-    );
+    setDeletableChildrenRelationship(article.getCollaborativeAuthors(), newCollaborativeAuthors,
+        article::setCollaborativeAuthors);
 
     article.setUrl(buildUrl(readString("/article/front/article-meta/article-id[@pub-id-type = 'doi']")));
   }
@@ -282,20 +272,16 @@ public class ArticleXml extends AbstractArticleXml<Article> {
    * For example, instead of <pre>article.setFoo(newStuff);</pre>
    * you should instead do
    * <pre>
-   *   setDeletableChildrenRelationship(article, article.getFoo(), newStuff, new Runnable() {
-   *     public void run() {
-   *       article.setFoo(newStuff);
-   *     }
-   *   }
+   *   setDeletableChildrenRelationship(article.getFoo(), newStuff, article::setFoo;
    * </pre>
    *
-   * @param article        parent object
    * @param existingValues existing values obtained by calling the getter on article
    * @param newValues      new values that will be set if they differ from existingValues
    * @param setter         encapsulates the property's setter method, which will be called with newValues when run
    */
-  private void setDeletableChildrenRelationship(Article article, @Nullable Collection existingValues,
-                                                Collection newValues, Runnable setter) {
+  private <T, C extends Collection<T>> void setDeletableChildrenRelationship(@Nullable C existingValues,
+                                                                             C newValues,
+                                                                             Consumer<? super C> setter) {
     if (!newValues.equals(existingValues)) {
       if (existingValues != null) {
 
@@ -305,7 +291,7 @@ public class ArticleXml extends AbstractArticleXml<Article> {
         existingValues.clear();
         existingValues.addAll(newValues);
       } else {
-        setter.run();
+        setter.accept(newValues);
       }
     }
   }
