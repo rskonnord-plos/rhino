@@ -1,7 +1,6 @@
 package org.ambraproject.rhino.view.article;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -27,6 +26,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -60,7 +60,7 @@ public class ArticleCriteria {
                                        boolean includeLastModifiedDate) {
     Optional<ImmutableSet<Integer>> publicationStateConstants;
     if (CollectionUtils.isEmpty(clientPubStates)) {
-      publicationStateConstants = Optional.absent();
+      publicationStateConstants = Optional.empty();
     } else {
       ImmutableSet.Builder<Integer> builder = ImmutableSet.builder();
       for (String clientPubState : clientPubStates) {
@@ -75,7 +75,7 @@ public class ArticleCriteria {
 
     Optional<ImmutableSet<String>> syndicationStatusConstants;
     if (CollectionUtils.isEmpty(clientSyndStatuses)) {
-      syndicationStatusConstants = Optional.absent();
+      syndicationStatusConstants = Optional.empty();
     } else {
       ImmutableSet.Builder<String> builder = ImmutableSet.builder();
       for (String clientSyndStatus : clientSyndStatuses) {
@@ -187,7 +187,7 @@ public class ArticleCriteria {
       public List<Object[]> doInHibernate(Session session) throws HibernateException, SQLException {
         Query query = session.createQuery(SYND_QUERY);
         query.setParameterList("syndStatuses", syndicationStatuses.get());
-        query.setParameterList("pubStates", publicationStates.or(ArticleJsonConstants.PUBLICATION_STATE_CONSTANTS));
+        query.setParameterList("pubStates", publicationStates.orElse(ArticleJsonConstants.PUBLICATION_STATE_CONSTANTS));
         return query.list();
       }
     });

@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.service;
 
-import com.google.common.base.Optional;
 import org.ambraproject.models.ArticleAsset;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.AssetFileIdentity;
@@ -29,6 +28,7 @@ import org.plos.crepo.model.RepoObjectMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 public interface AssetCrudService extends DoiBasedCrudService {
 

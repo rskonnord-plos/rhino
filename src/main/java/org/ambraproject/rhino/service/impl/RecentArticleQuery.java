@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -26,6 +25,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -53,7 +53,7 @@ public class RecentArticleQuery {
   private RecentArticleQuery(Builder builder) {
     this.journalKey = Preconditions.checkNotNull(builder.journalKey);
     this.threshold = Preconditions.checkNotNull(builder.threshold);
-    this.minimum = Optional.fromNullable(builder.minimum);
+    this.minimum = Optional.ofNullable(builder.minimum);
     this.articleTypes = (builder.articleTypes == null) ? ImmutableList.<String>of()
         : ImmutableList.copyOf(builder.articleTypes);
     this.excludedArticleTypes = (builder.excludedArticleTypes == null) ? builder.alwaysExcludedArticleTypes
@@ -195,7 +195,7 @@ public class RecentArticleQuery {
 
       // Get all articles more recent than the threshold
       if (articleTypes.isEmpty()) {
-        results = query(false, Optional.<String>absent());
+        results = query(false, Optional.empty());
       } else {
         results = new ArrayList<>();
         Set<String> uniqueDois = new HashSet<>();
@@ -204,7 +204,7 @@ public class RecentArticleQuery {
         // in order to preserve the "preference order" in the articleTypes list.
         for (String articleType : articleTypes) {
           Optional<String> articleTypeArg = articleType.equals(ARTICLE_TYPE_WILDCARD)
-              ? Optional.<String>absent() : Optional.of(articleType);
+              ? Optional.empty() : Optional.of(articleType);
           List<Object[]> queryResults = query(false, articleTypeArg);
 
           // Add each query result to 'results' only if the DOI is not already in 'uniqueDois'
@@ -220,7 +220,7 @@ public class RecentArticleQuery {
         // Not enough results. Get enough past the threshold to meet the minimum.
         // Ignore order of articleTypes and get the union of all.
         if (articleTypes.isEmpty() || articleTypes.contains(ARTICLE_TYPE_WILDCARD)) {
-          results = query(true, Optional.<String>absent());
+          results = query(true, Optional.empty());
         } else if (articleTypes.size() == 1) {
           results = query(true, Optional.of(articleTypes.get(0)));
         } else {

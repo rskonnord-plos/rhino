@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.service;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,6 +7,7 @@ import com.google.gson.JsonSerializationContext;
 import org.ambraproject.rhino.view.JsonOutputView;
 
 import java.net.URI;
+import java.util.Optional;
 
 public class ArticleType implements JsonOutputView {
 
@@ -36,7 +36,7 @@ public class ArticleType implements JsonOutputView {
   }
 
   public Optional<String> getCode() {
-    return Optional.fromNullable(code);
+    return Optional.ofNullable(code);
   }
 
 

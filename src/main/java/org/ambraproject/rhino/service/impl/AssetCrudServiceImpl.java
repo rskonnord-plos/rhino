@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.ambraproject.models.ArticleAsset;
@@ -66,6 +65,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class AssetCrudServiceImpl extends AmbraService implements AssetCrudService {
 

@@ -1,7 +1,6 @@
 package org.ambraproject.rhino.service.impl;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
@@ -63,6 +62,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -121,7 +121,7 @@ class LegacyIngestionService {
    */
   private Article populateArticleFromXml(Document doc, Optional<ArticleIdentity> suppliedId,
                                          DoiBasedCrudService.WriteMode mode, int xmlDataLength) {
-    return populateArticleFromXml(doc, Optional.<ManifestXml>absent(), suppliedId, mode, xmlDataLength);
+    return populateArticleFromXml(doc, Optional.empty(), suppliedId, mode, xmlDataLength);
   }
 
   /**
@@ -368,7 +368,7 @@ class LegacyIngestionService {
       xmlData = ByteStreams.toByteArray(xmlStream);
     }
     Document doc = parentService.parseXml(xmlData);
-    Article article = populateArticleFromXml(doc, Optional.fromNullable(manifest), suppliedId, mode, xmlData.length);
+    Article article = populateArticleFromXml(doc, Optional.ofNullable(manifest), suppliedId, mode, xmlData.length);
     article.setArchiveName(new File(archive.getArchiveName()).getName());
     article.setStrkImgURI(manifest.getStrkImgURI());
 

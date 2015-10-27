@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.rest.controller;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.ArticleListIdentity;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @Controller
 public class ArticleListCrudController extends RestController {
@@ -88,7 +88,7 @@ public class ArticleListCrudController extends RestController {
   @RequestMapping(value = "/lists", method = RequestMethod.GET)
   public void listAll(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    articleListCrudService.readAll(Optional.<String>absent(), Optional.<String>absent()).respond(request, response, entityGson);
+    articleListCrudService.readAll(Optional.empty(), Optional.empty()).respond(request, response, entityGson);
   }
 
   @Transactional(rollbackFor = {Throwable.class})
@@ -96,7 +96,7 @@ public class ArticleListCrudController extends RestController {
   public void listAll(HttpServletRequest request, HttpServletResponse response,
                       @PathVariable("type") String type)
       throws IOException {
-    articleListCrudService.readAll(Optional.of(type), Optional.<String>absent()).respond(request, response, entityGson);
+    articleListCrudService.readAll(Optional.of(type), Optional.empty()).respond(request, response, entityGson);
   }
 
   @Transactional(rollbackFor = {Throwable.class})

@@ -1,7 +1,6 @@
 package org.ambraproject.rhino.view.asset.groomed;
 
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
@@ -16,6 +15,7 @@ import org.ambraproject.rhino.view.article.ArticleVisibility;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 public class GroomedImageView implements JsonOutputView {
 
@@ -33,7 +33,7 @@ public class GroomedImageView implements JsonOutputView {
     this.thumbnails = ImmutableSortedMap.copyOf(thumbnails);
     Preconditions.checkArgument(!this.thumbnails.isEmpty());
     Preconditions.checkArgument(!this.thumbnails.containsKey(ImageFileType.ORIGINAL));
-    this.parentArticleVisibility = Optional.absent();
+    this.parentArticleVisibility = Optional.empty();
     this.imageType = Preconditions.checkNotNull(imageType);
   }
 

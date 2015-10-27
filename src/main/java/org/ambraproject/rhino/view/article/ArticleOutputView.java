@@ -20,7 +20,6 @@ package org.ambraproject.rhino.view.article;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -48,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,8 +83,8 @@ public class ArticleOutputView implements JsonOutputView, ArticleView {
                     Collection<Pingback> pingbacks,
                     boolean excludeCitations) {
     this.article = Preconditions.checkNotNull(article);
-    this.nlmArticleType = Optional.fromNullable(nlmArticleType);
-    this.articleType = Optional.fromNullable(articleType);
+    this.nlmArticleType = Optional.ofNullable(nlmArticleType);
+    this.articleType = Optional.ofNullable(articleType);
     this.relatedArticles = ImmutableList.copyOf(relatedArticles);
     this.articleIssues = ImmutableList.copyOf(articleIssues);
     this.syndications = Maps.uniqueIndex(syndications, GET_TARGET);

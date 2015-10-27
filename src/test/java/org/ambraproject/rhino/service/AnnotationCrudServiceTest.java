@@ -13,7 +13,6 @@
 
 package org.ambraproject.rhino.service;
 
-import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.ambraproject.models.Annotation;
@@ -39,6 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import static org.testng.Assert.assertEquals;

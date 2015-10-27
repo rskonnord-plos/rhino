@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.identity;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.ambraproject.models.ArticleAsset;
@@ -26,6 +25,7 @@ import org.ambraproject.rhino.util.ContentTypeInference;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -168,7 +168,7 @@ public class AssetFileIdentity extends DoiBasedIdentity {
     if (XML_EXTENSION.equalsIgnoreCase(extension)) {
       return Optional.of(ArticleIdentity.create(getIdentifier()));
     }
-    return Optional.absent();
+    return Optional.empty();
   }
 
   @Override

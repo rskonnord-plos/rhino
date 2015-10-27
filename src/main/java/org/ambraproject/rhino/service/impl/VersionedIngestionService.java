@@ -1,7 +1,6 @@
 package org.ambraproject.rhino.service.impl;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableBiMap;
@@ -55,6 +54,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 class VersionedIngestionService {
@@ -357,7 +357,7 @@ class VersionedIngestionService {
   }
 
   private ArticleObject createDynamicObject(RepoObject repoObject) {
-    return new ArticleObject(repoObject, Optional.<String>absent());
+    return new ArticleObject(repoObject, Optional.empty());
   }
 
   private class ArticleCollection {

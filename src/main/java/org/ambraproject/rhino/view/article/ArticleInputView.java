@@ -1,7 +1,6 @@
 package org.ambraproject.rhino.view.article;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -15,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A view of an update to an article's state as submitted by a REST client.
@@ -65,7 +65,7 @@ public class ArticleInputView {
 
   private ArticleInputView(Integer publicationState, Map<String, SyndicationUpdate> syndicationUpdates) {
     Preconditions.checkArgument(publicationState == null || ArticleJsonConstants.PUBLICATION_STATE_CONSTANTS.contains(publicationState));
-    this.publicationState = Optional.fromNullable(publicationState);
+    this.publicationState = Optional.ofNullable(publicationState);
     this.syndicationUpdates = (syndicationUpdates == null)
         ? ImmutableMap.<String, SyndicationUpdate>of()
         : ImmutableMap.copyOf(syndicationUpdates);

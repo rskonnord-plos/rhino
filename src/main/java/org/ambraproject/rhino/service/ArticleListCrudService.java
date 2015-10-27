@@ -1,11 +1,11 @@
 package org.ambraproject.rhino.service;
 
-import com.google.common.base.Optional;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.identity.ArticleListIdentity;
 import org.ambraproject.rhino.util.response.Transceiver;
 import org.ambraproject.rhino.view.journal.ArticleListView;
 
+import java.util.Optional;
 import java.util.Set;
 
 public interface ArticleListCrudService {

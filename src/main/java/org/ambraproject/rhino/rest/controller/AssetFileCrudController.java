@@ -19,7 +19,6 @@
 package org.ambraproject.rhino.rest.controller;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.HttpHeaders;
 import org.ambraproject.models.ArticleAsset;
@@ -53,6 +52,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 
 import static org.ambraproject.rhino.service.impl.AmbraService.reportNotFound;
 
@@ -157,11 +157,11 @@ public class AssetFileCrudController extends DoiBasedCrudController {
       throws IOException {
     Optional<String> contentType = objMeta.getContentType();
     // In case contentType field is empty, default to what we would have written at ingestion
-    response.setHeader(HttpHeaders.CONTENT_TYPE, contentType.or(id.inferContentType().toString()));
+    response.setHeader(HttpHeaders.CONTENT_TYPE, contentType.orElseGet(() -> id.inferContentType().toString()));
 
     Optional<String> filename = objMeta.getDownloadName();
     // In case downloadName field is empty, default to what we would have written at ingestion
-    String contentDisposition = "attachment; filename=" + filename.or(id.getFileName()); // TODO: 'attachment' is not always correct
+    String contentDisposition = "attachment; filename=" + filename.orElseGet(id::getFileName); // TODO: 'attachment' is not always correct
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
 
     Timestamp timestamp = objMeta.getTimestamp();
@@ -232,7 +232,7 @@ public class AssetFileCrudController extends DoiBasedCrudController {
     }
 
     RepoObjectMetadata assetObject = assetCrudService.getAssetObject(
-        parentArticle, assetId, Optional.fromNullable(versionNumber), fileType);
+        parentArticle, assetId, Optional.ofNullable(versionNumber), fileType);
 
     // TODO: Factor out of 'serve'. This shouldn't need to exist.
     AssetFileIdentity dummyAssetFileIdentity = AssetFileIdentity.parse(assetObject.getDownloadName().get());
