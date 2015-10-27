@@ -1,10 +1,11 @@
 package org.ambraproject.rhino.view.article;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableSet;
 import org.ambraproject.models.Article;
 import org.ambraproject.models.Syndication;
+
+import java.util.Objects;
 
 public class ArticleJsonConstants {
   private ArticleJsonConstants() {
@@ -42,7 +43,7 @@ public class ArticleJsonConstants {
    * @throws NullPointerException if the argument is null
    */
   public static String getPublicationStateName(Integer constant) {
-    return PUBLICATION_STATE_CONSTANT_MAP.get(Preconditions.checkNotNull(constant));
+    return PUBLICATION_STATE_CONSTANT_MAP.get(Objects.requireNonNull(constant));
   }
 
   /**

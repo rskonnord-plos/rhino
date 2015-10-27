@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,8 +41,8 @@ public class ArticleCriteria {
 
   private ArticleCriteria(Optional<ImmutableSet<Integer>> publicationStates,
                           Optional<ImmutableSet<String>> syndicationStatuses, boolean includeLastModifiedDate) {
-    this.publicationStates = Preconditions.checkNotNull(publicationStates);
-    this.syndicationStatuses = Preconditions.checkNotNull(syndicationStatuses);
+    this.publicationStates = Objects.requireNonNull(publicationStates);
+    this.syndicationStatuses = Objects.requireNonNull(syndicationStatuses);
     this.includeLastModifiedDate = includeLastModifiedDate;
   }
 
@@ -97,7 +98,7 @@ public class ArticleCriteria {
   private static RestClientException unrecognizedInputs(String valueDescription,
                                                         Collection<?> inputValues,
                                                         Set<?> expectedValues) {
-    Preconditions.checkNotNull(valueDescription);
+    Objects.requireNonNull(valueDescription);
     Preconditions.checkArgument(!expectedValues.isEmpty());
 
     Set<?> inputValueSet = (inputValues instanceof Set) ? (Set<?>) inputValues
@@ -117,7 +118,7 @@ public class ArticleCriteria {
    * @return a list of article DOIs
    */
   public Object apply(HibernateTemplate hibernateTemplate) {
-    Preconditions.checkNotNull(hibernateTemplate);
+    Objects.requireNonNull(hibernateTemplate);
     if (syndicationStatuses.isPresent()) {
       return findBySyndication(hibernateTemplate);
     }
@@ -164,8 +165,8 @@ public class ArticleCriteria {
     private final Date lastModified;
 
     private TimestampedDoi(String doi, Date lastModified) {
-      this.doi = Preconditions.checkNotNull(doi);
-      this.lastModified = Preconditions.checkNotNull(lastModified);
+      this.doi = Objects.requireNonNull(doi);
+      this.lastModified = Objects.requireNonNull(lastModified);
     }
 
     @Override
@@ -226,8 +227,8 @@ public class ArticleCriteria {
     private final List<Syndication> syndications;
 
     public ArticleStateViewBuilder(String doi, String state) {
-      this.doi = Preconditions.checkNotNull(doi);
-      this.state = Preconditions.checkNotNull(state);
+      this.doi = Objects.requireNonNull(doi);
+      this.state = Objects.requireNonNull(state);
       this.syndications = Lists.newArrayListWithExpectedSize(EXPECTED_SYNDICATION_TARGETS);
     }
 

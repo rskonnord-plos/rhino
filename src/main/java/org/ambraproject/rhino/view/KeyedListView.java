@@ -1,12 +1,12 @@
 package org.ambraproject.rhino.view;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * An output view of objects, which presents those objects as members of one big JSON object.
@@ -44,7 +44,7 @@ public abstract class KeyedListView<T> implements JsonOutputView {
     JsonObject serializedList = new JsonObject();
     for (T value : values) {
       if (value == null) continue;
-      String key = Preconditions.checkNotNull(getKey(value));
+      String key = Objects.requireNonNull(getKey(value));
       if (serializedList.has(key)) {
         throw new IllegalStateException("Collision on key: " + key);
       }

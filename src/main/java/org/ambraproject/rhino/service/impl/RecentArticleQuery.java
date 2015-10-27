@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -51,8 +52,8 @@ public class RecentArticleQuery {
   private final ImmutableList<String> excludedArticleTypes;
 
   private RecentArticleQuery(Builder builder) {
-    this.journalKey = Preconditions.checkNotNull(builder.journalKey);
-    this.threshold = Preconditions.checkNotNull(builder.threshold);
+    this.journalKey = Objects.requireNonNull(builder.journalKey);
+    this.threshold = Objects.requireNonNull(builder.threshold);
     this.minimum = Optional.ofNullable(builder.minimum);
     this.articleTypes = (builder.articleTypes == null) ? ImmutableList.<String>of()
         : ImmutableList.copyOf(builder.articleTypes);
@@ -137,7 +138,7 @@ public class RecentArticleQuery {
     private final HibernateTemplate hibernateTemplate;
 
     private Result(HibernateTemplate hibernateTemplate) {
-      this.hibernateTemplate = Preconditions.checkNotNull(hibernateTemplate);
+      this.hibernateTemplate = Objects.requireNonNull(hibernateTemplate);
     }
 
     /**

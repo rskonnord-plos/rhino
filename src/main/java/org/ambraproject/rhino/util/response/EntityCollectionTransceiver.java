@@ -1,12 +1,12 @@
 package org.ambraproject.rhino.util.response;
 
-import com.google.common.base.Preconditions;
 import org.ambraproject.models.AmbraEntity;
 
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * A "transceiver" that translates a collection of timestamped persistent entities into a view.
@@ -18,7 +18,7 @@ public abstract class EntityCollectionTransceiver<E extends AmbraEntity> extends
   private Collection<? extends E> entities = null;
 
   private Collection<? extends E> getEntities() {
-    return (entities != null) ? entities : (entities = Preconditions.checkNotNull(fetchEntities()));
+    return (entities != null) ? entities : (entities = Objects.requireNonNull(fetchEntities()));
   }
 
   /**
@@ -49,7 +49,7 @@ public abstract class EntityCollectionTransceiver<E extends AmbraEntity> extends
 
   @Override
   protected final Object getData() throws IOException {
-    return Preconditions.checkNotNull(getView(getEntities()));
+    return Objects.requireNonNull(getView(getEntities()));
   }
 
   /**

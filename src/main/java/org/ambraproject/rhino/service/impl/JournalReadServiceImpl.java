@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Preconditions;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.ambraproject.models.Issue;
 import org.ambraproject.models.Journal;
@@ -34,6 +33,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class JournalReadServiceImpl extends AmbraService implements JournalReadService {
 
@@ -72,7 +72,7 @@ public class JournalReadServiceImpl extends AmbraService implements JournalReadS
 
   @Override
   public Transceiver readCurrentIssue(final String journalKey) {
-    Preconditions.checkNotNull(journalKey);
+    Objects.requireNonNull(journalKey);
     return new Transceiver() {
       @Override
       protected Calendar getLastModifiedDate() throws IOException {
@@ -101,7 +101,7 @@ public class JournalReadServiceImpl extends AmbraService implements JournalReadS
             DetachedCriteria.forClass(Journal.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .add(Restrictions.eq("journalKey", journalKey))
-                .setProjection(Preconditions.checkNotNull(projection))
+                .setProjection(Objects.requireNonNull(projection))
         ));
       }
 

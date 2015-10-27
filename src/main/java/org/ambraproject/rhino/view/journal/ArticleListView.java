@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.journal;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -9,14 +8,16 @@ import org.ambraproject.models.ArticleList;
 import org.ambraproject.rhino.identity.ArticleListIdentity;
 import org.ambraproject.rhino.view.JsonOutputView;
 
+import java.util.Objects;
+
 public class ArticleListView implements JsonOutputView {
 
   private final String journalKey;
   private final ArticleList articleList;
 
   public ArticleListView(String journalKey, ArticleList articleList) {
-    this.journalKey = Preconditions.checkNotNull(journalKey);
-    this.articleList = Preconditions.checkNotNull(articleList);
+    this.journalKey = Objects.requireNonNull(journalKey);
+    this.articleList = Objects.requireNonNull(articleList);
   }
 
   public ArticleListIdentity getIdentity() {

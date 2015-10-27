@@ -1,8 +1,9 @@
 package org.ambraproject.rhino.identity;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.ambraproject.models.ArticleAsset;
+
+import java.util.Objects;
 
 /**
  * An identity for an asset, independent of its associated files (which may or may not be in the system).
@@ -51,7 +52,7 @@ public class AssetIdentity extends DoiBasedIdentity {
    */
   public static boolean hasFile(ArticleAsset asset) {
     String extension = asset.getExtension();
-    Preconditions.checkNotNull(extension);
+    Objects.requireNonNull(extension);
     return !extension.isEmpty();
   }
 

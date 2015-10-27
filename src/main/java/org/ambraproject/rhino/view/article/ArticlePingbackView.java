@@ -3,6 +3,7 @@ package org.ambraproject.rhino.view.article;
 import com.google.common.base.Preconditions;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * A view of an article that contains a digest of its associated pingbacks (and some other data that's friendly to a
@@ -21,7 +22,7 @@ public class ArticlePingbackView
   public ArticlePingbackView(String doi, String title, String url, long pingbackCount, Date mostRecentPingback) {
     Preconditions.checkArgument(pingbackCount >= 0L);
     Preconditions.checkArgument((mostRecentPingback == null) == (pingbackCount == 0L));
-    this.doi = Preconditions.checkNotNull(doi);
+    this.doi = Objects.requireNonNull(doi);
     this.title = title;
     this.url = url;
     this.pingbackCount = pingbackCount;

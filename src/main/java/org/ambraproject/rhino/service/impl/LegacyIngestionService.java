@@ -62,6 +62,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -76,7 +77,7 @@ class LegacyIngestionService {
   private final ArticleCrudServiceImpl parentService;
 
   LegacyIngestionService(ArticleCrudServiceImpl parentService) {
-    this.parentService = Preconditions.checkNotNull(parentService);
+    this.parentService = Objects.requireNonNull(parentService);
   }
 
   /**
@@ -413,7 +414,7 @@ class LegacyIngestionService {
    * @return true if this file should be persisted as an asset
    */
   static boolean shouldSaveAssetFile(String filename, String articleXmlFilename) {
-    Preconditions.checkNotNull(filename);
+    Objects.requireNonNull(filename);
     filename = filename.toLowerCase().trim();
     return !(filename.startsWith("manifest.") || filename.startsWith(articleXmlFilename));
   }

@@ -13,13 +13,13 @@
 
 package org.ambraproject.rhino.view;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 /**
  * Class intended for JSON serialization that wraps some other object.  The constructor allows you to specify which
@@ -38,7 +38,7 @@ public class JsonWrapper<T> implements JsonOutputView {
    * @param propertiesToInclude only these properties of target will be serialized; all others will not be visible
    */
   public JsonWrapper(T target, String... propertiesToInclude) {
-    this.target = Preconditions.checkNotNull(target);
+    this.target = Objects.requireNonNull(target);
     this.propertiesToInclude = propertiesToInclude;
   }
 

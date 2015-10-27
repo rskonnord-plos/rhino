@@ -1,11 +1,12 @@
 package org.ambraproject.rhino.view.asset.groomed;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.ambraproject.models.ArticleAsset;
 import org.ambraproject.rhino.identity.AssetFileIdentity;
 import org.ambraproject.rhino.view.JsonOutputView;
+
+import java.util.Objects;
 
 public class GroomedAssetFileView implements JsonOutputView {
 
@@ -13,7 +14,7 @@ public class GroomedAssetFileView implements JsonOutputView {
   private final boolean includeFigureFields;
 
   private GroomedAssetFileView(ArticleAsset asset, boolean includeFigureFields) {
-    this.asset = Preconditions.checkNotNull(asset);
+    this.asset = Objects.requireNonNull(asset);
     this.includeFigureFields = includeFigureFields;
   }
 

@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.journal;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -11,6 +10,7 @@ import org.ambraproject.rhino.view.JsonOutputView;
 import org.ambraproject.rhino.view.KeyedListView;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A view of a {@link Journal} object that shows all nested volume and issue lists as JSON objects keyed by their
@@ -21,7 +21,7 @@ public class JournalOutputView implements JsonOutputView {
   private final Journal journal;
 
   public JournalOutputView(Journal journal) {
-    this.journal = Preconditions.checkNotNull(journal);
+    this.journal = Objects.requireNonNull(journal);
   }
 
   @Override

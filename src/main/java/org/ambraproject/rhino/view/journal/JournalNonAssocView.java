@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.journal;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -9,6 +8,7 @@ import org.ambraproject.rhino.view.JsonOutputView;
 import org.ambraproject.rhino.view.KeyedListView;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * A view of a {@link Journal} object that does not serialize its associative {@code volumes} field. Therefore, it is
@@ -21,7 +21,7 @@ public class JournalNonAssocView implements JsonOutputView {
   private final Journal journal;
 
   public JournalNonAssocView(Journal journal) {
-    this.journal = Preconditions.checkNotNull(journal);
+    this.journal = Objects.requireNonNull(journal);
   }
 
   @Override

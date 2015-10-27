@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.article;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,6 +10,7 @@ import org.ambraproject.rhino.util.JsonAdapterUtil;
 import org.ambraproject.rhino.view.JsonOutputView;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class RelatedArticleView implements JsonOutputView, ArticleView {
@@ -20,7 +20,7 @@ public class RelatedArticleView implements JsonOutputView, ArticleView {
   private final ImmutableList<ArticleAuthor> authors;
 
   public RelatedArticleView(ArticleRelationship raw, String title, List<ArticleAuthor> authors) {
-    this.raw = Preconditions.checkNotNull(raw);
+    this.raw = Objects.requireNonNull(raw);
     this.title = Optional.ofNullable(title);
     this.authors = (authors == null) ? ImmutableList.<ArticleAuthor>of() : ImmutableList.copyOf(authors);
   }

@@ -1,7 +1,8 @@
 package org.ambraproject.rhino.service;
 
-import com.google.common.base.Preconditions;
 import org.springframework.http.HttpStatus;
+
+import java.util.Objects;
 
 /**
  * The result of writing (creating or updating) an entity to the database.
@@ -32,8 +33,8 @@ public class WriteResult<T> {
   private final Action action;
 
   public WriteResult(T writtenObject, Action action) {
-    this.action = Preconditions.checkNotNull(action);
-    this.writtenObject = Preconditions.checkNotNull(writtenObject);
+    this.action = Objects.requireNonNull(action);
+    this.writtenObject = Objects.requireNonNull(writtenObject);
   }
 
   /**

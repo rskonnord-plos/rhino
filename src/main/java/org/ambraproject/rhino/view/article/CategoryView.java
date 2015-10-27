@@ -1,11 +1,12 @@
 package org.ambraproject.rhino.view.article;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.ambraproject.models.Category;
 import org.ambraproject.rhino.view.JsonOutputView;
+
+import java.util.Objects;
 
 public class CategoryView implements JsonOutputView {
 
@@ -13,7 +14,7 @@ public class CategoryView implements JsonOutputView {
   private final int weight;
 
   public CategoryView(Category category, int weight) {
-    this.category = Preconditions.checkNotNull(category);
+    this.category = Objects.requireNonNull(category);
     this.weight = weight;
   }
 

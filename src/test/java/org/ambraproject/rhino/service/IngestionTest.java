@@ -20,8 +20,6 @@ package org.ambraproject.rhino.service;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -224,7 +222,7 @@ public class IngestionTest extends BaseRhinoTest {
   }
 
   private Article readReferenceCase(File jsonFile) throws IOException {
-    Preconditions.checkNotNull(jsonFile);
+    Objects.requireNonNull(jsonFile);
     Article article;
     try (Reader input = new BufferedReader(new FileReader(jsonFile))) {
       article = entityGson.fromJson(input, Article.class);
@@ -504,7 +502,7 @@ public class IngestionTest extends BaseRhinoTest {
    * @return
    */
   private static Pattern optionalWhitespace(CharSequence text) {
-    Matcher nonWhitespaceGroups = NON_WHITESPACE.matcher(Preconditions.checkNotNull(text));
+    Matcher nonWhitespaceGroups = NON_WHITESPACE.matcher(Objects.requireNonNull(text));
     StringBuilder optionalWhitespacePattern = new StringBuilder(text.length());
     while (nonWhitespaceGroups.find()) {
       if (optionalWhitespacePattern.length() > 0) {

@@ -65,6 +65,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class AssetCrudServiceImpl extends AmbraService implements AssetCrudService {
@@ -182,7 +183,7 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
    * @return the new asset
    */
   private static ArticleAsset copyArticleFields(ArticleAsset oldAsset) {
-    Preconditions.checkNotNull(oldAsset);
+    Objects.requireNonNull(oldAsset);
     ArticleAsset newAsset = new ArticleAsset();
     newAsset.setDoi(oldAsset.getDoi());
     newAsset.setTitle(oldAsset.getTitle());
@@ -230,12 +231,12 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
           }
         })
     );
-    final BigInteger parentArticleId = Preconditions.checkNotNull((BigInteger) result[0]);
+    final BigInteger parentArticleId = Objects.requireNonNull((BigInteger) result[0]);
     int maxSortOrder = (Integer) result[1];
     final int newSortOrder = maxSortOrder + 1;
 
     hibernateTemplate.save(asset);
-    final Long newAssetId = Preconditions.checkNotNull(asset.getID());
+    final Long newAssetId = Objects.requireNonNull(asset.getID());
 
     hibernateTemplate.execute(new HibernateCallback<Integer>() {
       @Override
@@ -296,7 +297,7 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
     private final AssetIdentity id;
 
     protected ArticleAssetsRetriever(AssetIdentity id) {
-      this.id = Preconditions.checkNotNull(id);
+      this.id = Objects.requireNonNull(id);
     }
 
     @Override

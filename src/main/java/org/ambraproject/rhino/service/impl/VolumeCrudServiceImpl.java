@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Preconditions;
 import org.ambraproject.models.Journal;
 import org.ambraproject.models.Volume;
 import org.ambraproject.rhino.identity.ArticleIdentity;
@@ -38,6 +37,7 @@ import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class VolumeCrudServiceImpl extends AmbraService implements VolumeCrudService {
 
@@ -77,7 +77,7 @@ public class VolumeCrudServiceImpl extends AmbraService implements VolumeCrudSer
 
   @Override
   public DoiBasedIdentity create(String journalKey, VolumeInputView input) {
-    Preconditions.checkNotNull(journalKey);
+    Objects.requireNonNull(journalKey);
 
     DoiBasedIdentity volumeId = DoiBasedIdentity.create(input.getVolumeUri());
     if (findVolume(volumeId) != null) {
@@ -106,7 +106,7 @@ public class VolumeCrudServiceImpl extends AmbraService implements VolumeCrudSer
 
   @Override
   public void update(DoiBasedIdentity volumeId, VolumeInputView input) {
-    Preconditions.checkNotNull(input);
+    Objects.requireNonNull(input);
     Volume volume = findVolume(volumeId);
     if (volume == null) {
       throw new RestClientException("Volume not found at URI=" + volumeId.getIdentifier(), HttpStatus.NOT_FOUND);

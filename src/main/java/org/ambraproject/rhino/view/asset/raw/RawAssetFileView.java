@@ -1,12 +1,13 @@
 package org.ambraproject.rhino.view.asset.raw;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.ambraproject.models.ArticleAsset;
 import org.ambraproject.rhino.view.JsonOutputView;
 import org.ambraproject.rhino.view.article.ArticleVisibility;
+
+import java.util.Objects;
 
 /**
  * Wrapper for serializing the metadata of a single asset file object.
@@ -21,8 +22,8 @@ public class RawAssetFileView implements JsonOutputView {
   private final ArticleVisibility parentArticle;
 
   public RawAssetFileView(ArticleAsset asset, ArticleVisibility parentArticle) {
-    this.asset = Preconditions.checkNotNull(asset);
-    this.parentArticle = Preconditions.checkNotNull(parentArticle);
+    this.asset = Objects.requireNonNull(asset);
+    this.parentArticle = Objects.requireNonNull(parentArticle);
   }
 
   @Override

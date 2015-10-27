@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.config;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.ambraproject.configuration.ConfigurationStore;
@@ -88,6 +87,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -203,9 +203,9 @@ public class RhinoConfiguration extends BaseConfiguration {
   public ContentRepoService contentRepoService(RuntimeConfiguration runtimeConfiguration,
                                                final CloseableHttpClient httpClient) {
     RuntimeConfiguration.ContentRepoEndpoint corpus = runtimeConfiguration.getCorpusBucket();
-    final String repoServer = Preconditions.checkNotNull(corpus.getAddress().toString());
-    final String bucketName = Preconditions.checkNotNull(corpus.getBucket());
-    Preconditions.checkNotNull(httpClient);
+    final String repoServer = Objects.requireNonNull(corpus.getAddress().toString());
+    final String bucketName = Objects.requireNonNull(corpus.getBucket());
+    Objects.requireNonNull(httpClient);
 
     ContentRepoAccessConfig accessConfig = new ContentRepoAccessConfig() {
       @Override

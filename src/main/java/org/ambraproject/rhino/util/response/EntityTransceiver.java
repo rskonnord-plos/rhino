@@ -1,10 +1,10 @@
 package org.ambraproject.rhino.util.response;
 
-import com.google.common.base.Preconditions;
 import org.ambraproject.models.AmbraEntity;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Objects;
 
 /**
  * A "transceiver" that translates a timestamped persistent entity into a view.
@@ -16,7 +16,7 @@ public abstract class EntityTransceiver<E extends AmbraEntity> extends Transceiv
   private E entity = null;
 
   private E getEntity() {
-    return (entity != null) ? entity : (entity = Preconditions.checkNotNull(fetchEntity()));
+    return (entity != null) ? entity : (entity = Objects.requireNonNull(fetchEntity()));
   }
 
   /**
@@ -39,7 +39,7 @@ public abstract class EntityTransceiver<E extends AmbraEntity> extends Transceiv
 
   @Override
   protected final Object getData() throws IOException {
-    return Preconditions.checkNotNull(getView(getEntity()));
+    return Objects.requireNonNull(getView(getEntity()));
   }
 
   /**

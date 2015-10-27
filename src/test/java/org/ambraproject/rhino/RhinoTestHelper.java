@@ -13,7 +13,6 @@
 
 package org.ambraproject.rhino;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -33,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -170,7 +170,7 @@ public final class RhinoTestHelper {
    * @return a new dummy journal object
    */
   public static Journal createDummyJournal(String eissn) {
-    Preconditions.checkNotNull(eissn);
+    Objects.requireNonNull(eissn);
     Journal journal = new Journal();
     String title = "Test Journal " + eissn;
     journal.setTitle(title);

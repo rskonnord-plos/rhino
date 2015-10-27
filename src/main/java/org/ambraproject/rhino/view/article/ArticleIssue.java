@@ -1,9 +1,10 @@
 package org.ambraproject.rhino.view.article;
 
-import com.google.common.base.Preconditions;
 import org.ambraproject.models.Issue;
 import org.ambraproject.models.Journal;
 import org.ambraproject.models.Volume;
+
+import java.util.Objects;
 
 /**
  * Wrapper class for Issue which includes parent Volume and Journal objects
@@ -15,9 +16,9 @@ public class ArticleIssue {
   private final Journal parentJournal;
 
   public ArticleIssue(Issue issue, Volume parentVolume, Journal parentJournal) {
-    this.issue = Preconditions.checkNotNull(issue);
-    this.parentVolume = Preconditions.checkNotNull(parentVolume);
-    this.parentJournal = Preconditions.checkNotNull(parentJournal);
+    this.issue = Objects.requireNonNull(issue);
+    this.parentVolume = Objects.requireNonNull(parentVolume);
+    this.parentJournal = Objects.requireNonNull(parentJournal);
   }
 
   public Issue getIssue() {

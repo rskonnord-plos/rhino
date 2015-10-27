@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.ambraproject.rhino.config.RuntimeConfiguration;
 import org.ambraproject.rhino.service.ConfigurationReadService;
@@ -15,6 +14,7 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 public class ConfigurationReadServiceImpl extends AmbraService implements ConfigurationReadService {
@@ -105,7 +105,7 @@ public class ConfigurationReadServiceImpl extends AmbraService implements Config
    * @return
    */
   private Map<String, Object> convertToMap(Configuration configuration) throws IOException {
-    Preconditions.checkNotNull(configuration);
+    Objects.requireNonNull(configuration);
     Map<String, Object> map = Maps.newLinkedHashMap();
     Properties buildProperties = getBuildProperties();
     for (String key : buildProperties.stringPropertyNames()) {

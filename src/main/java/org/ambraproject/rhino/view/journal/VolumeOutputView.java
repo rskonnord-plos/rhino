@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.journal;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -11,13 +10,14 @@ import org.ambraproject.rhino.view.JsonOutputView;
 import org.ambraproject.rhino.view.KeyedListView;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class VolumeOutputView implements JsonOutputView {
 
   private final Volume volume;
 
   public VolumeOutputView(Volume volume) {
-    this.volume = Preconditions.checkNotNull(volume);
+    this.volume = Objects.requireNonNull(volume);
   }
 
   @Override

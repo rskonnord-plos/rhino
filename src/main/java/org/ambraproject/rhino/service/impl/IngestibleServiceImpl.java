@@ -14,7 +14,6 @@
 package org.ambraproject.rhino.service.impl;
 
 
-import com.google.common.base.Preconditions;
 import org.ambraproject.rhino.identity.ArticleIdentity;
 import org.ambraproject.rhino.service.IngestibleService;
 import org.ambraproject.rhino.util.response.Transceiver;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * {@inheritDoc}
@@ -58,7 +58,7 @@ public class IngestibleServiceImpl extends AmbraService implements IngestibleSer
   @Override
   public Transceiver read() throws IOException {
     String ingestSourceDirName = ambraConfiguration.getString(INGEST_SOURCE_DIR_KEY);
-    Preconditions.checkNotNull(ingestSourceDirName); // should be covered by webapp's built-in defaults
+    Objects.requireNonNull(ingestSourceDirName); // should be covered by webapp's built-in defaults
     File ingestDir = new File(ingestSourceDirName);
     File[] archives = ingestDir.listFiles(ZIP_FILENAME_FILTER);
     if (archives == null) {

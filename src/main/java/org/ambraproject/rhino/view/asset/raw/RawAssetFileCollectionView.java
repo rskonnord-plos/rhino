@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.asset.raw;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -14,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A serializable view of a group of assets that all have the same DOI, possibly representing different files.
@@ -25,7 +25,7 @@ public class RawAssetFileCollectionView implements JsonOutputView {
 
   public RawAssetFileCollectionView(Collection<? extends ArticleAsset> assets, ArticleVisibility parentArticle) {
     this.assets = ImmutableList.copyOf(assets);
-    this.parentArticle = Preconditions.checkNotNull(parentArticle);
+    this.parentArticle = Objects.requireNonNull(parentArticle);
   }
 
   @Override

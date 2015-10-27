@@ -54,6 +54,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -64,7 +65,7 @@ class VersionedIngestionService {
   private final ArticleCrudServiceImpl parentService;
 
   VersionedIngestionService(ArticleCrudServiceImpl parentService) {
-    this.parentService = Preconditions.checkNotNull(parentService);
+    this.parentService = Objects.requireNonNull(parentService);
   }
 
   static class IngestionResult {
@@ -72,8 +73,8 @@ class VersionedIngestionService {
     private final RepoCollectionList collection;
 
     public IngestionResult(Article article, RepoCollectionList collection) {
-      this.article = Preconditions.checkNotNull(article);
-      this.collection = Preconditions.checkNotNull(collection);
+      this.article = Objects.requireNonNull(article);
+      this.collection = Objects.requireNonNull(collection);
     }
 
     public Article getArticle() {
@@ -351,8 +352,8 @@ class VersionedIngestionService {
     private RepoObjectMetadata created;
 
     private ArticleObject(RepoObject input, Optional<String> archiveEntryName) {
-      this.input = Preconditions.checkNotNull(input);
-      this.archiveEntryName = Preconditions.checkNotNull(archiveEntryName);
+      this.input = Objects.requireNonNull(input);
+      this.archiveEntryName = Objects.requireNonNull(archiveEntryName);
     }
   }
 
@@ -371,8 +372,8 @@ class VersionedIngestionService {
     private ArticleCollection(String archiveName, ArticleIdentity articleIdentity, AssetTable<String> assetTable) {
       Preconditions.checkArgument(!Strings.isNullOrEmpty(archiveName));
       this.archiveName = archiveName;
-      this.articleIdentity = Preconditions.checkNotNull(articleIdentity);
-      this.assetTable = Preconditions.checkNotNull(assetTable);
+      this.articleIdentity = Objects.requireNonNull(articleIdentity);
+      this.assetTable = Objects.requireNonNull(assetTable);
     }
 
     public ArticleObject insertArchiveObject(String entryName, RepoObject.RepoObjectBuilder builder) {

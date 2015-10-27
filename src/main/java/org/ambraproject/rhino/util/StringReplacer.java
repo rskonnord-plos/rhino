@@ -18,12 +18,12 @@
 
 package org.ambraproject.rhino.util;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -43,8 +43,8 @@ public class StringReplacer {
     private final String replacement;
 
     private ReplacementCase(Pattern regex, String replacement) {
-      this.regex = Preconditions.checkNotNull(regex);
-      this.replacement = Preconditions.checkNotNull(replacement);
+      this.regex = Objects.requireNonNull(regex);
+      this.replacement = Objects.requireNonNull(replacement);
     }
 
     private String replace(CharSequence text) {

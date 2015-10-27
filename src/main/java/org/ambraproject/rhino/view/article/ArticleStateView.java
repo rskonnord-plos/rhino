@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.article;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -10,6 +9,7 @@ import org.ambraproject.rhino.view.JsonOutputView;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 import static org.ambraproject.rhino.view.article.ArticleJsonConstants.MemberNames;
 
@@ -26,7 +26,7 @@ public class ArticleStateView implements JsonOutputView, ArticleView {
   private final Collection<? extends Syndication> syndications;
 
   public ArticleStateView(String doi, String publicationState, Collection<? extends Syndication> syndications) {
-    this.doi = Preconditions.checkNotNull(doi);
+    this.doi = Objects.requireNonNull(doi);
     this.publicationState = publicationState;
     this.syndications = (syndications == null) ? null : Collections.unmodifiableCollection(syndications);
   }

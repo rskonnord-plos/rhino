@@ -26,6 +26,7 @@ import org.w3c.dom.NodeList;
 import java.util.AbstractList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Adapt a collection from the W3C DOM library to be a {@link List} compatible with the Java Collections Framework.
@@ -85,7 +86,7 @@ public abstract class NodeListAdapter extends AbstractList<Node> {
     private final NodeList wrapped;
 
     private NodeListWrapper(NodeList wrapped) {
-      this.wrapped = Preconditions.checkNotNull(wrapped);
+      this.wrapped = Objects.requireNonNull(wrapped);
     }
 
     @Override
@@ -103,7 +104,7 @@ public abstract class NodeListAdapter extends AbstractList<Node> {
     private final NamedNodeMap wrapped;
 
     private NodeMapWrapper(NamedNodeMap wrapped) {
-      this.wrapped = Preconditions.checkNotNull(wrapped);
+      this.wrapped = Objects.requireNonNull(wrapped);
     }
 
     @Override

@@ -20,7 +20,6 @@ package org.ambraproject.rhino.content.xml;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.ambraproject.rhino.util.NodeListAdapter;
@@ -42,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A container for a node of XML data that reads it with XPath queries.
@@ -55,7 +55,7 @@ public abstract class AbstractXpathReader {
 
   protected AbstractXpathReader(Node xml) {
     this();
-    this.xml = Preconditions.checkNotNull(xml);
+    this.xml = Objects.requireNonNull(xml);
   }
 
   protected AbstractXpathReader() {

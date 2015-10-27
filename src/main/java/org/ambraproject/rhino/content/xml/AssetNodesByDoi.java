@@ -18,12 +18,13 @@
 
 package org.ambraproject.rhino.content.xml;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
 import org.w3c.dom.Node;
+
+import java.util.Objects;
 
 /**
  * A set of article XML nodes, each representing an asset, mapped by the asset's DOI.
@@ -67,7 +68,7 @@ public class AssetNodesByDoi {
    * @throws NullPointerException     if {@code doi == null}
    */
   public ImmutableList<Node> getNodes(String doi) {
-    Preconditions.checkNotNull(doi);
+    Objects.requireNonNull(doi);
     ImmutableList<Node> nodes = nodeMap.get(doi);
     if (nodes.isEmpty()) {
       throw new IllegalArgumentException("DOI not matched to asset node: " + doi);

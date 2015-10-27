@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.journal;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -11,6 +10,7 @@ import org.ambraproject.rhino.view.KeyedListView;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class IssueOutputView implements JsonOutputView {
@@ -23,7 +23,7 @@ public class IssueOutputView implements JsonOutputView {
   }
 
   public IssueOutputView(Issue issue, Object parentVolumeView) {
-    this.issue = Preconditions.checkNotNull(issue);
+    this.issue = Objects.requireNonNull(issue);
     this.parentVolumeView = Optional.ofNullable(parentVolumeView);
   }
 

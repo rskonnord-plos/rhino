@@ -2,7 +2,6 @@ package org.ambraproject.rhino.service.impl;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 class AssetTable<T> {
@@ -39,8 +39,8 @@ class AssetTable<T> {
     private final FileType fileType;
 
     private Key(AssetIdentity id, FileType fileType) {
-      this.id = Preconditions.checkNotNull(id);
-      this.fileType = Preconditions.checkNotNull(fileType);
+      this.id = Objects.requireNonNull(id);
+      this.fileType = Objects.requireNonNull(fileType);
     }
 
     @Override
@@ -61,8 +61,8 @@ class AssetTable<T> {
     private final T fileLocator;
 
     private Value(AssetType assetType, T fileLocator) {
-      this.assetType = Preconditions.checkNotNull(assetType);
-      this.fileLocator = Preconditions.checkNotNull(fileLocator);
+      this.assetType = Objects.requireNonNull(assetType);
+      this.fileLocator = Objects.requireNonNull(fileLocator);
     }
   }
 
@@ -388,7 +388,7 @@ class AssetTable<T> {
     // Second pass to validate each set of files against its asset type
     for (Map.Entry<AssetIdentity, Set<FileType>> entry : Multimaps.asMap(fileTypes).entrySet()) {
       AssetIdentity assetIdentity = entry.getKey();
-      AssetType assetType = Preconditions.checkNotNull(assetTypes.get(assetIdentity));
+      AssetType assetType = Objects.requireNonNull(assetTypes.get(assetIdentity));
       Set<FileType> assetFileTypes = entry.getValue();
 
       Set<FileType> requiredFileTypes = assetType.getRequiredFileTypes();

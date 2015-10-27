@@ -1,7 +1,6 @@
 package org.ambraproject.rhino.util;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteStreams;
@@ -22,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -42,7 +42,7 @@ public abstract class Archive implements Closeable {
   private final ImmutableMap<String, ?> files;
 
   private Archive(String archiveName, Map<String, ?> files) {
-    this.archiveName = Preconditions.checkNotNull(archiveName);
+    this.archiveName = Objects.requireNonNull(archiveName);
     this.files = ImmutableMap.copyOf(files);
   }
 
@@ -87,7 +87,7 @@ public abstract class Archive implements Closeable {
   protected abstract InputStream openFileFrom(Object fileObj);
 
   public final RepoObject.ContentAccessor getContentAccessorFor(final String entryName) {
-    if (!files.containsKey(Preconditions.checkNotNull(entryName))) {
+    if (!files.containsKey(Objects.requireNonNull(entryName))) {
       throw new IllegalArgumentException("Archive does not contain an entry named: " + entryName);
     }
     return new RepoObject.ContentAccessor() {
@@ -217,7 +217,7 @@ public abstract class Archive implements Closeable {
   public static Archive readRepoCollection(final ContentRepoService service, String archiveName,
                                            RepoCollectionList collection,
                                            Function<? super RepoObjectMetadata, String> entryNameExtractor) {
-    Preconditions.checkNotNull(service);
+    Objects.requireNonNull(service);
 
     ImmutableMap.Builder<String, RepoVersion> objects = ImmutableMap.builder();
     for (RepoObjectMetadata objectMetadata : collection.getObjects()) {

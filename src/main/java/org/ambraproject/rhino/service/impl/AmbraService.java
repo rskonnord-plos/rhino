@@ -19,7 +19,6 @@
 package org.ambraproject.rhino.service.impl;
 
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import org.ambraproject.models.Journal;
@@ -50,6 +49,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class AmbraService {
 
@@ -105,7 +105,7 @@ public abstract class AmbraService {
    * @return a byte array of the input stream contents
    */
   protected static byte[] readClientInput(InputStream input) {
-    Preconditions.checkNotNull(input);
+    Objects.requireNonNull(input);
     try {
       try {
         return IOUtils.toByteArray(input);
@@ -155,7 +155,7 @@ public abstract class AmbraService {
    * @throws RestClientException if the stream does not contain valid XML
    */
   protected static Document parseXml(InputStream stream) throws IOException, RestClientException {
-    Preconditions.checkNotNull(stream);
+    Objects.requireNonNull(stream);
     try {
       // Get a new DocumentBuilder every time because because it isn't thread-safe
       return newDocumentBuilder().parse(stream);

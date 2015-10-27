@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.article;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -11,13 +10,14 @@ import org.ambraproject.rhino.view.journal.JournalNonAssocView;
 import org.ambraproject.rhino.view.journal.VolumeNonAssocView;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class ArticleIssueOutputView implements JsonOutputView {
 
   private final ArticleIssue articleIssue;
 
   public ArticleIssueOutputView(ArticleIssue articleIssue) {
-    this.articleIssue = Preconditions.checkNotNull(articleIssue);
+    this.articleIssue = Objects.requireNonNull(articleIssue);
   }
 
   @Override

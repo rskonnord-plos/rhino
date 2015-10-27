@@ -1,7 +1,5 @@
 package org.ambraproject.rhino.test;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -100,8 +98,8 @@ public class AssertionCollector {
     protected final String fieldName;
 
     protected AssertionCase(String objectName, String fieldName) {
-      this.objectName = Preconditions.checkNotNull(objectName);
-      this.fieldName = Preconditions.checkNotNull(fieldName);
+      this.objectName = Objects.requireNonNull(objectName);
+      this.fieldName = Objects.requireNonNull(fieldName);
     }
 
     @Override

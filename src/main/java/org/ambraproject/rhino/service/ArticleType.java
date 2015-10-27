@@ -1,12 +1,12 @@
 package org.ambraproject.rhino.service;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.ambraproject.rhino.view.JsonOutputView;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ArticleType implements JsonOutputView {
@@ -17,9 +17,9 @@ public class ArticleType implements JsonOutputView {
   private final String code;
 
   public ArticleType(URI uri, String heading, String pluralHeading, String code) {
-    this.uri = Preconditions.checkNotNull(uri);
-    this.heading = Preconditions.checkNotNull(heading);
-    this.pluralHeading = Preconditions.checkNotNull(pluralHeading);
+    this.uri = Objects.requireNonNull(uri);
+    this.heading = Objects.requireNonNull(heading);
+    this.pluralHeading = Objects.requireNonNull(pluralHeading);
     this.code = code; // nullable
   }
 

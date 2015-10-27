@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.ambraproject.rhino.shared.XPathExtractor;
 import org.ambraproject.rhino.util.StringReplacer;
@@ -20,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Contains logic for extracting author information from article XML.
@@ -64,8 +64,8 @@ public final class AuthorsXmlExtractor {
   private final ImmutableMap<String, String> otherFootnotesMap;
 
   private AuthorsXmlExtractor(Document doc, XPathExtractor xpath) throws XPathException {
-    this.doc = Preconditions.checkNotNull(doc);
-    this.xpath = Preconditions.checkNotNull(xpath);
+    this.doc = Objects.requireNonNull(doc);
+    this.xpath = Objects.requireNonNull(xpath);
 
     affiliateMap = ImmutableMap.copyOf(getAffiliateMap(doc, xpath));
     addressMap = ImmutableMap.copyOf(getAddressMap(doc, xpath));

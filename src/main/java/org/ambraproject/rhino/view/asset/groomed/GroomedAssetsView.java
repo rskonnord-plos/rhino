@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.view.asset.groomed;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -10,6 +9,7 @@ import org.ambraproject.models.ArticleAsset;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class GroomedAssetsView {
 
@@ -25,7 +25,7 @@ public class GroomedAssetsView {
                             List<GroomedImageView> figures,
                             List<GroomedImageView> graphics,
                             List<GroomedAssetFileView> miscellaneousAssetFiles) {
-    this.articleXml = Preconditions.checkNotNull(articleXml);
+    this.articleXml = Objects.requireNonNull(articleXml);
     this.articlePdf = articlePdf; // nullable
     this.figures = ImmutableList.copyOf(figures);
     this.graphics = ImmutableList.copyOf(graphics);

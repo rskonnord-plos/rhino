@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.content.xml;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -49,6 +48,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -133,7 +133,7 @@ public class ArticleXml extends AbstractArticleXml<Article> {
   }
 
   private Document truncate(Set<String> nodeNamesToRemove) {
-    Preconditions.checkNotNull(nodeNamesToRemove);
+    Objects.requireNonNull(nodeNamesToRemove);
     Document document = (Document) xml.cloneNode(true);
     for (Node articleNode : NodeListAdapter.wrap(document.getChildNodes())) {
       NodeList childNodes = articleNode.getChildNodes(); // can't use NodeListAdapter because we want to delete during iteration
@@ -173,7 +173,7 @@ public class ArticleXml extends AbstractArticleXml<Article> {
    * @param nodeMap   the map to modify if a nested DOI is found
    */
   private void findNestedDoi(Node outerNode, Multimap<String, Node> nodeMap) {
-    Preconditions.checkNotNull(nodeMap);
+    Objects.requireNonNull(nodeMap);
 
     // Currently, the only special case handled here is
     //   <table-wrap> ... <graphic xlink:href="..." /> ... </table-wrap>
@@ -406,7 +406,7 @@ public class ArticleXml extends AbstractArticleXml<Article> {
     // Represent a article type token as a URI, as required by legacy article type model.
     // TODO: Either refactor URI-based data model, or allow base URI to be configured (no hard-coded "plos.org").
     // This also ensures that we throw a NullPointerException rather than return "http://rdf.plos.org/RDF/articleType/null"
-    return "http://rdf.plos.org/RDF/articleType/" + Preconditions.checkNotNull(articleType);
+    return "http://rdf.plos.org/RDF/articleType/" + Objects.requireNonNull(articleType);
   }
 
   /**

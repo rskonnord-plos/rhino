@@ -13,13 +13,13 @@
 
 package org.ambraproject.rhino.content.xml;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -128,8 +128,8 @@ public class ManifestXml extends AbstractXpathReader {
 
     private Asset(AssetType assetType, String uri, String mainEntry, boolean isStrikingImage, Iterable<Representation> representations) {
       this.isStrikingImage = isStrikingImage;
-      this.assetType = Preconditions.checkNotNull(assetType);
-      this.uri = Preconditions.checkNotNull(uri);
+      this.assetType = Objects.requireNonNull(assetType);
+      this.uri = Objects.requireNonNull(uri);
       this.mainEntry = Optional.ofNullable(mainEntry);
       this.representations = ImmutableList.copyOf(representations);
     }
@@ -175,8 +175,8 @@ public class ManifestXml extends AbstractXpathReader {
     private final String entry;
 
     private Representation(String name, String entry) {
-      this.name = Preconditions.checkNotNull(name);
-      this.entry = Preconditions.checkNotNull(entry);
+      this.name = Objects.requireNonNull(name);
+      this.entry = Objects.requireNonNull(entry);
     }
 
     public String getName() {

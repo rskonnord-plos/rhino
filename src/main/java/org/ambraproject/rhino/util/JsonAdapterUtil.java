@@ -1,6 +1,5 @@
 package org.ambraproject.rhino.util;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -12,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
+import java.util.Objects;
 
 public final class JsonAdapterUtil {
   private JsonAdapterUtil() {
@@ -26,7 +26,7 @@ public final class JsonAdapterUtil {
    * @return {@code destination}
    */
   public static JsonObject copyWithoutOverwriting(JsonObject source, JsonObject destination) {
-    Preconditions.checkNotNull(destination);
+    Objects.requireNonNull(destination);
     for (Map.Entry<String, JsonElement> fromEntry : source.entrySet()) {
       String key = fromEntry.getKey();
       if (!destination.has(key)) {
@@ -65,7 +65,7 @@ public final class JsonAdapterUtil {
    * @see org.hibernate.proxy.HibernateProxy#writeReplace()
    */
   public static <T> T forceHibernateLazyLoad(T object, Class<T> classToken) {
-    Preconditions.checkNotNull(classToken);
+    Objects.requireNonNull(classToken);
     if (object instanceof HibernateProxy) {
       HibernateProxy hibernateProxy = (HibernateProxy) object;
       return classToken.cast(hibernateProxy.writeReplace());

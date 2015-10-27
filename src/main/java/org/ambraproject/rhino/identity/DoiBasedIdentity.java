@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * An entity identifier based on a Digital Object Identifier (DOI). Instances of this class cover two cases: <ol>
@@ -44,7 +45,7 @@ public class DoiBasedIdentity {
    * @param identifier the DOI for this resource
    */
   protected DoiBasedIdentity(String identifier) {
-    identifier = Preconditions.checkNotNull(identifier).trim();
+    identifier = Objects.requireNonNull(identifier).trim();
     Preconditions.checkArgument(!identifier.isEmpty(), "DOI is an empty string");
     if (identifier.startsWith("info:doi/")) {
       identifier = identifier.substring("info:doi/".length());

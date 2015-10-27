@@ -2,7 +2,6 @@ package org.ambraproject.rhino.util.response;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
 import com.google.gson.Gson;
@@ -16,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 /**
@@ -85,9 +85,9 @@ public abstract class Transceiver {
    * @throws IOException
    */
   public final void respond(HttpServletRequest request, HttpServletResponse response, Gson gson) throws IOException {
-    Preconditions.checkNotNull(request);
-    Preconditions.checkNotNull(response);
-    Preconditions.checkNotNull(gson);
+    Objects.requireNonNull(request);
+    Objects.requireNonNull(response);
+    Objects.requireNonNull(gson);
 
     Calendar lastModified = getLastModifiedDate();
     if (lastModified != null) {
@@ -96,7 +96,7 @@ public abstract class Transceiver {
     if (lastModified != null && !checkIfModifiedSince(request, lastModified)) {
       response.setStatus(HttpStatus.NOT_MODIFIED.value());
     } else {
-      Object responseData = Preconditions.checkNotNull(getData());
+      Object responseData = Objects.requireNonNull(getData());
       if (bufferResponseBody()) {
         serializeSafely(request, response, gson, responseData);
       } else {

@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Preconditions;
 import org.ambraproject.configuration.ConfigurationStore;
 import org.ambraproject.models.UserLogin;
 import org.ambraproject.models.UserProfile;
@@ -39,6 +38,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class UserCrudServiceImpl extends AmbraService implements UserCrudService {
 
@@ -113,7 +113,7 @@ public class UserCrudServiceImpl extends AmbraService implements UserCrudService
    */
   @Override
   public UserProfile createUserLogin(final String authId, final UserLogin userLogin) {
-    Preconditions.checkNotNull(userLogin);
+    Objects.requireNonNull(userLogin);
 
     UserProfile userProfile = getUserByAuthId(authId);
     if (userProfile == null) {

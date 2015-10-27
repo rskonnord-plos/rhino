@@ -18,7 +18,6 @@
 
 package org.ambraproject.rhino.service.impl;
 
-import com.google.common.base.Preconditions;
 import org.ambraproject.models.Article;
 import org.ambraproject.models.Issue;
 import org.ambraproject.models.Journal;
@@ -48,6 +47,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class IssueCrudServiceImpl extends AmbraService implements IssueCrudService {
 
@@ -122,7 +122,7 @@ public class IssueCrudServiceImpl extends AmbraService implements IssueCrudServi
    * @throws RestClientException if {@code imageArticleId} doesn't match an existing article
    */
   private void updateImageArticle(Issue issue, ArticleIdentity imageArticleId) {
-    Preconditions.checkNotNull(imageArticleId);
+    Objects.requireNonNull(imageArticleId);
     Object[] result = (Object[]) DataAccessUtils.uniqueResult(hibernateTemplate.findByCriteria(
         DetachedCriteria.forClass(Article.class)
             .add(Restrictions.eq("doi", imageArticleId.getKey()))
@@ -194,7 +194,7 @@ public class IssueCrudServiceImpl extends AmbraService implements IssueCrudServi
 
   @Override
   public DoiBasedIdentity create(DoiBasedIdentity volumeId, IssueInputView input) {
-    Preconditions.checkNotNull(volumeId);
+    Objects.requireNonNull(volumeId);
 
     DoiBasedIdentity issueId = DoiBasedIdentity.create(input.getIssueUri());
     if (findIssue(issueId) != null) {
@@ -221,7 +221,7 @@ public class IssueCrudServiceImpl extends AmbraService implements IssueCrudServi
 
   @Override
   public void update(DoiBasedIdentity issueId, IssueInputView input) {
-    Preconditions.checkNotNull(input);
+    Objects.requireNonNull(input);
     Issue issue = findIssue(issueId);
     if (issue == null) {
       throw new RestClientException("Issue not found for issueUri: " + issueId.getIdentifier(), HttpStatus.BAD_REQUEST);
