@@ -42,12 +42,7 @@ public class IngestibleServiceImpl extends AmbraService implements IngestibleSer
   private static final String INGEST_DEST_DIR_KEY
       = "ambra.services.documentManagement.ingestDestinationDir";
 
-  private static final FilenameFilter ZIP_FILENAME_FILTER = new FilenameFilter() {
-    @Override
-    public boolean accept(File dir, String name) {
-      return name.endsWith(".zip");
-    }
-  };
+  private static final FilenameFilter ZIP_FILENAME_FILTER = (dir, name) -> name.endsWith(".zip");
 
   @Autowired
   private Configuration ambraConfiguration;

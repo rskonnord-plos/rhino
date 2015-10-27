@@ -48,12 +48,9 @@ public class ArticleListCrudServiceImpl extends AmbraService implements ArticleL
   }
 
   private boolean listExists(final ArticleListIdentity identity) {
-    long count = hibernateTemplate.execute(new HibernateCallback<Long>() {
-      @Override
-      public Long doInHibernate(Session session) throws HibernateException, SQLException {
-        Query query = queryFor(session, "select count(*)", identity);
-        return (Long) query.uniqueResult();
-      }
+    long count = hibernateTemplate.execute(session -> {
+      Query query = queryFor(session, "select count(*)", identity);
+      return (Long) query.uniqueResult();
     });
     return count > 0L;
   }
@@ -88,12 +85,9 @@ public class ArticleListCrudServiceImpl extends AmbraService implements ArticleL
   }
 
   private ArticleListView getArticleList(final ArticleListIdentity identity) {
-    Object[] result = DataAccessUtils.uniqueResult(hibernateTemplate.execute(new HibernateCallback<List<Object[]>>() {
-      @Override
-      public List<Object[]> doInHibernate(Session session) throws HibernateException, SQLException {
-        Query query = queryFor(session, "select j.journalKey, l", identity);
-        return query.list();
-      }
+    Object[] result = DataAccessUtils.uniqueResult(hibernateTemplate.execute(session -> {
+      Query query = queryFor(session, "select j.journalKey, l", identity);
+      return query.list();
     }));
     if (result == null) {
       throw nonexistentList(identity);
@@ -208,28 +202,25 @@ public class ArticleListCrudServiceImpl extends AmbraService implements ArticleL
     return new Transceiver() {
       @Override
       protected Object getData() throws IOException {
-        List<Object[]> result = hibernateTemplate.execute(new HibernateCallback<List<Object[]>>() {
-          @Override
-          public List<Object[]> doInHibernate(Session session) throws HibernateException, SQLException {
-            StringBuilder queryString = new StringBuilder(125)
-                .append("select j.journalKey, l from Journal j inner join j.articleLists l");
-            if (listType.isPresent()) {
-              queryString.append(" where (l.listType=:listType)");
-              if (journalKey.isPresent()) {
-                queryString.append(" and (j.journalKey=:journalKey)");
-              }
+        List<Object[]> result = hibernateTemplate.execute(session -> {
+          StringBuilder queryString = new StringBuilder(125)
+              .append("select j.journalKey, l from Journal j inner join j.articleLists l");
+          if (listType.isPresent()) {
+            queryString.append(" where (l.listType=:listType)");
+            if (journalKey.isPresent()) {
+              queryString.append(" and (j.journalKey=:journalKey)");
             }
-
-            Query query = session.createQuery(queryString.toString());
-            if (listType.isPresent()) {
-              query.setParameter("listType", listType.get());
-              if (journalKey.isPresent()) {
-                query.setParameter("journalKey", journalKey.get());
-              }
-            }
-
-            return query.list();
           }
+
+          Query query = session.createQuery(queryString.toString());
+          if (listType.isPresent()) {
+            query.setParameter("listType", listType.get());
+            if (journalKey.isPresent()) {
+              query.setParameter("journalKey", journalKey.get());
+            }
+          }
+
+          return query.list();
         });
         return asArticleListViews(result);
       }
@@ -242,17 +233,14 @@ public class ArticleListCrudServiceImpl extends AmbraService implements ArticleL
   }
 
   private Collection<ArticleListView> findContainingLists(final ArticleIdentity articleId) {
-    return hibernateTemplate.execute(new HibernateCallback<Collection<ArticleListView>>() {
-      @Override
-      public Collection<ArticleListView> doInHibernate(Session session) {
-        Query query = session.createQuery("" +
-            "select j.journalKey, l " +
-            "from Journal j join j.articleLists l join l.articles a " +
-            "where a.doi=:doi");
-        query.setString("doi", articleId.getKey());
-        List<Object[]> results = query.list();
-        return asArticleListViews(results);
-      }
+    return hibernateTemplate.execute(session -> {
+      Query query = session.createQuery("" +
+          "select j.journalKey, l " +
+          "from Journal j join j.articleLists l join l.articles a " +
+          "where a.doi=:doi");
+      query.setString("doi", articleId.getKey());
+      List<Object[]> results = query.list();
+      return asArticleListViews(results);
     });
   }
 

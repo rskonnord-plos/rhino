@@ -11,11 +11,6 @@ public interface JsonOutputView {
 
   public abstract JsonElement serialize(JsonSerializationContext context);
 
-  public static final JsonSerializer<JsonOutputView> SERIALIZER = new JsonSerializer<JsonOutputView>() {
-    @Override
-    public JsonElement serialize(JsonOutputView src, Type typeOfSrc, JsonSerializationContext context) {
-      return src.serialize(context);
-    }
-  };
+  public static final JsonSerializer<JsonOutputView> SERIALIZER = (src, typeOfSrc, context) -> src.serialize(context);
 
 }

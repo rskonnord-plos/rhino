@@ -149,44 +149,41 @@ public class RecentArticleQuery {
      * @param articleType  if absent, return results of all article types; if present, filter results for that type
      */
     private List<Object[]> query(final boolean forceMinimum, final Optional<String> articleType) {
-      return hibernateTemplate.execute(new HibernateCallback<List<Object[]>>() {
-        @Override
-        public List<Object[]> doInHibernate(Session session) throws HibernateException, SQLException {
-          StringBuilder hql = new StringBuilder(211)
-              .append("select distinct a.doi, a.title, a.date ")
-              .append("from Article a, Journal j ")
-              .append("where j in elements(a.journals) and j.journalKey = :journalKey");
-          if (!forceMinimum) {
-            hql.append(" and a.date >= :threshold");
-          }
-          if (articleType.isPresent()) {
-            hql.append(" and :articleType in elements(a.types)");
-          }
-          for (int i = 0; i < excludedArticleTypes.size(); i++) {
-            // No type in excludedArticleTypes should be in a.types. Until we can figure out a better way to express
-            // this in HQL, just kludge in a variable number of clauses. TODO: Improve?
-            hql.append(" and not (:exclude").append(i) // variable names are exclude0, exclude1, etc.
-                .append(" in elements(a.types))");
-          }
-          hql.append(" order by a.date desc");
-
-          Query query = session.createQuery(hql.toString());
-          query.setString("journalKey", journalKey);
-          if (forceMinimum) {
-            query.setMaxResults(minimum.get());
-          } else {
-            query.setDate("threshold", threshold.getTime());
-          }
-          if (articleType.isPresent()) {
-            query.setString("articleType", articleType.get());
-          }
-          for (ListIterator<String> iter = excludedArticleTypes.listIterator(); iter.hasNext(); ) {
-            String paramName = "exclude" + iter.nextIndex();
-            query.setParameter(paramName, iter.next());
-          }
-
-          return query.list();
+      return hibernateTemplate.execute(session -> {
+        StringBuilder hql = new StringBuilder(211)
+            .append("select distinct a.doi, a.title, a.date ")
+            .append("from Article a, Journal j ")
+            .append("where j in elements(a.journals) and j.journalKey = :journalKey");
+        if (!forceMinimum) {
+          hql.append(" and a.date >= :threshold");
         }
+        if (articleType.isPresent()) {
+          hql.append(" and :articleType in elements(a.types)");
+        }
+        for (int i = 0; i < excludedArticleTypes.size(); i++) {
+          // No type in excludedArticleTypes should be in a.types. Until we can figure out a better way to express
+          // this in HQL, just kludge in a variable number of clauses. TODO: Improve?
+          hql.append(" and not (:exclude").append(i) // variable names are exclude0, exclude1, etc.
+              .append(" in elements(a.types))");
+        }
+        hql.append(" order by a.date desc");
+
+        Query query = session.createQuery(hql.toString());
+        query.setString("journalKey", journalKey);
+        if (forceMinimum) {
+          query.setMaxResults(minimum.get());
+        } else {
+          query.setDate("threshold", threshold.getTime());
+        }
+        if (articleType.isPresent()) {
+          query.setString("articleType", articleType.get());
+        }
+        for (ListIterator<String> iter = excludedArticleTypes.listIterator(); iter.hasNext(); ) {
+          String paramName = "exclude" + iter.nextIndex();
+          query.setParameter(paramName, iter.next());
+        }
+
+        return query.list();
       });
     }
 
@@ -272,11 +269,6 @@ public class RecentArticleQuery {
    * Order by date. Maintain stable order for objects with the same date. Not consistent with {@link
    * RecentArticleView#equals}.
    */
-  private static final Comparator<RecentArticleView> BY_DATE_DESCENDING = new Comparator<RecentArticleView>() {
-    @Override
-    public int compare(RecentArticleView o1, RecentArticleView o2) {
-      return -o1.getDate().compareTo(o2.getDate());
-    }
-  };
+  private static final Comparator<RecentArticleView> BY_DATE_DESCENDING = (o1, o2) -> -o1.getDate().compareTo(o2.getDate());
 
 }

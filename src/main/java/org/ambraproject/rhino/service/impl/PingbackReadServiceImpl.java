@@ -44,16 +44,13 @@ import java.util.List;
 
 public class PingbackReadServiceImpl extends AmbraService implements PingbackReadService {
 
-  private static Function<Object[], ArticlePingbackView> AS_VIEW = new Function<Object[], ArticlePingbackView>() {
-    @Override
-    public ArticlePingbackView apply(Object[] input) {
-      String doi = (String) input[0];
-      String title = (String) input[1];
-      String url = (String) input[2];
-      Long pingbackCount = (Long) input[3];
-      Date mostRecentPingback = (Date) input[4];
-      return new ArticlePingbackView(doi, title, url, pingbackCount, mostRecentPingback);
-    }
+  private static Function<Object[], ArticlePingbackView> AS_VIEW = input -> {
+    String doi = (String) input[0];
+    String title = (String) input[1];
+    String url = (String) input[2];
+    Long pingbackCount = (Long) input[3];
+    Date mostRecentPingback = (Date) input[4];
+    return new ArticlePingbackView(doi, title, url, pingbackCount, mostRecentPingback);
   };
 
   @Override

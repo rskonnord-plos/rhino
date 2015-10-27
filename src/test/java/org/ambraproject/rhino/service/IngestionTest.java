@@ -158,12 +158,7 @@ public class IngestionTest extends BaseRhinoTest {
   });
 
   private static FilenameFilter forSuffix(final String suffix) {
-    return new FilenameFilter() {
-      @Override
-      public boolean accept(File dir, String name) {
-        return name.endsWith(suffix);
-      }
-    };
+    return (dir, name) -> name.endsWith(suffix);
   }
 
   /**
@@ -886,40 +881,15 @@ public class IngestionTest extends BaseRhinoTest {
 
   // Transformation helpers
 
-  private static final Function<Journal, String> JOURNAL_EISSN = new Function<Journal, String>() {
-    @Override
-    public String apply(Journal input) {
-      return input.geteIssn();
-    }
-  };
+  private static final Function<Journal, String> JOURNAL_EISSN = Journal::geteIssn;
 
-  private static final Function<ArticleRelationship, String> RELATIONSHIP_DOI = new Function<ArticleRelationship, String>() {
-    @Override
-    public String apply(ArticleRelationship input) {
-      return input.getOtherArticleDoi();
-    }
-  };
+  private static final Function<ArticleRelationship, String> RELATIONSHIP_DOI = ArticleRelationship::getOtherArticleDoi;
 
-  private static final Function<ArticleAsset, AssetIdentity> ASSET_IDENTITY = new Function<ArticleAsset, AssetIdentity>() {
-    @Override
-    public AssetIdentity apply(ArticleAsset input) {
-      return AssetIdentity.from(input);
-    }
-  };
+  private static final Function<ArticleAsset, AssetIdentity> ASSET_IDENTITY = AssetIdentity::from;
 
-  private static final Function<ArticleAsset, AssetFileIdentity> ASSET_FILE_IDENTITY = new Function<ArticleAsset, AssetFileIdentity>() {
-    @Override
-    public AssetFileIdentity apply(ArticleAsset input) {
-      return AssetFileIdentity.from(input);
-    }
-  };
+  private static final Function<ArticleAsset, AssetFileIdentity> ASSET_FILE_IDENTITY = AssetFileIdentity::from;
 
-  private static final Function<CitedArticle, String> CITATION_KEY = new Function<CitedArticle, String>() {
-    @Override
-    public String apply(CitedArticle input) {
-      return input.getKey();
-    }
-  };
+  private static final Function<CitedArticle, String> CITATION_KEY = CitedArticle::getKey;
 
   private static ImmutableList<PersonName> asPersonNames(Collection<? extends AmbraEntity> persons) {
     List<PersonName> names = Lists.newArrayListWithCapacity(persons.size());

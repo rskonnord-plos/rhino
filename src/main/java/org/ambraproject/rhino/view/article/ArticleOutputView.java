@@ -92,12 +92,7 @@ public class ArticleOutputView implements JsonOutputView, ArticleView {
     this.excludeCitations = excludeCitations;
   }
 
-  private static final Function<Syndication, String> GET_TARGET = new Function<Syndication, String>() {
-    @Override
-    public String apply(Syndication input) {
-      return input.getTarget();
-    }
-  };
+  private static final Function<Syndication, String> GET_TARGET = Syndication::getTarget;
 
 
   @Override

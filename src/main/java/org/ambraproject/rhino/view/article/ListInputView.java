@@ -49,32 +49,29 @@ public class ListInputView {
     private Collection<String> articleDois;
   }
 
-  public static final JsonDeserializer<ListInputView> DESERIALIZER = new JsonDeserializer<ListInputView>() {
-    @Override
-    public ListInputView deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-      RawInput inp = context.deserialize(json, RawInput.class);
+  public static final JsonDeserializer<ListInputView> DESERIALIZER = (json, typeOfT, context) -> {
+    RawInput inp = context.deserialize(json, RawInput.class);
 
-      final ArticleListIdentity identity;
-      if (inp.type != null && inp.journal != null && inp.key != null) {
-        identity = new ArticleListIdentity(inp.type, inp.journal, inp.key);
-      } else if (inp.type == null && inp.journal == null && inp.key == null) {
-        identity = null;
-      } else {
-        throw new PartialIdentityException();
-      }
-
-      final Set<ArticleIdentity> articleIds;
-      if (inp.articleDois == null) {
-        articleIds = null;
-      } else {
-        articleIds = Sets.newLinkedHashSetWithExpectedSize(inp.articleDois.size());
-        for (String articleDoi : inp.articleDois) {
-          articleIds.add(ArticleIdentity.create(articleDoi));
-        }
-      }
-
-      return new ListInputView(identity, inp.title, articleIds);
+    final ArticleListIdentity identity1;
+    if (inp.type != null && inp.journal != null && inp.key != null) {
+      identity1 = new ArticleListIdentity(inp.type, inp.journal, inp.key);
+    } else if (inp.type == null && inp.journal == null && inp.key == null) {
+      identity1 = null;
+    } else {
+      throw new PartialIdentityException();
     }
+
+    final Set<ArticleIdentity> articleIds1;
+    if (inp.articleDois == null) {
+      articleIds1 = null;
+    } else {
+      articleIds1 = Sets.newLinkedHashSetWithExpectedSize(inp.articleDois.size());
+      for (String articleDoi : inp.articleDois) {
+        articleIds1.add(ArticleIdentity.create(articleDoi));
+      }
+    }
+
+    return new ListInputView(identity1, inp.title, articleIds1);
   };
 
   /**

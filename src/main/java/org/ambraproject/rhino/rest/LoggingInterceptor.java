@@ -46,23 +46,20 @@ public class LoggingInterceptor extends HandlerInterceptorAdapter {
     return super.preHandle(request, response, handler);
   }
 
-  private static final Function<Object, String> STRING_LITERAL = new Function<Object, String>() {
-    @Override
-    public String apply(@Nullable Object input) {
-      String text = String.valueOf(input);
-      if (input == null) {
-        return text;
-      }
-
-      /*
-       * TODO: Use org.apache.commons.lang.StringEscapeUtils?
-       * StringEscapeUtils is a little funny with forward-slashes, which makes these values hard to read. So for now,
-       * just handle some simple cases by hand. The returned values are not guaranteed to be parsable in any particular
-       * context; this is just for human readability.
-       */
-      text = text.replace("\\", "\\\\").replace("\"", "\\\"");
-      return '"' + text + '"';
+  private static final Function<Object, String> STRING_LITERAL = input -> {
+    String text = String.valueOf(input);
+    if (input == null) {
+      return text;
     }
+
+    /*
+     * TODO: Use org.apache.commons.lang.StringEscapeUtils?
+     * StringEscapeUtils is a little funny with forward-slashes, which makes these values hard to read. So for now,
+     * just handle some simple cases by hand. The returned values are not guaranteed to be parsable in any particular
+     * context; this is just for human readability.
+     */
+    text = text.replace("\\", "\\\\").replace("\"", "\\\"");
+    return '"' + text + '"';
   };
 
   private static final Joiner JOINER = Joiner.on(", ");

@@ -208,27 +208,24 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
     Preconditions.checkArgument(!Strings.isNullOrEmpty(assetDoi));
 
     Object[] result = (Object[]) DataAccessUtils.uniqueResult(
-        hibernateTemplate.execute(new HibernateCallback<List<?>>() {
-          @Override
-          public List<?> doInHibernate(Session session) throws HibernateException, SQLException {
-            // Find the parent article, and the max sort order for all assets with that parent (not necessarily same asset DOI)
-            SQLQuery query = session.createSQLQuery(""
-                + "SELECT forArticle.articleID, MAX(forArticle.sortOrder) FROM "
-                + "  articleAsset forArticle INNER JOIN articleAsset forDoi "
-                + "  ON forArticle.articleID = forDoi.articleID "
-                + "WHERE forDoi.doi = :assetDoi "
-                + "GROUP BY forArticle.articleID");
+        hibernateTemplate.execute(session -> {
+          // Find the parent article, and the max sort order for all assets with that parent (not necessarily same asset DOI)
+          SQLQuery query = session.createSQLQuery(""
+              + "SELECT forArticle.articleID, MAX(forArticle.sortOrder) FROM "
+              + "  articleAsset forArticle INNER JOIN articleAsset forDoi "
+              + "  ON forArticle.articleID = forDoi.articleID "
+              + "WHERE forDoi.doi = :assetDoi "
+              + "GROUP BY forArticle.articleID");
 
-            // TODO: Consider this query instead
-            // It seems to do the same thing and is simpler, but probably performs worse.
-            //   SELECT articleID, MAX(sortOrder)
-            //   FROM articleAsset WHERE articleID =
-            //     (SELECT DISTINCT articleID FROM articleAsset WHERE doi = :assetDoi)
-            //   GROUP BY articleID
+          // TODO: Consider this query instead
+          // It seems to do the same thing and is simpler, but probably performs worse.
+          //   SELECT articleID, MAX(sortOrder)
+          //   FROM articleAsset WHERE articleID =
+          //     (SELECT DISTINCT articleID FROM articleAsset WHERE doi = :assetDoi)
+          //   GROUP BY articleID
 
-            query.setParameter("assetDoi", assetDoi);
-            return query.list();
-          }
+          query.setParameter("assetDoi", assetDoi);
+          return query.list();
         })
     );
     final BigInteger parentArticleId = Objects.requireNonNull((BigInteger) result[0]);
@@ -238,19 +235,16 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
     hibernateTemplate.save(asset);
     final Long newAssetId = Objects.requireNonNull(asset.getID());
 
-    hibernateTemplate.execute(new HibernateCallback<Integer>() {
-      @Override
-      public Integer doInHibernate(Session session) throws HibernateException, SQLException {
-        SQLQuery query = session.createSQLQuery(""
-            // Insert the new asset into the article's "assets" list as Hibernate would.
-            + "UPDATE articleAsset "
-            + "SET articleID = :parentArticleId, sortOrder = :newSortOrder "
-            + "WHERE articleAssetID = :newAssetId");
-        query.setParameter("parentArticleId", parentArticleId);
-        query.setParameter("newSortOrder", newSortOrder);
-        query.setParameter("newAssetId", newAssetId);
-        return query.executeUpdate();
-      }
+    hibernateTemplate.execute(session -> {
+      SQLQuery query = session.createSQLQuery(""
+          // Insert the new asset into the article's "assets" list as Hibernate would.
+          + "UPDATE articleAsset "
+          + "SET articleID = :parentArticleId, sortOrder = :newSortOrder "
+          + "WHERE articleAssetID = :newAssetId");
+      query.setParameter("parentArticleId", parentArticleId);
+      query.setParameter("newSortOrder", newSortOrder);
+      query.setParameter("newAssetId", newAssetId);
+      return query.executeUpdate();
     });
   }
 

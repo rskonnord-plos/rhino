@@ -142,22 +142,16 @@ public class ArticleCriteria {
     return new DoiList((List<String>) hibernateTemplate.findByCriteria(criteria));
   }
 
-  private static final Function<Object[], ArticleView> DOI_AND_STATE_AS_VIEW = new Function<Object[], ArticleView>() {
-    @Override
-    public ArticleView apply(Object[] input) {
-      String doi = (String) input[0];
-      Integer pubStateConstant = (Integer) input[1];
-      String pubStateName = ArticleJsonConstants.getPublicationStateName(pubStateConstant);
-      return new ArticleStateView(doi, pubStateName, null);
-    }
+  private static final Function<Object[], ArticleView> DOI_AND_STATE_AS_VIEW = input -> {
+    String doi = (String) input[0];
+    Integer pubStateConstant = (Integer) input[1];
+    String pubStateName = ArticleJsonConstants.getPublicationStateName(pubStateConstant);
+    return new ArticleStateView(doi, pubStateName, null);
   };
-  private static final Function<Object[], ArticleView> DOI_AND_TIMESTAMP_AS_VIEW = new Function<Object[], ArticleView>() {
-    @Override
-    public ArticleView apply(Object[] input) {
-      String doi = (String) input[0];
-      Date lastModified = (Date) input[1];
-      return new TimestampedDoi(doi, lastModified);
-    }
+  private static final Function<Object[], ArticleView> DOI_AND_TIMESTAMP_AS_VIEW = input -> {
+    String doi = (String) input[0];
+    Date lastModified = (Date) input[1];
+    return new TimestampedDoi(doi, lastModified);
   };
 
   private static class TimestampedDoi implements ArticleView {
@@ -183,14 +177,11 @@ public class ArticleCriteria {
    * Special-case hack requiring weird logic.
    */
   private ArticleViewList findBySyndication(HibernateTemplate hibernateTemplate) {
-    List<Object[]> results = hibernateTemplate.execute(new HibernateCallback<List<Object[]>>() {
-      @Override
-      public List<Object[]> doInHibernate(Session session) throws HibernateException, SQLException {
-        Query query = session.createQuery(SYND_QUERY);
-        query.setParameterList("syndStatuses", syndicationStatuses.get());
-        query.setParameterList("pubStates", publicationStates.orElse(ArticleJsonConstants.PUBLICATION_STATE_CONSTANTS));
-        return query.list();
-      }
+    List<Object[]> results = hibernateTemplate.execute(session -> {
+      Query query = session.createQuery(SYND_QUERY);
+      query.setParameterList("syndStatuses", syndicationStatuses.get());
+      query.setParameterList("pubStates", publicationStates.orElse(ArticleJsonConstants.PUBLICATION_STATE_CONSTANTS));
+      return query.list();
     });
 
     List<ArticleStateView> views = Lists.newArrayListWithExpectedSize(results.size() / EXPECTED_SYNDICATION_TARGETS);

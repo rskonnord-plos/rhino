@@ -243,47 +243,32 @@ public class ArticleXml extends AbstractArticleXml<Article> {
     // TODO: this can probably be made more elegant with lambdas once we are on Java 8.
 
     final Set<String> newTypes = buildArticleTypes();
-    setDeletableChildrenRelationship(article, article.getTypes(), newTypes, new Runnable() {
-      @Override
-      public void run() {
-        article.setTypes(newTypes);
-      }
+    setDeletableChildrenRelationship(article, article.getTypes(), newTypes, () -> {
+      article.setTypes(newTypes);
     });
 
     final List<CitedArticle> newCitedArticles = parseCitations(readNodeList("/article/back/ref-list/ref"));
-    setDeletableChildrenRelationship(article, article.getCitedArticles(), newCitedArticles, new Runnable() {
-      @Override
-      public void run() {
-        article.setCitedArticles(newCitedArticles);
-      }
+    setDeletableChildrenRelationship(article, article.getCitedArticles(), newCitedArticles, () -> {
+      article.setCitedArticles(newCitedArticles);
     });
 
     final List<ArticleAuthor> newAuthors = readAuthors(readNodeList(
         "/article/front/article-meta/contrib-group/contrib[@contrib-type=\"author\"]/name"));
-    setDeletableChildrenRelationship(article, article.getAuthors(), newAuthors, new Runnable() {
-      @Override
-      public void run() {
-        article.setAuthors(newAuthors);
-      }
+    setDeletableChildrenRelationship(article, article.getAuthors(), newAuthors, () -> {
+      article.setAuthors(newAuthors);
     });
 
     final List<ArticleEditor> newEditors = readEditors(readNodeList(
         "/article/front/article-meta/contrib-group/contrib[@contrib-type=\"editor\"]/name"));
-    setDeletableChildrenRelationship(article, article.getEditors(), newEditors, new Runnable() {
-      @Override
-      public void run() {
-        article.setEditors(newEditors);
-      }
+    setDeletableChildrenRelationship(article, article.getEditors(), newEditors, () -> {
+      article.setEditors(newEditors);
     });
 
     final List<String> newCollaborativeAuthors = parseCollaborativeAuthors(readNodeList(
         "/article/front/article-meta/contrib-group/contrib[@contrib-type=\"author\"]/collab"));
     setDeletableChildrenRelationship(article, article.getCollaborativeAuthors(), newCollaborativeAuthors,
-        new Runnable() {
-          @Override
-          public void run() {
-            article.setCollaborativeAuthors(newCollaborativeAuthors);
-          }
+        () -> {
+          article.setCollaborativeAuthors(newCollaborativeAuthors);
         }
     );
 

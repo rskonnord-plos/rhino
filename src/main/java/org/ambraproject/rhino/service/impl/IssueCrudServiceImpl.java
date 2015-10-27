@@ -163,32 +163,30 @@ public class IssueCrudServiceImpl extends AmbraService implements IssueCrudServi
   @Transactional(readOnly = true)
   @Override
   public List<ArticleIssue> getArticleIssues(final ArticleIdentity articleIdentity) {
-    return (List<ArticleIssue>) hibernateTemplate.execute(new HibernateCallback() {
-      public Object doInHibernate(Session session) throws HibernateException, SQLException {
-        List<Object[]> queryResults = session.createSQLQuery(
-            "select {j.*}, {v.*}, {i.*} " +
-                "from issueArticleList ial " +
-                "join issue i on ial.issueID = i.issueID " +
-                "join volume v on i.volumeID = v.volumeID " +
-                "join journal j on v.journalID = j.journalID " +
-                "where ial.doi = :articleURI " +
-                "order by i.created desc ")
-            .addEntity("j", Journal.class)
-            .addEntity("v", Volume.class)
-            .addEntity("i", Issue.class)
-            .setString("articleURI", articleIdentity.getKey())
-            .list();
+    return (List<ArticleIssue>) hibernateTemplate.execute(session -> {
+      List<Object[]> queryResults = session.createSQLQuery(
+          "select {j.*}, {v.*}, {i.*} " +
+              "from issueArticleList ial " +
+              "join issue i on ial.issueID = i.issueID " +
+              "join volume v on i.volumeID = v.volumeID " +
+              "join journal j on v.journalID = j.journalID " +
+              "where ial.doi = :articleURI " +
+              "order by i.created desc ")
+          .addEntity("j", Journal.class)
+          .addEntity("v", Volume.class)
+          .addEntity("i", Issue.class)
+          .setString("articleURI", articleIdentity.getKey())
+          .list();
 
-        List<ArticleIssue> articleIssues = new ArrayList<>(queryResults.size());
-        for (Object[] row : queryResults) {
-          Journal journal = (Journal) row[0];
-          Volume volume = (Volume) row[1];
-          Issue issue = (Issue) row[2];
-          articleIssues.add(new ArticleIssue(issue, volume, journal));
-        }
-
-        return articleIssues;
+      List<ArticleIssue> articleIssues = new ArrayList<>(queryResults.size());
+      for (Object[] row : queryResults) {
+        Journal journal = (Journal) row[0];
+        Volume volume = (Volume) row[1];
+        Issue issue = (Issue) row[2];
+        articleIssues.add(new ArticleIssue(issue, volume, journal));
       }
+
+      return articleIssues;
     });
   }
 

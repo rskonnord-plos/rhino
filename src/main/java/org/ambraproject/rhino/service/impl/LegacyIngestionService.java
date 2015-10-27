@@ -570,18 +570,13 @@ class LegacyIngestionService {
       // JDBC, involving flushing and clearing the session in various orders.  However
       // they all lead to either unique constraint violations or optimistic locking
       // exceptions.
-      parentService.hibernateTemplate.execute(new HibernateCallback<Integer>() {
-        @Override
-        public Integer doInHibernate(Session session) throws HibernateException, SQLException {
-          return session.createSQLQuery(
-              "update articleAsset " +
-                  "set doi = concat('old-', doi), " +
-                  "extension = concat('old-', extension) " +
-                  "where articleID = :articleID"
-          ).setParameter("articleID", article.getID())
-              .executeUpdate();
-        }
-      });
+      parentService.hibernateTemplate.execute(session -> session.createSQLQuery(
+          "update articleAsset " +
+              "set doi = concat('old-', doi), " +
+              "extension = concat('old-', extension) " +
+              "where articleID = :articleID"
+      ).setParameter("articleID", article.getID())
+          .executeUpdate());
       assets.clear();
     }
 
@@ -739,12 +734,7 @@ class LegacyIngestionService {
     for (ArticleAsset articleAsset : article.getAssets()) {
       final AssetFileIdentity assetFileIdentity = AssetFileIdentity.from(articleAsset);
       String entryName = inferFileName(assetFileIdentity) + "." + assetFileIdentity.getFileExtension();
-      map.put(entryName, new Archive.InputStreamSource() {
-        @Override
-        public InputStream open() throws IOException {
-          return parentService.assetService.read(assetFileIdentity);
-        }
-      });
+      map.put(entryName, () -> parentService.assetService.read(assetFileIdentity));
     }
 
     String archiveName = inferFileName(articleIdentity) + ".zip";
@@ -833,12 +823,7 @@ class LegacyIngestionService {
     }
     final byte[] result = outputStream.toByteArray();
 
-    return new Archive.InputStreamSource() {
-      @Override
-      public InputStream open() throws IOException {
-        return new ByteArrayInputStream(result);
-      }
-    };
+    return () -> new ByteArrayInputStream(result);
   }
 
   private static final Pattern PLOS_DOI_NAMING_CONVENTION = Pattern.compile(

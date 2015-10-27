@@ -77,22 +77,19 @@ public class JournalReadServiceImpl extends AmbraService implements JournalReadS
       @Override
       protected Calendar getLastModifiedDate() throws IOException {
         // Look ahead to the parent volume, and return the max lastModified date between it and the issue.
-        return hibernateTemplate.execute(new HibernateCallback<Calendar>() {
-          @Override
-          public Calendar doInHibernate(Session session) throws HibernateException, SQLException {
-            String hql = "select i.lastModified, v.lastModified " +
-                "from Journal j, Issue i, Volume v " +
-                "where j.journalKey = :journalKey " +
-                "and i = j.currentIssue " +
-                "and i in elements(v.issues)";
-            Query query = session.createQuery(hql);
-            query.setParameter("journalKey", journalKey);
-            Object[] results = (Object[]) query.uniqueResult();
-            if (results == null) return null;
+        return hibernateTemplate.execute(session -> {
+          String hql = "select i.lastModified, v.lastModified " +
+              "from Journal j, Issue i, Volume v " +
+              "where j.journalKey = :journalKey " +
+              "and i = j.currentIssue " +
+              "and i in elements(v.issues)";
+          Query query = session.createQuery(hql);
+          query.setParameter("journalKey", journalKey);
+          Object[] results = (Object[]) query.uniqueResult();
+          if (results == null) return null;
 
-            Date mostRecent = (Date) Collections.max(Arrays.asList(results));
-            return copyToCalendar(mostRecent);
-          }
+          Date mostRecent = (Date) Collections.max(Arrays.asList(results));
+          return copyToCalendar(mostRecent);
         });
       }
 
@@ -116,15 +113,12 @@ public class JournalReadServiceImpl extends AmbraService implements JournalReadS
           throw new RestClientException(message, HttpStatus.BAD_REQUEST);
         }
 
-        Object[] parentVolumeResults = hibernateTemplate.execute(new HibernateCallback<Object[]>() {
-          @Override
-          public Object[] doInHibernate(Session session) throws HibernateException, SQLException {
-            String hql = "select volumeUri, displayName, imageUri, title, description " +
-                "from Volume where :issue in elements(issues)";
-            Query query = session.createQuery(hql);
-            query.setParameter("issue", issue);
-            return (Object[]) query.uniqueResult();
-          }
+        Object[] parentVolumeResults = hibernateTemplate.execute(session -> {
+          String hql = "select volumeUri, displayName, imageUri, title, description " +
+              "from Volume where :issue in elements(issues)";
+          Query query = session.createQuery(hql);
+          query.setParameter("issue", issue);
+          return (Object[]) query.uniqueResult();
         });
         VolumeNonAssocView parentVolumeView = (parentVolumeResults == null) ? null
             : VolumeNonAssocView.fromArray(parentVolumeResults);
