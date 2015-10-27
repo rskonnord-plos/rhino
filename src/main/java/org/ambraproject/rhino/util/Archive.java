@@ -244,6 +244,7 @@ public abstract class Archive implements Closeable {
     };
   }
 
+  @FunctionalInterface
   public static interface InputStreamSource {
     public abstract InputStream open() throws IOException;
   }

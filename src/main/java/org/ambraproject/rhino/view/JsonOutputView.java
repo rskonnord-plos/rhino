@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
+@FunctionalInterface
 public interface JsonOutputView {
 
   public abstract JsonElement serialize(JsonSerializationContext context);
