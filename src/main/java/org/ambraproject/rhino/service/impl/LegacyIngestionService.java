@@ -513,9 +513,10 @@ class LegacyIngestionService {
       try {
         terms = parentService.taxonomyService.classifyArticle(xml, article);
       } catch (TaxonomyClassificationService.TaxonomyClassificationServiceNotConfiguredException e) {
-        log.error("Taxonomy server not configured. Ingesting article without categories. " + article.getDoi(), e);
+        log.error("Skipping calls to taxonomy server because it is not configured. " + article.getDoi(), e);
       } catch (IOException e) {
-        log.error("Taxonomy server not responding, but ingesting article anyway." + article.getDoi(), e);
+        log.error("Could not receive a valid response from taxonomy server. (Ingestion operations not interrupted.) "
+            + article.getDoi(), e);
       }
     }
 
