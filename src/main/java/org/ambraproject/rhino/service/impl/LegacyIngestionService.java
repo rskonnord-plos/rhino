@@ -11,10 +11,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
+import org.ambraproject.ApplicationException;
 import org.ambraproject.models.Article;
 import org.ambraproject.models.ArticleAsset;
 import org.ambraproject.models.ArticleRelationship;
-import org.ambraproject.models.Category;
 import org.ambraproject.rhino.content.xml.ArticleXml;
 import org.ambraproject.rhino.content.xml.AssetNodesByDoi;
 import org.ambraproject.rhino.content.xml.AssetXml;
@@ -500,23 +500,29 @@ class LegacyIngestionService {
 
     // Attempt to assign categories to the non-amendment article based on the taxonomy server.  However,
     // we still want to ingest the article even if this process fails.
-    Map<String, Integer> terms;
+    Map<String, Integer> terms = null;
 
+    boolean isAmendment;
     try {
-      if (!parentService.articleService.isAmendment(article)) {
+      isAmendment = parentService.articleService.isAmendment(article);
+    } catch (ApplicationException | NoSuchArticleIdException e) {
+      throw new RuntimeException(e);
+    }
+
+    if (!isAmendment) {
+      try {
         terms = parentService.taxonomyService.classifyArticle(xml, article);
-        if (terms != null && terms.size() > 0) {
-          parentService.articleService.setArticleCategories(article, terms);
-        } else {
-          article.setCategories(new HashMap<Category, Integer>());
-        }
-      } else {
-        article.setCategories(new HashMap<Category, Integer>());
+      } catch (TaxonomyClassificationService.TaxonomyClassificationServiceNotConfiguredException e) {
+        log.error("Taxonomy server not configured. Ingesting article without categories. " + article.getDoi(), e);
+      } catch (IOException e) {
+        log.error("Taxonomy server not responding, but ingesting article anyway." + article.getDoi(), e);
       }
-    } catch (TaxonomyClassificationService.TaxonomyClassificationServiceNotConfiguredException e) {
-      log.error("Taxonomy server not configured. Ingesting article without categories. " + article.getDoi(), e);
-    } catch (Exception e) {
-      log.error("Taxonomy server not responding, but ingesting article anyway." + article.getDoi(), e);
+    }
+
+    if (terms != null && terms.size() > 0) {
+      parentService.articleService.setArticleCategories(article, terms);
+    } else {
+      article.setCategories(new HashMap<>());
     }
   }
 
