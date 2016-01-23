@@ -26,6 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,6 +65,24 @@ public class AssetController extends DoiBasedCrudController {
       throws IOException {
     AssetIdentity id = parse(request);
     assetCrudService.readFigureMetadata(id).respond(request, response, entityGson);
+  }
+
+  /**
+   * Retrieves the metadata from a random article asset
+   *
+   * @param request          HttpServletRequest
+   * @param response         HttpServletResponse
+   * @param journalFilterKey journal filter as it appears in a doi (EG pbio, pgen)
+   * @return a JSON representation of the random article asset
+   * @throws IOException
+   */
+  @Transactional(readOnly = true)
+  @RequestMapping(value = ASSET_META_TEMPLATE, method = RequestMethod.GET, params = "random")
+  public void readRandom(HttpServletRequest request, HttpServletResponse response,
+      @RequestParam(value = "journal", required = false) String journalFilterKey)
+      throws IOException {
+    AssetIdentity id = parse(request);
+    assetCrudService.readRandom(journalFilterKey).respond(request, response, entityGson);
   }
 
 }

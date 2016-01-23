@@ -85,6 +85,13 @@ public interface AssetCrudService extends DoiBasedCrudService {
       throws IOException;
 
   /**
+   * Read the metadata of a random asset file.
+   *
+   * <em>WARNING</em> random retrieval of records is not performant and should be used only for testing
+   */
+  public abstract Transceiver readRandom(String journalFilterKeyword) throws IOException;
+
+  /**
    * Overwrite an existing asset's file with a new file.
    *
    * @param fileContent the file to write

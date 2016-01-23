@@ -44,6 +44,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.plos.crepo.exceptions.ContentRepoException;
@@ -350,6 +351,32 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
         return figureView;
       }
     };
+  }
+
+  @Override
+  public Transceiver readRandom(String journalFilterKeyword) throws IOException {
+    Criteria criteria = hibernateTemplate.getSessionFactory()
+        .getCurrentSession().createCriteria(ArticleAsset.class);
+
+    boolean hasJournalFilter = !Strings.isNullOrEmpty(journalFilterKeyword);
+    if (hasJournalFilter) {
+      criteria.add(Restrictions.like("doi", "info:doi/10.1371/journal." + journalFilterKeyword + "%"));
+    }
+    criteria.add(Restrictions.eq("contextElement", "fig"));
+    criteria.add(Restrictions.sqlRestriction("1=1 order by rand()"));
+    criteria.setMaxResults(1);
+
+    Object result = criteria.uniqueResult();
+    if (result != null) {
+      ArticleAsset randomArticleAsset = (ArticleAsset) result;
+      AssetIdentity assetIdentity = AssetIdentity.create(randomArticleAsset.getDoi());
+      return readMetadata(assetIdentity);
+    }
+
+    String errorMessage = "No assets present in database";
+    errorMessage = hasJournalFilter
+        ? errorMessage + " with journal filter " + journalFilterKeyword : errorMessage;
+    throw new RestClientException(errorMessage, HttpStatus.NOT_FOUND);
   }
 
   @Override
