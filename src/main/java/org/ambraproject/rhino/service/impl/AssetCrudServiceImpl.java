@@ -110,6 +110,8 @@ public class AssetCrudServiceImpl extends AmbraService implements AssetCrudServi
     } else {
       saveAssetForcingParentArticle(assetToPersist);
     }
+    hibernateTemplate.flush();
+    hibernateTemplate.refresh(assetToPersist);
 
     // Return the result
     return new WriteResult<>(assetToPersist, WriteResult.Action.CREATED);

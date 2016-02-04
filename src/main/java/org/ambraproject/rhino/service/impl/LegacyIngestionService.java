@@ -192,6 +192,8 @@ class LegacyIngestionService {
     } else {
       parentService.hibernateTemplate.update(article);
     }
+    parentService.hibernateTemplate.flush();
+    parentService.hibernateTemplate.refresh(article);
   }
 
   /**
