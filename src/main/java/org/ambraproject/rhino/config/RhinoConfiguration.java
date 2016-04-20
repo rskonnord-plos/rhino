@@ -64,18 +64,26 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.hibernate.SessionFactory;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DataSourceConnectionProvider;
+import org.jooq.impl.DefaultConfiguration;
+import org.jooq.impl.DefaultDSLContext;
 import org.plos.crepo.config.ContentRepoAccessConfig;
 import org.plos.crepo.service.ContentRepoService;
 import org.plos.crepo.service.ContentRepoServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.File;
@@ -86,6 +94,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Properties;
 
+
 /**
  * Bean configuration for the application.
  * <p/>
@@ -94,6 +103,80 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 public class RhinoConfiguration extends BaseConfiguration {
+
+  @Resource(name="hibernateDataSource")
+  private DataSource dataSource;
+
+  @Bean
+  public LazyConnectionDataSourceProxy lazyConnectionDataSource() {
+    //return new LazyConnectionDataSourceProxy(webApplicationContext.getBean(javax.sql.DataSource.class));
+    return new LazyConnectionDataSourceProxy(dataSource);
+  }
+
+  @Bean
+  public TransactionAwareDataSourceProxy transactionAwareDataSource() {
+    return new TransactionAwareDataSourceProxy(lazyConnectionDataSource());
+  }
+
+  @Bean(name="jooqTXM")
+  public DataSourceTransactionManager jooqTransactionManager() {
+    return new DataSourceTransactionManager(lazyConnectionDataSource());
+  }
+
+  @Bean
+  public DataSourceConnectionProvider connectionProvider() {
+    return new DataSourceConnectionProvider(transactionAwareDataSource());
+  }
+
+//  @Bean
+//  public JOOQToSpringExceptionTransformer jooqToSpringExceptionTransformer() {
+//    return new JOOQToSpringExceptionTransformer();
+//  }
+
+  //// use this implementation class if the exception transformer turns out to be necessary
+// (see http://www.petrikainulainen.net/programming/jooq/using-jooq-with-spring-configuration/)
+//  import org.jooq.ExecuteContext;
+//  import org.jooq.SQLDialect;
+//  import org.jooq.impl.DefaultExecuteListener;
+//  import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+//  import org.springframework.jdbc.support.SQLExceptionTranslator;
+//  import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+//
+//
+//  public class JOOQToSpringExceptionTransformer extends DefaultExecuteListener {
+//
+//    @Override
+//    public void exception(ExecuteContext ctx) {
+//      SQLDialect dialect = ctx.configuration().dialect();
+//      SQLExceptionTranslator translator = (dialect != null)
+//          ? new SQLErrorCodeSQLExceptionTranslator(dialect.name())
+//          : new SQLStateSQLExceptionTranslator();
+//
+//      ctx.exception(translator.translate("jOOQ", ctx.sql(), ctx.sqlException()));
+//    }
+//  }
+//
+  // also see http://www.jooq.org/doc/3.7/manual-single-page/#jooq-with-spring for another implementation (XML config)
+  //
+  @Bean
+  public DefaultConfiguration configuration() {
+    DefaultConfiguration jooqConfiguration = new DefaultConfiguration();
+
+    jooqConfiguration.set(connectionProvider());
+//    jooqConfiguration.set(new DefaultExecuteListenerProvider(
+//        jooqToSpringExceptionTransformer()
+//    ));
+
+    SQLDialect dialect = SQLDialect.valueOf("MYSQL");
+    jooqConfiguration.set(dialect);
+
+    return jooqConfiguration;
+  }
+
+  @Bean
+  public DefaultDSLContext dsl() {
+    return new DefaultDSLContext(configuration());
+  }
 
   /**
    * Static stuff outside the Spring framework that needs to be run on startup. Ideally this should be empty.
