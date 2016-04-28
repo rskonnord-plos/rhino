@@ -17,10 +17,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.ambraproject.rhino.rest.RestClientException;
+import org.springframework.http.HttpStatus;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -75,18 +79,25 @@ public class ManifestXml extends AbstractXpathReader {
   }
 
 
-  private transient ImmutableMap<String, Asset> parsedAssets;
+  private transient Map<String, Asset> parsedAssets;
 
   public ImmutableList<Asset> parse() {
-    if (parsedAssets != null) return parsedAssets.values().asList();
-
-    // Build into ImmutableMap to force all Assets to have unique identities
-    ImmutableMap.Builder<String, Asset> assets = ImmutableMap.builder();
+    if (parsedAssets == null) {
+      parsedAssets = new HashMap<>();
+    } else {
+      return ImmutableList.copyOf(parsedAssets.values());
+    }
 
     List<Node> assetNodes = readNodeList("//article|//object");
     for (Node assetNode : assetNodes) {
-      String nodeName = assetNode.getNodeName();
       String uri = readString("@uri", assetNode);
+
+      if (parsedAssets.containsKey(uri)) {
+        String message = String.format("Duplicate keys in manifest: %s", uri);
+        throw new RestClientException(message, HttpStatus.BAD_REQUEST);
+      }
+
+      String nodeName = assetNode.getNodeName();
       String mainEntry = readString("@main-entry", assetNode);
       String strkImage = readString("@strkImage", assetNode);
 
@@ -104,10 +115,10 @@ public class ManifestXml extends AbstractXpathReader {
         }
       }
 
-      assets.put(uri, new Asset(assetType, uri, mainEntry, isStrikingImage, representations));
+      parsedAssets.put(uri, new Asset(assetType, uri, mainEntry, isStrikingImage, representations));
     }
 
-    return (parsedAssets = assets.build()).values().asList();
+    return ImmutableList.copyOf(parsedAssets.values());
   }
 
   /**
