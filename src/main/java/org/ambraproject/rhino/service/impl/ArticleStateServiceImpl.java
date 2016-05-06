@@ -16,6 +16,8 @@ package org.ambraproject.rhino.service.impl;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.ambraproject.models.Article;
 import org.ambraproject.models.ArticleAsset;
 import org.ambraproject.models.Journal;
@@ -33,6 +35,8 @@ import org.ambraproject.service.article.NoSuchArticleIdException;
 import org.ambraproject.util.DocumentBuilderFactoryCreator;
 import org.apache.camel.CamelExecutionException;
 import org.apache.commons.configuration.Configuration;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.DetachedCriteria;
@@ -51,10 +55,18 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -149,6 +161,7 @@ public class ArticleStateServiceImpl extends AmbraService implements ArticleStat
    */
   private void updateSolrIndex(ArticleIdentity articleId, Article article, boolean isPublished)
       throws IOException {
+    MessageSender dummyMessageSender = new DummyMessageSender();
     if (isPublished) {
       Document doc;
       try (InputStream xml = articleCrudService.readXml(articleId)) {
@@ -170,14 +183,83 @@ public class ArticleStateServiceImpl extends AmbraService implements ArticleStat
           throw new RuntimeException("Bad XML retrieved for " + article.getDoi(), se);
         }
       }
+      if (doc.getElementsByTagName("body").getLength() == 0) {
+        // AOP XML, so populate create a body element with extracted text from PDF
+        if (articleHasPdfRepresentation(article)) {
+          // TODO: get PDF representation of article from repo
+          dummyMessageSender.sendMessage("pre-insert:", doc);
+          log.info("Sent pre-insert dummy message");
+          String filePath = "/home/jfesenko/Documents/rhino/em_sample.pdf";
+          PDFTextStripper pdfStripper = new PDFTextStripper();
+          PDDocument pdDoc = PDDocument.load(new File(filePath));
+          Element body = doc.createElementNS(XML_NAMESPACE, "body");
+          doc.getDocumentElement().appendChild(body);
+          String pdfText = pdfStripper.getText(pdDoc);
+          body.appendChild(doc.createTextNode(pdfText));
+          dummyMessageSender.sendMessage("post-insert:", doc);
+          log.info("Sent post-insert dummy message");
+        }
+      }
       doc = appendJournals(doc, articleId);
       doc = appendStrikingImage(doc, article);
       messageSender.sendMessage(ambraConfiguration.getString(
           "ambra.services.search.articleIndexingQueue", null), doc);
+      log.info("Sent XML doc message to indexing queue");
     } else {
       messageSender.sendMessage(ambraConfiguration.getString("ambra.services.search.articleDeleteQueue", null),
           articleId.getKey());
     }
+  }
+
+  // borrowed from rhino test code
+  private class DummyMessageSender implements MessageSender {
+
+    public ListMultimap<String, String> messagesSent = LinkedListMultimap.create();
+    public Map<String, Object> headersSent;
+
+    @Override
+    public void sendMessage(String destination, String body) {
+      messagesSent.put(destination, body);
+    }
+
+    @Override
+    public void sendMessage(String destination, Document body) {
+      try {
+        TransformerFactory factory = TransformerFactory.newInstance();
+        Transformer transformer = factory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        DOMSource source = new DOMSource(body);
+        transformer.transform(source, result);
+        messagesSent.put(destination, writer.toString());
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    @Override
+    public void sendMessage(String destination, Object body, Map<String, Object> headers) {
+      messagesSent.put(destination, (String)body);
+      headersSent = headers;
+    }
+  }
+  /**
+   * Iterate through an article's assets to determine if the article has a PDF representation The PDF asset DOI is equal
+   * to the article DOI, and the extension is "PDF".
+   *
+   * @param article the article to analyze
+   * @return boolean indicating existence of article PDF representation
+   */
+  private static boolean articleHasPdfRepresentation(Article article) {
+    for (ArticleAsset articleAsset : article.getAssets()) {
+      if (articleAsset.getDoi().equals(article.getDoi())
+          && articleAsset.getExtension().equals("PDF")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
