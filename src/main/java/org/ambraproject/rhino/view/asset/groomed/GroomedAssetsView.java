@@ -61,6 +61,7 @@ public class GroomedAssetsView {
         miscellaneous.add(asset);
       }
     }
+    if (articleXml == null) throw new IllegalStateException("articleXml not found");
 
     // By legacy convention, these asset files have figure fields that are redundant to the article itself.
     // So, suppress those fields the same way as for a figure thumbnail.
