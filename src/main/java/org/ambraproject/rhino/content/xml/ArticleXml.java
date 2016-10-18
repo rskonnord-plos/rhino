@@ -317,7 +317,7 @@ public class ArticleXml extends AbstractArticleXml<ArticleMetadata> {
 
   private List<AssetMetadata> parseAssets() {
     AssetNodesByDoi nodeMap = findAllAssetNodes();
-    return nodeMap.getDois().stream().map((Doi assetDoi) -> {
+    return nodeMap.getDois().parallelStream().map((Doi assetDoi) -> {
       ImmutableList<Node> nodes = nodeMap.getNodes(assetDoi);
       List<AssetMetadata> assetMetadataList = nodes.stream()
           .map(assetNode -> new AssetXml(assetNode, assetDoi).build())
