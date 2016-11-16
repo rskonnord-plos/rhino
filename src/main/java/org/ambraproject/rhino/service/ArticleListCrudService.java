@@ -7,7 +7,7 @@ import org.ambraproject.rhino.rest.response.ServiceResponse;
 import org.ambraproject.rhino.view.journal.ArticleListView;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 public interface ArticleListCrudService {
 
@@ -19,10 +19,10 @@ public interface ArticleListCrudService {
    * @param articleIds  the non-empty set of articles that will display the link
    * @return the created list (augmented with its parent journal key)
    */
-  ArticleListView create(ArticleListIdentity identity, String displayName, Set<ArticleIdentifier> articleIds);
+  ArticleListView create(ArticleListIdentity identity, String displayName, List<ArticleIdentifier> articleIds);
 
   ArticleListView update(ArticleListIdentity identity, Optional<String> displayName,
-                         Optional<? extends Set<ArticleIdentifier>> articleIds);
+                         Optional<? extends List<ArticleIdentifier>> articleIds);
 
   ServiceResponse<ArticleListView> read(ArticleListIdentity identity);
 

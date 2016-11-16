@@ -1,8 +1,8 @@
 package org.ambraproject.rhino.view.article;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -12,19 +12,20 @@ import org.ambraproject.rhino.identity.ArticleListIdentity;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListInputView {
 
   private final Optional<ArticleListIdentity> identity;
   private final Optional<String> title;
-  private final Optional<ImmutableSet<ArticleIdentifier>> articleIds;
+  private final Optional<ImmutableList<ArticleIdentifier>> articleIds;
 
-  private ListInputView(ArticleListIdentity identity, String title, Set<ArticleIdentifier> articleIds) {
+  private ListInputView(ArticleListIdentity identity, String title, List<ArticleIdentifier> articleIds) {
     this.identity = Optional.fromNullable(identity);
     this.title = Optional.fromNullable(title);
-    this.articleIds = (articleIds == null) ? Optional.<ImmutableSet<ArticleIdentifier>>absent()
-        : Optional.of(ImmutableSet.copyOf(articleIds));
+    this.articleIds = (articleIds == null) ? Optional.absent()
+        : Optional.of(ImmutableList.copyOf(articleIds));
   }
 
   public Optional<ArticleListIdentity> getIdentity() {
@@ -35,7 +36,7 @@ public class ListInputView {
     return title;
   }
 
-  public Optional<ImmutableSet<ArticleIdentifier>> getArticleIds() {
+  public Optional<ImmutableList<ArticleIdentifier>> getArticleIds() {
     return articleIds;
   }
 
@@ -63,14 +64,11 @@ public class ListInputView {
         throw new PartialIdentityException();
       }
 
-      final Set<ArticleIdentifier> articleIds;
+      final List<ArticleIdentifier> articleIds;
       if (inp.articleDois == null) {
         articleIds = null;
       } else {
-        articleIds = Sets.newLinkedHashSetWithExpectedSize(inp.articleDois.size());
-        for (String articleDoi : inp.articleDois) {
-          articleIds.add(ArticleIdentifier.create(articleDoi));
-        }
+        articleIds = inp.articleDois.stream().map(ArticleIdentifier::create)            .collect(Collectors.toList());
       }
 
       return new ListInputView(identity, inp.title, articleIds);
